@@ -1,0 +1,83 @@
+/* Hintergrund und allgemeine Schrift */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container für das Login-Formular */
+.login-container {
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  width: 320px;
+  text-align: center;
+}
+
+/* Überschrift */
+.login-container h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #333;
+}
+
+/* Eingabefelder */
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border 0.3s;
+}
+
+.login-container input[type="password"]:focus {
+  border-color: #74ebd5;
+  outline: none;
+}
+
+/* Buttons */
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #74ebd5;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-container button:hover {
+  background-color: #67d9c6;
+  transform: translateY(-2px);
+}
+
+.login-container button:active {
+  transform: translateY(0);
+}
+
+/* Fehlernachricht */
+#errorMessage {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #e74c3c;
+}
+
+/* Gast-Button Styling leicht anders */
+#guestButton {
+  background-color: #ACB6E5;
+}
+
+#guestButton:hover {
+  background-color: #8fa3db;
+}
