@@ -1,4 +1,5 @@
 const tbody = document.querySelector("#kinderDetails tbody");
+const role = localStorage.getItem("userRole"); // Rolle aus localStorage
 
 // Kinder aus der DB laden
 async function ladeKinderDetails() {
@@ -12,12 +13,14 @@ async function ladeKinderDetails() {
 
     kinderListe.forEach(kind => {
       const tr = document.createElement("tr");
-      tr.dataset.id = kind.id; // <-- ID speichern
+      tr.dataset.id = kind.id; // ID speichern
+
+      // Nur admin darf contenteditable setzen
       tr.innerHTML = `
         <td>${kind.name}</td>
-        <td contenteditable="true">${kind.klasse || ""}</td>
-        <td contenteditable="true">${kind.eltern || ""}</td>
-        <td contenteditable="true">${kind.telefon || ""}</td>
+        <td ${role === "admin" ? 'contenteditable="true"' : ""}>${kind.klasse || ""}</td>
+        <td ${role === "admin" ? 'contenteditable="true"' : ""}>${kind.eltern || ""}</td>
+        <td ${role === "admin" ? 'contenteditable="true"' : ""}>${kind.telefon || ""}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -28,20 +31,18 @@ async function ladeKinderDetails() {
   }
 }
 
-// Änderungen speichern beim Verlassen der Zelle
+// Änderungen speichern beim Verlassen der Zelle (nur admin erlaubt)
 tbody.addEventListener("blur", async (e) => {
+  if (role !== "admin") return; // Gäste dürfen nichts ändern
   const td = e.target;
   if (!td.matches("td[contenteditable='true']")) return;
+
   const tr = td.parentElement;
   const id = tr.dataset.id;
   if (!id) return;
 
   const spaltenIndex = td.cellIndex;
-  const feldMap = {
-    1: "klasse",
-    2: "eltern",
-    3: "telefon"
-  };
+  const feldMap = { 1: "klasse", 2: "eltern", 3: "telefon" };
   const feldName = feldMap[spaltenIndex];
   if (!feldName) return;
 
@@ -63,15 +64,14 @@ tbody.addEventListener("blur", async (e) => {
   }
 }, true);
 
-
-// Enter-Taste speichert automatisch
+// Enter-Taste speichert automatisch (nur admin)
 tbody.addEventListener("keydown", (e) => {
+  if (role !== "admin") return; // Gäste dürfen nichts ändern
   if (e.key === "Enter") {
     e.preventDefault(); // Kein Zeilenumbruch
     e.target.blur();    // blur-Event feuert und speichert
   }
 });
-
 
 // Funktion direkt aufrufen
 ladeKinderDetails();

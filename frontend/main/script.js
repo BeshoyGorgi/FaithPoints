@@ -35,7 +35,8 @@ ladeKinder(); // Funktion direkt aufrufen
 
 
 // === Kind hinzufügen ===
-plusButton.addEventListener("click", async () => {
+plusButton?.addEventListener("click", async () => {
+  if (role === "guest") return; // Gäste blockieren
   const name = prompt("Wie heißt das neue Kind?");
   if (!name || name.trim() === "") return;
 
@@ -88,7 +89,8 @@ plusButton.addEventListener("click", async () => {
 
 
 // === Kind löschen ===
-minusButton.addEventListener("click", async () => {
+minusButton?.addEventListener("click", async () => {
+  if (role === "guest") return; // Gäste blockieren
   const name = prompt("Wie heißt das Kind, das du löschen möchtest?");
   if (!name || name.trim() === "") return;
 
@@ -132,6 +134,7 @@ minusButton.addEventListener("click", async () => {
 
 // === Klick auf Punkte-Zelle ===
 tabelle.addEventListener("click", (e) => {
+  if (role === "guest") return; // Gäste können keine Punkte ändern
   const zelle = e.target.closest("td");
   if (!zelle) return;
 
@@ -152,8 +155,10 @@ tabelle.addEventListener("click", (e) => {
   punkteMenue.classList.remove("hidden");
 });
 
+
 // === Punkte-Menü Klick ===
 punkteMenue.addEventListener("click", async (e) => {
+  if (role === "guest") return; // Gäste dürfen keine Punkte klicken
   const button = e.target.closest("button");
   if (!button || !aktiveZelle) return;
 
@@ -234,6 +239,7 @@ markiereHoverbareZellen();
 
 // === Name bearbeiten bei Doppelklick ===
 tabelle.addEventListener("dblclick", (e) => {
+  if (role === "guest") return; // Gäste dürfen nichts bearbeiten
   const zelle = e.target.closest("td");
   if (!zelle || zelle.cellIndex !== 0) return; // nur erste Spalte (Name)
 
@@ -343,6 +349,7 @@ function aktualisiereGesamt(zeile) {
 
 // === Zahlen manuell ändern bei Doppelklick (außer Name und Gesamt) ===
 tabelle.addEventListener("dblclick", (e) => {
+  if (role === "guest") return; // Gäste dürfen nichts bearbeiten
   const zelle = e.target.closest("td");
   if (!zelle) return;
 
@@ -423,3 +430,30 @@ tabelle.addEventListener("dblclick", (e) => {
 document.getElementById("zuDetails").addEventListener("click", () => {
   window.location.href = "/frontend/details/details.html";
 });
+
+
+// === login ====
+
+const role = localStorage.getItem("userRole");
+
+if (!role) {
+  window.location.href = "../login/login.html";
+}
+// Alle Zellen vorbereiten
+document.querySelectorAll("#meineTabelle td").forEach(td => {
+  if (role === "admin") {
+    // Nur Punkte-Spalten editierbar (Name & Gesamt = nicht editierbar)
+    const spalte = td.cellIndex;
+    td.contentEditable = spalte !== 0 && spalte !== 5;
+  } else {
+    td.contentEditable = false; // Gast kann nichts bearbeiten
+  }
+});
+
+// Buttons für Gäste ausblenden
+if (role === "guest") {
+  document.getElementById("addRow")?.remove();
+  document.getElementById("removeColumn")?.remove();
+}
+
+
