@@ -1,6 +1,8 @@
 # 🎵 Al7an Punkte
 
-Ein webbasiertes Verwaltungssystem für Kinderpunkte (Hymne, Verhalten, Anwesenheit) — entwickelt mit **Node.js**, **Express** und **MySQL**, inklusive Frontend in **HTML**, **CSS** und **JavaScript**.
+Al7an Punkte ist ein webbasiertes Verwaltungssystem zur Erfassung und Auswertung von Kinderpunkten in verschiedenen Kategorien wie Hymne, Verhalten und Anwesenheit.
+Es ermöglicht das Anlegen, Bearbeiten, Löschen und Verwalten von Kinderprofilen, einschließlich Bild-Upload und Punktespeicherung.
+Das System wurde mit Node.js, Express und MySQL entwickelt und enthält ein Frontend in HTML, CSS und JavaScript.
 
 ---
 
