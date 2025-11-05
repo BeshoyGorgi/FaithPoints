@@ -11,11 +11,6 @@ Das System wurde mit Node.js, Express und MySQL entwickelt und enthält ein Fron
 2. [Funktionen](#-funktionen)
 3. [Technologien](#-technologien)
 4. [Projektstruktur](#-projektstruktur)
-5. [Installation & Start](#-installation--start)
-6. [API-Endpunkte](#-api-endpunkte)
-7. [Datenbank-Struktur](#-datenbank-struktur)
-8. [Deployment](#-deployment)
-9. [Autor](#-autor)
 
 ---
 
