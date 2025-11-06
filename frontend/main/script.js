@@ -132,7 +132,7 @@ minusButton?.addEventListener("click", async () => {
 
 
 
-// === Klick auf Punkte-Zelle ===
+// === Klick auf Punkte-Zelle +20,-20 +10, ...===
 tabelle.addEventListener("click", (e) => {
   if (role === "guest") return; // Gäste können keine Punkte ändern
   const zelle = e.target.closest("td");
@@ -146,6 +146,21 @@ tabelle.addEventListener("click", (e) => {
 
   aktiveZelle = zelle;
 
+  // === Dynamisch erlaubte Buttons anzeigen ===
+  const alleButtons = punkteMenue.querySelectorAll("button");
+  alleButtons.forEach(btn => btn.style.display = "none"); // erst alle verstecken
+
+  if (spaltenIndex === 1) {
+    // Hymne-Spalte
+    zeigeButtons([20, -20, 10, -10]);
+  } else if (spaltenIndex === 2) {
+    // Verhalten-Spalte
+    zeigeButtons([10, -10, 5, -5]);
+  } else if (spaltenIndex === 3 || spaltenIndex === 4) {
+    // Anwesenheit G / U
+    zeigeButtons([5, -5]);
+  }
+
   // Menüposition berechnen
   const rect = zelle.getBoundingClientRect();
   punkteMenue.style.top = `${rect.bottom + window.scrollY + 5}px`;
@@ -154,6 +169,15 @@ tabelle.addEventListener("click", (e) => {
   // Menü anzeigen
   punkteMenue.classList.remove("hidden");
 });
+
+// === Hilfsfunktion zum Anzeigen bestimmter Buttons ===
+function zeigeButtons(werte) {
+  werte.forEach(wert => {
+    const btn = punkteMenue.querySelector(`button[data-wert="${wert}"]`);
+    if (btn) btn.style.display = "inline-block";
+  });
+}
+
 
 
 // === Punkte-Menü Klick ===
