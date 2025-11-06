@@ -490,4 +490,3 @@ logoutButton.addEventListener("click", () => {
   // Zur Login-Seite weiterleiten
   window.location.href = "/frontend/login/login.html";
 });
-

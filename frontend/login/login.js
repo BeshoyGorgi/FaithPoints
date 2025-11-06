@@ -27,5 +27,3 @@ function logout() {
   localStorage.removeItem("userRole");
  window.location.href = "../main/login.html";
 }
-
-
