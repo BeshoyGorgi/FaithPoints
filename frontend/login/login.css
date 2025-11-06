@@ -28,7 +28,8 @@ body {
   color: #333;
 }
 
-.login-container input[type="password"] {
+.login-container input[type="password"],
+.login-container input[type="email"] {
   width: 100%;
   max-width: 300px;
   padding: 12px 15px;
@@ -39,7 +40,8 @@ body {
   transition: border 0.3s;
 }
 
-.login-container input[type="password"]:focus {
+.login-container input[type="password"]:focus,
+.login-container input[type="email"]:focus {
   border-color: #74ebd5;
   outline: none;
 }
