@@ -13,10 +13,10 @@ app.use(express.json());
 
 //Emails
 const users = [
-  { email: "Erste-Zweite-K@al7an.com", password: "12" },
-  { email: "Dritte-Vierte-K@al7an.com", password: "34" },
-  { email: "Fünfte-Sechste-K@al7an.com", password: "56" },
-  { email: "Oberstufe@al7an.com", password: "78" }
+  { email: "Kirchenchor-Klasse1@al7an.com", password: "KGK1" },
+  { email: "Kirchenchor-Klasse2@al7an.com", password: "KGK2" },
+  { email: "Kirchenchor-Klasse3@al7an.com", password: "KGK3" },
+  { email: "Kirchenchor-Oberstufe@al7an.com", password: "KGKO" }
 ];
 
 
