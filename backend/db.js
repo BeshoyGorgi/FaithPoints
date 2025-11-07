@@ -2,7 +2,7 @@ import mysql from "mysql2";
 
 const db = mysql.createConnection({
   host: "localhost", //  http://localhost:3000/api/kinder
-  user: "root",
+  user: "Beshoy",
   password: "IHIBHE10d.",
   database: "Faith_Points"
 });

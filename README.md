@@ -102,7 +102,7 @@ user_email varchar(255)
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
+  user: 'Beshoy',
   password: 'deinPasswort',
   database: 'Faith_Points'
 });
