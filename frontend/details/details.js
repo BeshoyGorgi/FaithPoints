@@ -1,13 +1,12 @@
-// details.js - ersetzt deinen bisherigen Code
+import { API_BASE_URL } from "../config.js";
 
 const tbody = document.querySelector("#kinderDetails tbody");
 
 // ----- Lade Kinder -----
 async function ladeKinderDetails() {
   try {
-    const email = localStorage.getItem("email"); // ✅ Email holen
-
-    const response = await fetch(`http://localhost:3000/api/kinder?email=${email}`); // ✅ an API übergeben
+    const email = localStorage.getItem("email"); // Email holen
+    const response = await fetch(`${API_BASE_URL}/api/kinder?email=${email}`);
     if (!response.ok) throw new Error("Fehler beim Laden der Kinder");
 
     const kinderListe = await response.json();
@@ -17,7 +16,6 @@ async function ladeKinderDetails() {
       const tr = document.createElement("tr");
       tr.dataset.id = kind.id;
 
-      // Falls kein Bild existiert, relativer Platzhalter
       const bildUrl = kind.bildUrl ? kind.bildUrl : "../images/platzhalter.png";
 
       tr.innerHTML = `
@@ -36,7 +34,6 @@ async function ladeKinderDetails() {
         <td contenteditable="true">${escapeHtml(kind.eltern || "")}</td>
         <td contenteditable="true">${escapeHtml(kind.telefon || "")}</td>
       `;
-
       tbody.appendChild(tr);
     });
 
@@ -46,8 +43,7 @@ async function ladeKinderDetails() {
   }
 }
 
-
-// ----- Save changes on blur (wie vorher) -----
+// ----- Save changes on blur -----
 tbody.addEventListener("blur", async (e) => {
   const td = e.target;
   if (!td.matches("td[contenteditable='true']")) return;
@@ -56,21 +52,18 @@ tbody.addEventListener("blur", async (e) => {
   const id = tr.dataset.id;
   if (!id) return;
 
-  const spaltenIndex = td.cellIndex; // 0 Bild, 1 Name, 2 Klasse, 3 Eltern, 4 Telefon
-  // Map anpassen - Name ist nicht editierbar in deinem Beispiel, wir speichern nur 2..4
   const feldMap = { 2: "klasse", 3: "eltern", 4: "telefon" };
-  const feldName = feldMap[spaltenIndex];
+  const feldName = feldMap[td.cellIndex];
   if (!feldName) return;
 
   const wert = td.textContent.trim();
 
   try {
-    const response = await fetch(`http://localhost:3000/api/kinder/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [feldName]: wert })
     });
-
     if (!response.ok) {
       const result = await response.json();
       alert(result.error || "Fehler beim Speichern in der DB.");
@@ -80,7 +73,7 @@ tbody.addEventListener("blur", async (e) => {
   }
 }, true);
 
-// ----- Enter speichert (wie vorher) -----
+// ----- Enter speichert -----
 tbody.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -88,9 +81,8 @@ tbody.addEventListener("keydown", (e) => {
   }
 });
 
-// ----- Bild-Upload (nur Admins) -----
+// ----- Bild-Upload -----
 tbody.addEventListener("change", async (e) => {
-
   const fileInput = e.target;
   if (!fileInput.classList.contains("bild-upload")) return;
 
@@ -102,22 +94,21 @@ tbody.addEventListener("change", async (e) => {
   formData.append("bild", file);
 
   try {
-    const response = await fetch(`http://localhost:3000/api/kinder/${id}/bild`, {
+    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, {
       method: "POST",
       body: formData
     });
 
     if (!response.ok) {
-      const err = await response.json().catch(()=>({error: 'Upload fehlgeschlagen'}));
+      const err = await response.json().catch(() => ({ error: 'Upload fehlgeschlagen' }));
       throw new Error(err.error || "Fehler beim Hochladen");
     }
 
     const result = await response.json();
-    // Neues Bild anzeigen (erwartet result.bildUrl)
     const img = fileInput.parentElement.querySelector("img.kinder-bild");
     if (img && result.bildUrl) img.src = result.bildUrl;
     alert("Bild erfolgreich aktualisiert!");
-   ladeKinderDetails(); // Tabelle neu laden, damit neues Bild sichtbar ist
+    ladeKinderDetails();
 
   } catch (err) {
     console.error("Fehler beim Hochladen des Bildes:", err);
@@ -125,7 +116,7 @@ tbody.addEventListener("change", async (e) => {
   }
 });
 
-// ----- Bild löschen (Button) -----
+// ----- Bild löschen -----
 tbody.addEventListener("click", async (e) => {
   const btn = e.target;
   if (!btn.classList.contains("bild-loeschen")) return;
@@ -134,12 +125,9 @@ tbody.addEventListener("click", async (e) => {
   if (!confirm("Bild wirklich löschen?")) return;
 
   try {
-    const response = await fetch(`http://localhost:3000/api/kinder/${id}/bild`, {
-      method: "DELETE"
-    });
+    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, { method: "DELETE" });
     if (!response.ok) throw new Error("Fehler beim Löschen");
 
-    // aktualisiere Anzeige: setze Platzhalter
     const img = btn.parentElement.querySelector("img.kinder-bild");
     if (img) img.src = "../images/platzhalter.png";
     alert("Bild gelöscht.");
@@ -168,9 +156,8 @@ document.getElementById("zurueckButton").addEventListener("click", () => {
   window.location.href = "/Faith_Points/frontend/main/index.html";
 });
 
-// logout Button
+// Logout
 const logoutButton = document.getElementById("logoutButton");
-
 logoutButton.addEventListener("click", () => {
   localStorage.removeItem("email");
   window.location.href = "/Faith_Points/frontend/login/login.html";

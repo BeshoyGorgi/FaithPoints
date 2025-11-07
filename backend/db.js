@@ -13,3 +13,6 @@ const pool = mysql.createPool({
 });
 
 export default pool;
+
+
+//Webseite URL ändern in config.js
