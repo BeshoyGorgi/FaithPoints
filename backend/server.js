@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // ==== Statische Frontend-Dateien ====
-const frontendPath = path.join(process.cwd(), "frontend");
+const frontendPath = path.join(process.cwd(), "..", "frontend");
 app.use(express.static(frontendPath));
 
 // Standardroute → login.html
