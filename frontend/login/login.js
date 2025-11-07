@@ -28,7 +28,7 @@ loginButton.addEventListener("click", async () => {
 
     const result = await response.json();
     localStorage.setItem("email", result.email);
-    window.location.href = "/main/index.html";
+    window.location.href = "../main/index.html";
 
   } catch (err) {
     console.error("Login Fehler:", err);
