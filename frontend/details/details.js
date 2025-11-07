@@ -131,6 +131,7 @@ tbody.addEventListener("click", async (e) => {
     const img = btn.parentElement.querySelector("img.kinder-bild");
     if (img) img.src = "../images/platzhalter.png";
     alert("Bild gelöscht.");
+    ladeKinderDetails();
   } catch (err) {
     console.error("Fehler beim Löschen:", err);
     alert("Fehler beim Löschen des Bildes.");
