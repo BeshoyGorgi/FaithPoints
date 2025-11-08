@@ -1,4 +1,4 @@
-export const API_BASE_URL = "faithpoints-production.up.railway.app"; 
+export const API_BASE_URL = "https://faithpoints-production.up.railway.app"; 
 
 // https://faith-points.onrender.com 
 
