@@ -138,4 +138,4 @@ app.delete("/api/kinder/:id/bild", async (req, res) => {
 
 // === Server starten ===
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server läuft auf Port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`✅ Server läuft auf Port ${PORT}`));
