@@ -13,13 +13,18 @@ let aktiveZelle = null;
 
 // === Farbe nach zeit ändern ===
 function updateRowColor(row) {
-  const lastUpdated = new Date(row.dataset.lastUpdated);
-  const diffDays = (Date.now() - lastUpdated) / (1000 * 60); //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
+  const now = Date.now();
+  const diffHymne = row.dataset.lastUpdatedHymne ? (now - new Date(row.dataset.lastUpdatedHymne)) / (1000 * 60) : 0;
+  const diffAnwG = row.dataset.lastUpdatedAnwesenheitG ? (now - new Date(row.dataset.lastUpdatedAnwesenheitG)) / (1000 * 60) : 0; //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
+  const diffAnwU = row.dataset.lastUpdatedAnwesenheitU ? (now - new Date(row.dataset.lastUpdatedAnwesenheitU)) / (1000 * 60) : 0; //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
 
-  if (diffDays >= RED_AFTER_DAYS) row.style.backgroundColor = "red";
-  else if (diffDays >= ORANGE_AFTER_DAYS) row.style.backgroundColor = "orange";
-  else row.style.backgroundColor = ""; // Standardfarbe
+  const diffMinutes = Math.max(diffHymne, diffAnwG, diffAnwU); // maximale Zeit der 3 Spalten
+
+  if (diffMinutes >= RED_AFTER_DAYS * 24 * 60) row.style.backgroundColor = "red";
+  else if (diffMinutes >= ORANGE_AFTER_DAYS * 24 * 60) row.style.backgroundColor = "orange";
+  else row.style.backgroundColor = "";
 }
+
 
 // Prüft alle 10 Sekunden, ob sich die Farbe ändern muss
 setInterval(() => {
@@ -38,7 +43,11 @@ async function ladeKinder() {
     kinder.forEach(k => {
     const neueZeile = document.createElement("tr");
     neueZeile.dataset.id = k.id;
-    neueZeile.dataset.lastUpdated = k.last_updated; // Timestamp speichern
+
+    neueZeile.dataset.lastUpdatedHymne = k.last_updated;
+    neueZeile.dataset.lastUpdatedAnwesenheitG = k.last_updated;
+    neueZeile.dataset.lastUpdatedAnwesenheitU = k.last_updated;
+    
     neueZeile.innerHTML = `
       <td>${k.name}</td>
       <td>${k.hymne}</td>
@@ -86,6 +95,12 @@ plusButton?.addEventListener("click", async () => {
     if (response.ok) {
       const neueZeile = document.createElement("tr");
       neueZeile.dataset.id = result.id;
+
+      // NEU: Timestamps initialisieren
+      neueZeile.dataset.lastUpdatedHymne = new Date();
+      neueZeile.dataset.lastUpdatedAnwesenheitG = new Date();
+      neueZeile.dataset.lastUpdatedAnwesenheitU = new Date();
+
       neueZeile.innerHTML = `
         <td>${result.name}</td>
         <td>${result.hymne}</td>
@@ -189,8 +204,15 @@ punkteMenue.addEventListener("click", async (e) => {
         gesamt: Number(zeile.children[5].textContent) || 0
       }),
     });
-    zeile.dataset.lastUpdated = new Date(); // Timestamp für Farb-Logik setzen
-    updateRowColor(zeile);                  // Farbe sofort neu berechnen
+
+    // Spaltte orange Rot färben
+    const spaltenIndex = aktiveZelle.cellIndex;
+    if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
+    if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
+    if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+
+    updateRowColor(zeile); // Farbe sofort neu berechnen
+
 
   } catch (err) {
     console.error("Fehler beim Speichern der Punkte:", err);
@@ -304,8 +326,13 @@ tabelle.addEventListener("dblclick", (e) => {
           gesamt: Number(zeile.children[5].textContent) || 0
         }),
       });
-      zeile.dataset.lastUpdated = new Date(); // Timestamp aktualisieren
-      updateRowColor(zeile);                  // Farbe sofort neu setzen
+      const spaltenIndex = aktiveZelle.cellIndex;
+      if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
+      if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
+      if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+
+      updateRowColor(zeile); // Farbe sofort neu berechnen
+
 
     } catch (err) {
       console.error("Fehler beim Speichern der Punkte:", err);
