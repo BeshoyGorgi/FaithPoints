@@ -49,7 +49,6 @@ tr:nth-child(even) {
   background-color: #1D546C;
 }
 
-
 #logoutButton {
   position: absolute;
   top: 20px;
@@ -72,8 +71,6 @@ tr:nth-child(even) {
   transform: scale(1.05);
 }
 
-
-
 /* Logo oben links */
 .header-logo {
   position: absolute;
@@ -87,85 +84,9 @@ tr:nth-child(even) {
   overflow: hidden;  
 }
 
-
-/* Bild hinzufügen */
-.kinder-bild {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid #1D546C;
-  display: block;
-  margin: 0 auto 6px auto;
-}
-
-/* Container für Bild + Buttons nebeneinander */
-.bild-container {
-  display: flex;
-  flex-direction: column; /* Bild oben, Buttons unten */
-  align-items: center;
-}
-
-/* Container für die Buttons nebeneinander */
-.bild-buttons {
-  display: flex;
-  justify-content: space-between;
-  width: 60%; /* Breite unter dem Bild, damit Buttons nicht zu weit auseinander stehen */
-  margin-top: 4px;
-}
-
-/* Buttons */
-.bild-upload-label,
-.bild-loeschen {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 24px;
-  text-align: center;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.bild-upload-label {
-  background-color: #0078d7;
-  color: white;
-}
-
-.bild-upload-label:hover {
-  background-color: #005fa3;
-  transform: scale(1.1);
-}
-
-.bild-loeschen {
-  background-color: #ff5c5c;
-  color: white;
-}
-
-.bild-loeschen:hover {
-  background-color: #e04b4b;
-  transform: scale(1.1);
-}
-
-/* Unsichtbares File Input */
-.bild-upload {
-  display: none;
-}
-
-
 @media (max-width: 768px) {
-  .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* zentriert Tabelle, Button, Suchfeld */
-    width: 95%;
-  }
-
   table {
     width: 100%;
-    max-width: 100%;
     font-size: 0.85rem;
   }
 
@@ -176,30 +97,16 @@ tr:nth-child(even) {
   #zurueckButton, #logoutButton {
     font-size: 0.85rem;
     padding: 0.35rem 0.7rem;
-    margin: 0 auto; /* zentriert den Zurück-Button */
+    margin: 0 auto;
   }
 
-  .header-logo, .kinder-bild {
+  .header-logo {
     width: 40px;
     height: 40px;
-  }
-
-  .bild-upload-label, .bild-loeschen {
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-    line-height: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 95%;
-  }
-
   table {
     font-size: 0.8rem;
   }
@@ -214,19 +121,8 @@ tr:nth-child(even) {
     margin: 0 auto;
   }
 
-  .header-logo, .kinder-bild {
+  .header-logo {
     width: 35px;
     height: 35px;
-  }
-
-  .bild-upload-label, .bild-loeschen {
-    width: 22px;
-    height: 22px;
-    font-size: 12px;
-    line-height: 22px;
-  }
-
-  .bild-buttons {
-    width: 70%;
   }
 }

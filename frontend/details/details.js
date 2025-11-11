@@ -5,7 +5,7 @@ const tbody = document.querySelector("#kinderDetails tbody");
 // ----- Lade Kinder -----
 async function ladeKinderDetails() {
   try {
-    const email = localStorage.getItem("email"); // Email holen
+    const email = localStorage.getItem("email"); 
     const response = await fetch(`${API_BASE_URL}/api/kinder?email=${email}`);
     if (!response.ok) throw new Error("Fehler beim Laden der Kinder");
 
@@ -16,19 +16,7 @@ async function ladeKinderDetails() {
       const tr = document.createElement("tr");
       tr.dataset.id = kind.id;
 
-      const bildUrl = kind.bildUrl ? kind.bildUrl.replace('..', '') : '/images/platzhalter.png';
-
       tr.innerHTML = `
-        <td>
-          <div class="bild-container">
-            <img src="${bildUrl}" alt="Bild von ${escapeHtml(kind.name)}" class="kinder-bild">
-            <div class="bild-buttons">
-              <button class="bild-loeschen" data-id="${kind.id}">-</button>
-              <label class="bild-upload-label" for="upload-${kind.id}">+</label>
-              <input id="upload-${kind.id}" type="file" accept="image/*" class="bild-upload" data-id="${kind.id}">
-            </div>
-          </div>
-        </td>
         <td>${escapeHtml(kind.name)}</td>
         <td contenteditable="true">${escapeHtml(kind.klasse || "")}</td>
         <td contenteditable="true">${escapeHtml(kind.eltern || "")}</td>
@@ -39,13 +27,12 @@ async function ladeKinderDetails() {
 
   } catch (err) {
     console.error(err);
-    tbody.innerHTML = "<tr><td colspan='5'>Fehler beim Laden der Kinder</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='4'>Fehler beim Laden der Kinder</td></tr>";
   }
 }
 
 // ====== SUCHFUNKTION ======
 const searchInput = document.getElementById("kinderSearch");
-
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -53,20 +40,17 @@ searchInput.addEventListener("keydown", (e) => {
     if (!query) return;
 
     const rows = Array.from(tbody.querySelectorAll("tr"));
-    const match = rows.find(row => row.children[1].textContent.toLowerCase().includes(query));
+    const match = rows.find(row => row.children[0].textContent.toLowerCase().includes(query));
 
     if (match) {
-      // Scroll zur Zeile
       match.scrollIntoView({ behavior: "smooth", block: "center" });
-      // Zeile kurz hervorheben
-      match.style.backgroundColor = "#ffff99"; // gelb
+      match.style.backgroundColor = "#ffff99"; 
       setTimeout(() => match.style.backgroundColor = "", 2000);
     } else {
       alert(`Kein Kind mit Namen "${searchInput.value}" gefunden.`);
     }
   }
 });
-
 
 // ----- Save changes on blur -----
 tbody.addEventListener("blur", async (e) => {
@@ -77,7 +61,7 @@ tbody.addEventListener("blur", async (e) => {
   const id = tr.dataset.id;
   if (!id) return;
 
-  const feldMap = { 2: "klasse", 3: "eltern", 4: "telefon" };
+  const feldMap = { 1: "klasse", 2: "eltern", 3: "telefon" };
   const feldName = feldMap[td.cellIndex];
   if (!feldName) return;
 
@@ -106,74 +90,7 @@ tbody.addEventListener("keydown", (e) => {
   }
 });
 
-// ----- Bild-Upload -----
-tbody.addEventListener("change", async (e) => {
-  const fileInput = e.target;
-  if (!fileInput.classList.contains("bild-upload")) return;
-
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  const id = fileInput.dataset.id;
-  const formData = new FormData();
-  formData.append("bild", file);
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, {
-      method: "POST",
-      body: formData
-    });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({ error: 'Upload fehlgeschlagen' }));
-      throw new Error(err.error || "Fehler beim Hochladen");
-    }
-
-    const result = await response.json();
-
-    // Direktes Aktualisieren des Bildes im kleinen Kreis
-    const img = fileInput.parentElement.querySelector("img.kinder-bild");
-    if (img && result.bildUrl) {
-    img.onload = () => URL.revokeObjectURL(img.src);
-    img.src = result.bildUrl + "?t=" + new Date().getTime();
-    }
-
-    alert("Bild erfolgreich aktualisiert!");
-
-  } catch (err) {
-    console.error("Fehler beim Hochladen des Bildes:", err);
-    alert("Fehler beim Hochladen des Bildes.");
-  }
-});
-
-
-// ----- Bild löschen -----
-tbody.addEventListener("click", async (e) => {
-  const btn = e.target;
-  if (!btn.classList.contains("bild-loeschen")) return;
-
-  const id = btn.dataset.id;
-  if (!confirm("Bild wirklich löschen?")) return;
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, { method: "DELETE" });
-    if (!response.ok) throw new Error("Fehler beim Löschen");
-
-    // Direktes Zurücksetzen des Bildes im kleinen Kreis
-    const img = btn.parentElement.querySelector("img.kinder-bild");
-    if (img) {
-      img.src = "../images/platzhalter.png?t=" + new Date().getTime();
-    }
-
-    alert("Bild gelöscht.");
-
-  } catch (err) {
-    console.error("Fehler beim Löschen:", err);
-    alert("Fehler beim Löschen des Bildes.");
-  }
-});
-
-// ----- Hilfsfunktionen -----
+// ----- Hilfsfunktion -----
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
@@ -193,8 +110,7 @@ document.getElementById("zurueckButton").addEventListener("click", () => {
 });
 
 // Logout
-const logoutButton = document.getElementById("logoutButton");
-logoutButton.addEventListener("click", () => {
+document.getElementById("logoutButton").addEventListener("click", () => {
   localStorage.removeItem("email");
   window.location.href = "/login/login.html";
 });
