@@ -16,7 +16,10 @@ async function ladeKinderDetails() {
       const tr = document.createElement("tr");
       tr.dataset.id = kind.id;
 
-      const bildUrl = kind.bildUrl ? kind.bildUrl : "../images/platzhalter.png";
+      const bildUrl = kind.bildUrl 
+           ? `${API_BASE_URL}${kind.bildUrl}`  // vollständiger Pfad zum Server
+           : "../images/platzhalter.png";
+
 
       tr.innerHTML = `
         <td>
@@ -106,7 +109,7 @@ tbody.addEventListener("change", async (e) => {
 
     const result = await response.json();
     const img = fileInput.parentElement.querySelector("img.kinder-bild");
-    if (img && result.bildUrl) img.src = result.bildUrl;
+    if (img && result.bildUrl) img.src = `${API_BASE_URL}${result.bildUrl}`;
     alert("Bild erfolgreich aktualisiert!");
     ladeKinderDetails();
 
