@@ -6,8 +6,8 @@ const punkteMenue = document.getElementById("punkteMenue");
 const tabelle = document.getElementById("meineTabelle");
 const tbody = tabelle.querySelector("tbody");
 
-const ORANGE_AFTER_MINUTES = 1;  // 2 Wochen
-const RED_AFTER_MINUTES = 2;     // 4 Wochen
+const ORANGE_AFTER_MINUTES = 1;  // 14 * 24 * 60   2 Wochen
+const RED_AFTER_MINUTES = 2;     // 28 * 24 * 60   4 Wochen
 
 let aktiveZelle = null;
 
@@ -22,25 +22,21 @@ function updateCellColor(row) {
     anwesenheit_U: row.children[4],
   };
 
-  // Differenz in Minuten berechnen
+  // Differenzen in Minuten berechnen
   const diffHymne = row.dataset.lastUpdatedHymne ? (now - new Date(row.dataset.lastUpdatedHymne)) / (1000 * 60) : 0;
   const diffAnwG = row.dataset.lastUpdatedAnwesenheitG ? (now - new Date(row.dataset.lastUpdatedAnwesenheitG)) / (1000 * 60) : 0;
   const diffAnwU = row.dataset.lastUpdatedAnwesenheitU ? (now - new Date(row.dataset.lastUpdatedAnwesenheitU)) / (1000 * 60) : 0;
 
-  // Hymne
-  if (diffHymne >= RED_AFTER_MINUTES) zellen.hymne.style.backgroundColor = "red";
-  else if (diffHymne >= ORANGE_AFTER_MINUTES) zellen.hymne.style.backgroundColor = "orange";
-  else zellen.hymne.style.backgroundColor = "";
+  // Funktion für Farbupdate, aber NUR wenn keine manuelle Änderung passiert ist
+  const setColor = (cell, diff) => {
+    if (cell.dataset.manualReset === "true") return; // Farbe bleibt bestehen, bis geändert
+    if (diff >= RED_AFTER_MINUTES) cell.style.backgroundColor = "red";
+    else if (diff >= ORANGE_AFTER_MINUTES) cell.style.backgroundColor = "orange";
+  };
 
-  // Anwesenheit G
-  if (diffAnwG >= RED_AFTER_MINUTES) zellen.anwesenheit_G.style.backgroundColor = "red";
-  else if (diffAnwG >= ORANGE_AFTER_MINUTES) zellen.anwesenheit_G.style.backgroundColor = "orange";
-  else zellen.anwesenheit_G.style.backgroundColor = "";
-
-  // Anwesenheit U
-  if (diffAnwU >= RED_AFTER_MINUTES) zellen.anwesenheit_U.style.backgroundColor = "red";
-  else if (diffAnwU >= ORANGE_AFTER_MINUTES) zellen.anwesenheit_U.style.backgroundColor = "orange";
-  else zellen.anwesenheit_U.style.backgroundColor = "";
+  setColor(zellen.hymne, diffHymne);
+  setColor(zellen.anwesenheit_G, diffAnwG);
+  setColor(zellen.anwesenheit_U, diffAnwU);
 }
 
 
@@ -75,6 +71,7 @@ async function ladeKinder() {
       <td>${k.gesamt}</td>
     `;
     updateCellColor(neueZeile); // Farbe setzen
+    neueZeile.querySelectorAll("td").forEach(td => td.dataset.manualReset = "false");
     tbody.appendChild(neueZeile);
   });
 
@@ -205,6 +202,10 @@ punkteMenue.addEventListener("click", async (e) => {
   const aktuellerWert = parseInt(aktiveZelle.textContent) || 0;
   aktiveZelle.textContent = aktuellerWert + wert;
 
+  // Wenn der Punktwert geändert wird, Hintergrund zurücksetzen
+  aktiveZelle.style.backgroundColor = "";
+  aktiveZelle.dataset.manualReset = "true";
+
   const zeile = aktiveZelle.parentElement;
   aktualisiereGesamt(zeile);
 
@@ -224,10 +225,13 @@ punkteMenue.addEventListener("click", async (e) => {
     });
 
     // Spaltte orange Rot färben
-    const spaltenIndex = aktiveZelle.cellIndex;
+    const spaltenIndex = zelle.cellIndex;
     if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
     if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
     if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+    
+    // Wenn Zelle neu geändert wurde, darf sie später wieder automatisch orange/rot werden
+    aktiveZelle.dataset.manualReset = "false";
 
     updateCellColor(zeile); // Farbe sofort neu berechnen
 
@@ -344,10 +348,13 @@ tabelle.addEventListener("dblclick", (e) => {
           gesamt: Number(zeile.children[5].textContent) || 0
         }),
       });
-      const spaltenIndex = aktiveZelle.cellIndex;
+      const spaltenIndex = zelle.cellIndex;
       if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
       if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
       if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+     
+      // Wenn Zelle neu geändert wurde, darf sie später wieder automatisch orange/rot werden
+      aktiveZelle.dataset.manualReset = "false";
 
       updateCellColor(zeile); // Farbe sofort neu berechnen
 
