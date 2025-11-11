@@ -43,6 +43,31 @@ async function ladeKinderDetails() {
   }
 }
 
+// ====== SUCHFUNKTION ======
+const searchInput = document.getElementById("kinderSearch");
+
+searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) return;
+
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const match = rows.find(row => row.children[1].textContent.toLowerCase().includes(query));
+
+    if (match) {
+      // Scroll zur Zeile
+      match.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Zeile kurz hervorheben
+      match.style.backgroundColor = "#ffff99"; // gelb
+      setTimeout(() => match.style.backgroundColor = "", 2000);
+    } else {
+      alert(`Kein Kind mit Namen "${searchInput.value}" gefunden.`);
+    }
+  }
+});
+
+
 // ----- Save changes on blur -----
 tbody.addEventListener("blur", async (e) => {
   const td = e.target;
