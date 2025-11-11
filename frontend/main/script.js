@@ -46,7 +46,7 @@ function updateCellColor(row) {
 
 // Prüft alle 10 Sekunden, ob sich die Farbe ändern muss
 setInterval(() => {
-  tbody.querySelectorAll("tr").forEach(row => updateRowColor(row));
+  tbody.querySelectorAll("tr").forEach(row => updateCellColor(row));
 }, 10000); // 10000ms = 10 Sekunden
 
 
@@ -74,7 +74,7 @@ async function ladeKinder() {
       <td>${k.anwesenheit_U}</td>
       <td>${k.gesamt}</td>
     `;
-    updateRowColor(neueZeile); // Farbe setzen
+    updateCellColor(neueZeile); // Farbe setzen
     tbody.appendChild(neueZeile);
   });
 
@@ -229,7 +229,7 @@ punkteMenue.addEventListener("click", async (e) => {
     if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
     if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
 
-    updateRowColor(zeile); // Farbe sofort neu berechnen
+    updateCellColor(zeile); // Farbe sofort neu berechnen
 
 
   } catch (err) {
@@ -349,7 +349,7 @@ tabelle.addEventListener("dblclick", (e) => {
       if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
       if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
 
-      updateRowColor(zeile); // Farbe sofort neu berechnen
+      updateCellColor(zeile); // Farbe sofort neu berechnen
 
 
     } catch (err) {
