@@ -176,6 +176,63 @@ punkteMenue.addEventListener("click", async (e) => {
   aktiveZelle = null;
 });
 
+
+// === Name bearbeiten bei Doppelklick ===
+tabelle.addEventListener("dblclick", (e) => {
+  const zelle = e.target.closest("td");
+  if (!zelle || zelle.cellIndex !== 0) return; // nur erste Spalte
+
+  const alterText = zelle.textContent;
+  zelle.contentEditable = "true";
+  zelle.focus();
+
+  const range = document.createRange();
+  range.selectNodeContents(zelle);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  const beenden = async () => {
+    zelle.contentEditable = "false";
+    const neueName = zelle.textContent.trim();
+    if (neueName && neueName !== alterText) {
+      const id = zelle.parentElement.dataset.id;
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: neueName })
+        });
+        if (!response.ok) {
+          const result = await response.json();
+          alert(result.error || "Fehler beim Speichern des neuen Namens.");
+          zelle.textContent = alterText;
+        }
+      } catch (err) {
+        console.error("Fehler beim Speichern des Namens:", err);
+        alert("Fehler bei der Verbindung zum Server.");
+        zelle.textContent = alterText;
+      }
+    }
+    zelle.removeEventListener("blur", beenden);
+    zelle.removeEventListener("keydown", handleEnter);
+  };
+
+  const handleEnter = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      beenden();
+    } else if (event.key === "Escape") {
+      zelle.textContent = alterText;
+      beenden();
+    }
+  };
+
+  zelle.addEventListener("blur", beenden);
+  zelle.addEventListener("keydown", handleEnter);
+});
+
+
 // === Menü schließen bei Klick außerhalb ===
 document.addEventListener("click", e => {
   if (!punkteMenue.contains(e.target) && !tabelle.contains(e.target)) {
