@@ -61,7 +61,7 @@ tbody.addEventListener("blur", async (e) => {
   const id = tr.dataset.id;
   if (!id) return;
 
-  const feldMap = { "Bild": "klasse", 1: "eltern", 2: "telefon" };
+  const feldMap = { 1: "klasse", 2: "eltern", 3: "telefon" };
   const feldName = feldMap[td.cellIndex];
   if (!feldName) return;
 
