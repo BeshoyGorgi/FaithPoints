@@ -97,6 +97,10 @@ app.put("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;
   const fields = Object.keys(req.body);
   const values = Object.values(req.body);
+  
+  fields.push("last_updated");           // NEU: Timestamp-Feld hinzufügen
+  values.push(new Date());               // NEU: aktuelles Datum
+
   if (fields.length === 0) return res.status(400).json({ error: "Keine Felder zum Aktualisieren" });
 
   const setString = fields.map((f, i) => `${f} = $${i + 1}`).join(", ");

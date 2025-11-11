@@ -6,7 +6,19 @@ const punkteMenue = document.getElementById("punkteMenue");
 const tabelle = document.getElementById("meineTabelle");
 const tbody = tabelle.querySelector("tbody");
 
+const ORANGE_AFTER_DAYS = 1;  // 2 Wochen
+const RED_AFTER_DAYS = 2;     // 4 Wochen
+
 let aktiveZelle = null;
+
+function updateRowColor(row) {
+  const lastUpdated = new Date(row.dataset.lastUpdated);
+  const diffDays = (Date.now() - lastUpdated) / (1000 * 60); //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
+
+  if (diffDays >= RED_AFTER_DAYS) row.style.backgroundColor = "red";
+  else if (diffDays >= ORANGE_AFTER_DAYS) row.style.backgroundColor = "orange";
+  else row.style.backgroundColor = ""; // Standardfarbe
+}
 
 // === Kinder aus DB laden ===
 
@@ -17,18 +29,21 @@ async function ladeKinder() {
     const kinder = await response.json();
     tbody.innerHTML = ""; // Tabelle vorher leeren
     kinder.forEach(k => {
-      const neueZeile = document.createElement("tr");
-      neueZeile.dataset.id = k.id;
-      neueZeile.innerHTML = `
-        <td>${k.name}</td>
-        <td>${k.hymne}</td>
-        <td>${k.verhalten}</td>
-        <td>${k.anwesenheit_G}</td>
-        <td>${k.anwesenheit_U}</td>
-        <td>${k.gesamt}</td>
-      `;
-      tbody.appendChild(neueZeile);
-    });
+    const neueZeile = document.createElement("tr");
+    neueZeile.dataset.id = k.id;
+    neueZeile.dataset.lastUpdated = k.last_updated; // Timestamp speichern
+    neueZeile.innerHTML = `
+      <td>${k.name}</td>
+      <td>${k.hymne}</td>
+      <td>${k.verhalten}</td>
+      <td>${k.anwesenheit_G}</td>
+      <td>${k.anwesenheit_U}</td>
+      <td>${k.gesamt}</td>
+    `;
+    updateRowColor(neueZeile); // Farbe setzen
+    tbody.appendChild(neueZeile);
+  });
+
     markiereHoverbareZellen();
     sortiereNachGesamt();
   } catch (err) {
@@ -167,6 +182,9 @@ punkteMenue.addEventListener("click", async (e) => {
         gesamt: Number(zeile.children[5].textContent) || 0
       }),
     });
+    zeile.dataset.lastUpdated = new Date(); // Timestamp für Farb-Logik setzen
+    updateRowColor(zeile);                  // Farbe sofort neu berechnen
+
   } catch (err) {
     console.error("Fehler beim Speichern der Punkte:", err);
   }
@@ -279,6 +297,9 @@ tabelle.addEventListener("dblclick", (e) => {
           gesamt: Number(zeile.children[5].textContent) || 0
         }),
       });
+      zeile.dataset.lastUpdated = new Date(); // Timestamp aktualisieren
+      updateRowColor(zeile);                  // Farbe sofort neu setzen
+
     } catch (err) {
       console.error("Fehler beim Speichern der Punkte:", err);
       alert("Fehler bei der Verbindung zum Server.");
