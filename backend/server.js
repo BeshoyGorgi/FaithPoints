@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import path from "path";        
 import { fileURLToPath } from "url"; 
 import multer from "multer";
-import path from "path";
 import fs from "fs";
 
 // Bild-Upload Ordner
