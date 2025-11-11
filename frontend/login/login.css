@@ -80,3 +80,27 @@ body {
   font-size: 14px;
   color: #e04b4b;
 }
+
+
+/* Responsive Anpassungen für Handys */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 20px 15px;
+  }
+
+  .login-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .login-container input[type="password"],
+  .login-container input[type="email"] {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .login-container button {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
