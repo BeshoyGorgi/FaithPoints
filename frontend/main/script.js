@@ -29,10 +29,12 @@ function updateCellColor(row) {
 
   // Funktion für Farbupdate, aber NUR wenn keine manuelle Änderung passiert ist
   const setColor = (cell, diff) => {
-    if (cell.dataset.manualReset === "true") return; // Farbe bleibt bestehen, bis geändert
+    if (cell.dataset.manualReset === "true") return; // manuell geändert → Farbe bleibt neutral
     if (diff >= RED_AFTER_MINUTES) cell.style.backgroundColor = "red";
     else if (diff >= ORANGE_AFTER_MINUTES) cell.style.backgroundColor = "orange";
+    else cell.style.backgroundColor = ""; // sonst neutral
   };
+
 
   setColor(zellen.hymne, diffHymne);
   setColor(zellen.anwesenheit_G, diffAnwG);
@@ -70,8 +72,12 @@ async function ladeKinder() {
       <td>${k.anwesenheit_U}</td>
       <td>${k.gesamt}</td>
     `;
-    updateCellColor(neueZeile); // Farbe setzen
+    // erst manualReset setzen
     neueZeile.querySelectorAll("td").forEach(td => td.dataset.manualReset = "false");
+
+    // dann Farbe setzen
+    updateCellColor(neueZeile);
+
     tbody.appendChild(neueZeile);
   });
 
@@ -204,7 +210,7 @@ punkteMenue.addEventListener("click", async (e) => {
 
   // Wenn der Punktwert geändert wird, Hintergrund zurücksetzen
   aktiveZelle.style.backgroundColor = "";
-  aktiveZelle.dataset.manualReset = "true";
+  aktiveZelle.dataset.manualReset = "true"; 
 
   const zeile = aktiveZelle.parentElement;
   aktualisiereGesamt(zeile);
