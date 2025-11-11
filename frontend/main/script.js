@@ -6,23 +6,41 @@ const punkteMenue = document.getElementById("punkteMenue");
 const tabelle = document.getElementById("meineTabelle");
 const tbody = tabelle.querySelector("tbody");
 
-const ORANGE_AFTER_DAYS = 1;  // 2 Wochen
-const RED_AFTER_DAYS = 2;     // 4 Wochen
+const ORANGE_AFTER_MINUTES = 1;  // 2 Wochen
+const RED_AFTER_MINUTES = 2;     // 4 Wochen
 
 let aktiveZelle = null;
 
 // === Farbe nach zeit ändern ===
-function updateRowColor(row) {
+function updateCellColor(row) {
   const now = Date.now();
+
+  const zellen = {
+    hymne: row.children[1],
+    verhalten: row.children[2],       // bleibt neutral
+    anwesenheit_G: row.children[3],
+    anwesenheit_U: row.children[4],
+  };
+
+  // Differenz in Minuten berechnen
   const diffHymne = row.dataset.lastUpdatedHymne ? (now - new Date(row.dataset.lastUpdatedHymne)) / (1000 * 60) : 0;
-  const diffAnwG = row.dataset.lastUpdatedAnwesenheitG ? (now - new Date(row.dataset.lastUpdatedAnwesenheitG)) / (1000 * 60) : 0; //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
-  const diffAnwU = row.dataset.lastUpdatedAnwesenheitU ? (now - new Date(row.dataset.lastUpdatedAnwesenheitU)) / (1000 * 60) : 0; //Tage (1000 * 60 * 60 * 24) Minuten (1000 * 60)
+  const diffAnwG = row.dataset.lastUpdatedAnwesenheitG ? (now - new Date(row.dataset.lastUpdatedAnwesenheitG)) / (1000 * 60) : 0;
+  const diffAnwU = row.dataset.lastUpdatedAnwesenheitU ? (now - new Date(row.dataset.lastUpdatedAnwesenheitU)) / (1000 * 60) : 0;
 
-  const diffMinutes = Math.max(diffHymne, diffAnwG, diffAnwU); // maximale Zeit der 3 Spalten
+  // Hymne
+  if (diffHymne >= RED_AFTER_MINUTES) zellen.hymne.style.backgroundColor = "red";
+  else if (diffHymne >= ORANGE_AFTER_MINUTES) zellen.hymne.style.backgroundColor = "orange";
+  else zellen.hymne.style.backgroundColor = "";
 
-  if (diffMinutes >= RED_AFTER_DAYS ) row.style.backgroundColor = "red"; // * 24 * 60
-  else if (diffMinutes >= ORANGE_AFTER_DAYS) row.style.backgroundColor = "orange"; // * 24 * 60
-  else row.style.backgroundColor = "";
+  // Anwesenheit G
+  if (diffAnwG >= RED_AFTER_MINUTES) zellen.anwesenheit_G.style.backgroundColor = "red";
+  else if (diffAnwG >= ORANGE_AFTER_MINUTES) zellen.anwesenheit_G.style.backgroundColor = "orange";
+  else zellen.anwesenheit_G.style.backgroundColor = "";
+
+  // Anwesenheit U
+  if (diffAnwU >= RED_AFTER_MINUTES) zellen.anwesenheit_U.style.backgroundColor = "red";
+  else if (diffAnwU >= ORANGE_AFTER_MINUTES) zellen.anwesenheit_U.style.backgroundColor = "orange";
+  else zellen.anwesenheit_U.style.backgroundColor = "";
 }
 
 
