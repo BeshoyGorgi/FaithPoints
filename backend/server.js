@@ -53,8 +53,25 @@ const upload = multer({ storage });
 app.get("/api/kinder", async (req, res) => {
   const { email } = req.query;
   try {
-    const result = await db.query("SELECT * FROM kinder WHERE user_email = $1", [email]);
-    res.json(result.rows);
+    const result = await db.query(`
+      SELECT 
+        id,
+        name,
+        hymne,
+        verhalten,
+        anwesenheit_g AS "anwesenheit_G",
+        anwesenheit_u AS "anwesenheit_U",
+        gesamt,
+        klasse,
+        eltern,
+        telefon,
+        bildUrl,
+        user_email
+      FROM kinder
+      WHERE user_email = $1
+    `, [email]);
+
+    res.json(result.rows); // Jetzt liefert die DB die Keys korrekt
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -83,19 +100,13 @@ app.put("/api/kinder/:id", async (req, res) => {
   if (fields.length === 0) return res.status(400).json({ error: "Keine Felder zum Aktualisieren" });
 
   const setString = fields.map((f, i) => `${f} = $${i + 1}`).join(", ");
-
   try {
-    // Update ausführen
     await db.query(`UPDATE kinder SET ${setString} WHERE id = $${fields.length + 1}`, [...values, id]);
-
-    // Den aktualisierten Datensatz holen
-    const result = await db.query("SELECT * FROM kinder WHERE id = $1", [id]);
-    res.json(result.rows[0]); // alles zurückgeben, inkl. anwesenheit_G/U
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 app.delete("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;
