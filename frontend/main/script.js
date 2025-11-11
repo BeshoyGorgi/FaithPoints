@@ -228,9 +228,35 @@ punkteMenue.addEventListener("click", async (e) => {
 
     // **Timestamp sofort auf jetzt setzen**
     const spaltenIndex = aktiveZelle.cellIndex;
-    if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
-    if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
-    if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+    const jetzt = new Date();
+
+    // Payload für DB
+    let payload = {
+      name: zeile.children[0].textContent.trim(),
+      hymne: Number(zeile.children[1].textContent) || 0,
+      verhalten: Number(zeile.children[2].textContent) || 0,
+      anwesenheit_G: Number(zeile.children[3].textContent) || 0,
+      anwesenheit_U: Number(zeile.children[4].textContent) || 0,
+      gesamt: Number(zeile.children[5].textContent) || 0
+    };
+
+    // Timestamp nur für die geänderte Spalte setzen
+    if (spaltenIndex === 1) payload.lastUpdatedHymne = jetzt;
+    if (spaltenIndex === 3) payload.lastUpdatedAnwesenheitG = jetzt;
+    if (spaltenIndex === 4) payload.lastUpdatedAnwesenheitU = jetzt;
+
+    // Update in DB
+    await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    // Timestamp auch im DOM speichern
+    if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = jetzt;
+    if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = jetzt;
+    if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = jetzt;
+
 
     // **Hintergrund neutral setzen**
     aktiveZelle.style.backgroundColor = "";
@@ -352,9 +378,35 @@ tabelle.addEventListener("dblclick", (e) => {
         }),
       });
       const spaltenIndex = zelle.cellIndex;
-      if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = new Date();
-      if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = new Date();
-      if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = new Date();
+      const jetzt = new Date();
+
+      // Payload für DB
+      let payload = {
+        name: zeile.children[0].textContent.trim(),
+        hymne: Number(zeile.children[1].textContent) || 0,
+        verhalten: Number(zeile.children[2].textContent) || 0,
+        anwesenheit_G: Number(zeile.children[3].textContent) || 0,
+        anwesenheit_U: Number(zeile.children[4].textContent) || 0,
+        gesamt: Number(zeile.children[5].textContent) || 0
+      };
+
+      // Timestamp nur für geänderte Spalte setzen
+      if (spaltenIndex === 1) payload.lastUpdatedHymne = jetzt;
+      if (spaltenIndex === 3) payload.lastUpdatedAnwesenheitG = jetzt;
+      if (spaltenIndex === 4) payload.lastUpdatedAnwesenheitU = jetzt;
+
+      // Update in DB
+      await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // Timestamp auch im DOM speichern
+      if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = jetzt;
+      if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = jetzt;
+      if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = jetzt;
+
      
       // Wenn Zelle neu geändert wurde, darf sie später wieder automatisch orange/rot werden
       aktiveZelle.dataset.manualReset = "false";
