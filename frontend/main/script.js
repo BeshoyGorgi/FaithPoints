@@ -233,6 +233,78 @@ tabelle.addEventListener("dblclick", (e) => {
 });
 
 
+// === Zahlen manuell ändern bei Doppelklick (außer Name und Gesamt) ===
+tabelle.addEventListener("dblclick", (e) => {
+  const zelle = e.target.closest("td");
+  if (!zelle) return;
+
+  const spaltenIndex = zelle.cellIndex;
+  const anzahlSpalten = tabelle.rows[0].cells.length;
+
+  // Name-Spalte (0) und Gesamt-Spalte (letzte) ignorieren
+  if (spaltenIndex === 0 || spaltenIndex === anzahlSpalten - 1) return;
+
+  const alterWert = zelle.textContent;
+
+  zelle.contentEditable = "true";
+  zelle.focus();
+
+  // Text markieren
+  const range = document.createRange();
+  range.selectNodeContents(zelle);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  const beenden = async () => {
+    zelle.contentEditable = "false";
+
+    // Wert sicher in Zahl umwandeln
+    zelle.textContent = Number(zelle.textContent) || 0;
+
+    const zeile = zelle.parentElement;
+    aktualisiereGesamt(zeile);
+
+    const id = zeile.dataset.id;
+    try {
+      await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: zeile.children[0].textContent.trim(),
+          hymne: Number(zeile.children[1].textContent) || 0,
+          verhalten: Number(zeile.children[2].textContent) || 0,
+          anwesenheit_G: Number(zeile.children[3].textContent) || 0,
+          anwesenheit_U: Number(zeile.children[4].textContent) || 0,
+          gesamt: Number(zeile.children[5].textContent) || 0
+        }),
+      });
+    } catch (err) {
+      console.error("Fehler beim Speichern der Punkte:", err);
+      alert("Fehler bei der Verbindung zum Server.");
+      zelle.textContent = alterWert;
+    }
+
+    zelle.removeEventListener("blur", beenden);
+    zelle.removeEventListener("keydown", handleEnter);
+  };
+
+  const handleEnter = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // kein Zeilenumbruch
+      beenden();
+    } else if (event.key === "Escape") {
+      zelle.textContent = alterWert; // Änderung verwerfen
+      beenden();
+    }
+  };
+
+  zelle.addEventListener("blur", beenden);
+  zelle.addEventListener("keydown", handleEnter);
+});
+
+
+
 // === Menü schließen bei Klick außerhalb ===
 document.addEventListener("click", e => {
   if (!punkteMenue.contains(e.target) && !tabelle.contains(e.target)) {
