@@ -62,6 +62,9 @@ app.get("/api/kinder", async (req, res) => {
         anwesenheit_g AS "anwesenheit_G",
         anwesenheit_u AS "anwesenheit_U",
         gesamt,
+        last_updated_hymne,
+        last_updated_anwesenheit_g,
+        last_updated_anwesenheit_u,
         klasse,
         eltern,
         telefon,
@@ -70,6 +73,7 @@ app.get("/api/kinder", async (req, res) => {
       FROM kinder
       WHERE user_email = $1
     `, [email]);
+
 
     res.json(result.rows); // Jetzt liefert die DB die Keys korrekt
   } catch (err) {
@@ -93,13 +97,25 @@ app.post("/api/kinder", async (req, res) => {
   }
 });
 
-app.put("/api/kinder/:id", async (req, res) => {
+  app.put("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;
   const fields = Object.keys(req.body);
   const values = Object.values(req.body);
-  
-  fields.push("last_updated");           // NEU: Timestamp-Feld hinzufügen
-  values.push(new Date());               // NEU: aktuelles Datum
+
+  const jetzt = new Date();
+
+  if ("hymne" in req.body) {
+    fields.push("last_updated_hymne");
+    values.push(jetzt);
+  }
+  if ("anwesenheit_G" in req.body) {
+    fields.push("last_updated_anwesenheit_g");
+    values.push(jetzt);
+  }
+  if ("anwesenheit_U" in req.body) {
+    fields.push("last_updated_anwesenheit_u");
+    values.push(jetzt);
+  }
 
   if (fields.length === 0) return res.status(400).json({ error: "Keine Felder zum Aktualisieren" });
 

@@ -17,7 +17,9 @@ export async function createTableIfNotExists() {
         bildUrl VARCHAR(255),
         user_id INT,
         user_email VARCHAR(255),
-        last_updated TIMESTAMP DEFAULT NOW()
+        last_updated_hymne TIMESTAMP DEFAULT NOW(),
+        last_updated_anwesenheit_g TIMESTAMP DEFAULT NOW(),
+        last_updated_anwesenheit_u TIMESTAMP DEFAULT NOW()
       );
     `);
     console.log("✅ Tabelle 'kinder' ist bereit!");

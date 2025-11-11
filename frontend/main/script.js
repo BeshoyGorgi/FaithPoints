@@ -60,9 +60,10 @@ async function ladeKinder() {
     const neueZeile = document.createElement("tr");
     neueZeile.dataset.id = k.id;
 
-    neueZeile.dataset.lastUpdatedHymne = k.last_updated;
-    neueZeile.dataset.lastUpdatedAnwesenheitG = k.last_updated;
-    neueZeile.dataset.lastUpdatedAnwesenheitU = k.last_updated;
+    neueZeile.dataset.lastUpdatedHymne = k.last_updated_hymne;
+    neueZeile.dataset.lastUpdatedAnwesenheitG = k.last_updated_anwesenheit_g;
+    neueZeile.dataset.lastUpdatedAnwesenheitU = k.last_updated_anwesenheit_u;
+
     
     neueZeile.innerHTML = `
       <td>${k.name}</td>
