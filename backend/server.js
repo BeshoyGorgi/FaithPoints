@@ -22,10 +22,6 @@ app.use('/images', express.static(path.join(__dirname, 'frontend', 'images')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API-Routen
-app.use('/api/kinder', kinderRoutes);
-
-
 // ==== Statische Frontend-Dateien ====
 const frontendPath = path.join(process.cwd(), "..", "frontend");
 app.use(express.static(frontendPath));
