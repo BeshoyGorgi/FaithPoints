@@ -22,10 +22,10 @@ app.get("/", (req, res) => {
 
 // === LOGIN ===
 const users = [
-  { email: "Kirchenchor-Klasse1@al7an.com", password: "KGK1" },
-  { email: "Kirchenchor-Klasse2@al7an.com", password: "KGK2" },
-  { email: "Kirchenchor-Klasse3@al7an.com", password: "KGK3" },
-  { email: "Kirchenchor-Oberstufe@al7an.com", password: "KGKO" }
+  { email: "Kirchenchor-Stufe1@al7an.com", password: "KS1" },
+  { email: "Kirchenchor-Stufe2@al7an.com", password: "KS2" },
+  { email: "Kirchenchor-Stufe3@al7an.com", password: "KS3" },
+  { email: "Kirchenchor-Oberstufe@al7an.com", password: "KO" }
 ];
 
 app.post("/api/login", (req, res) => {
