@@ -136,6 +136,11 @@ tr:nth-child(even) {
     width: 35px;
     height: 35px;
   }
+
+  #kinderSearch {
+    width: 90%;
+    font-size: 0.85rem;
+  }
 }
 
 
@@ -167,8 +172,3 @@ tr:nth-child(even) {
 .bild-buttons button:hover {
   background-color: #1D546C;
 }
-
-  #kinderSearch {
-    width: 90%;
-    font-size: 0.85rem;
-  }
