@@ -5,14 +5,16 @@
   left: 0;
   width: 100%;
   height: 70px; /* etwas mehr Platz für Button */
-  background-color: #0C2B4E;
+  background-color: linear-gradient(90deg, #0C2B4E, #1D546C);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px; /* horizontaler Abstand */
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(255,255,255,0.2);
   z-index: 1000;
   box-sizing: border-box;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
 }
 
 .header-logo {
