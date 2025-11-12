@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config.js";
+import { STUFEN_MAP } from "../config.js";
 
 const plusButton = document.getElementById("addRow");
 const minusButton = document.getElementById("removeColumn");
@@ -10,6 +11,16 @@ const ORANGE_AFTER_MINUTES = 7 * 24 * 60;  // 14 * 24 * 60   2 Wochen
 const RED_AFTER_MINUTES = 14 * 24 * 60;    //  28 * 24 * 60   4 Wochen
 
 let aktiveZelle = null;
+
+
+const email = localStorage.getItem("email");
+const stufenAnzeige = document.getElementById("stufenAnzeige");
+
+if (email && stufenAnzeige) {
+  stufenAnzeige.textContent = STUFEN_MAP[email] || "Unbekannte Stufe";
+}
+
+
 
 // === Farbe nach zeit ändern ===
 function updateCellColor(row) {

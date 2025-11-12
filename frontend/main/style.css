@@ -17,6 +17,15 @@ body {
   text-align: center;
 }
 
+
+.stufen-anzeige {
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: center;
+  flex: 1;
+}
+
+
 h1 {
   color: #FFFFFF;
   margin-bottom: 1rem;
