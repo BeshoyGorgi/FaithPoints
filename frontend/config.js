@@ -6,7 +6,6 @@ export const API_BASE_URL = "https://faith-points.onrender.com";
 // Und in .env auch bei DB_HOST ---> localhost
 
 
-
 export const STUFEN_MAP = {
   "Kirchenchor-Stufe1@al7an.com": "1/2 Klasse",
   "Kirchenchor-Stufe2@al7an.com": "3/4 Klasse",
