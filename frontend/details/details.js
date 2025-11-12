@@ -14,28 +14,28 @@ async function ladeKinderDetails() {
     tbody.innerHTML = "";
 
     kinderListe.forEach(kind => {
-      const tr = document.createElement("tr");
-      tr.dataset.id = kind.id;
+  const tr = document.createElement("tr");
+  tr.dataset.id = kind.id;
 
-      // 🔥 Bild-Spalte + Buttons direkt hier einfügen
-      const bildUrl = kind.bildurl || "../images/platzhalter.png";
+  // Bild zuerst
+  const bildUrl = kind.bildurl || "../images/platzhalter.png";
 
-      tr.innerHTML = `
-        <td>${escapeHtml(kind.name)}</td>
-        <td contenteditable="true">${escapeHtml(kind.klasse || "")}</td>
-        <td contenteditable="true">${escapeHtml(kind.eltern || "")}</td>
-        <td contenteditable="true">${escapeHtml(kind.telefon || "")}</td>
-        <td>
-          <img src="${bildUrl}" alt="Bild von ${kind.name}" class="kind-bild" id="bild-${kind.id}">
-          <div class="bild-buttons">
-            <button class="add-bild" data-id="${kind.id}">+</button>
-            <button class="remove-bild" data-id="${kind.id}">−</button>
-          </div>
-          <input type="file" accept="image/*" id="file-${kind.id}" style="display:none;">
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+  tr.innerHTML = `
+    <td>
+      <img src="${bildUrl}" alt="Bild von ${kind.name}" class="kind-bild" id="bild-${kind.id}">
+      <div class="bild-buttons">
+        <button class="add-bild" data-id="${kind.id}">+</button>
+        <button class="remove-bild" data-id="${kind.id}">−</button>
+      </div>
+      <input type="file" accept="image/*" id="file-${kind.id}" style="display:none;">
+    </td>
+    <td>${escapeHtml(kind.name)}</td>
+    <td contenteditable="true">${escapeHtml(kind.klasse || "")}</td>
+    <td contenteditable="true">${escapeHtml(kind.eltern || "")}</td>
+    <td contenteditable="true">${escapeHtml(kind.telefon || "")}</td>
+  `;
+  tbody.appendChild(tr);
+});
 
   } catch (err) {
     console.error(err);
