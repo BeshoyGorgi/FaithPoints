@@ -51,10 +51,6 @@ body {
   font-family: "Segoe UI", sans-serif;
   background: #1D546C;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   text-align: center;
 }
 
