@@ -149,13 +149,17 @@ app.post("/api/kinder/:id/bild", upload.single("bild"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "Kein Bild hochgeladen" });
 
   const bildUrl = `/uploads/${req.file.filename}`;
+
   try {
+    // ⬇️ hier wird der Bildpfad in der DB gespeichert
     await db.query(`UPDATE kinder SET bildurl = $1 WHERE id = $2`, [bildUrl, id]);
     res.json({ bildUrl });
   } catch (err) {
+    console.error("Fehler beim Speichern des Bildes:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // === BILD LÖSCHEN ===
 app.delete("/api/kinder/:id/bild", async (req, res) => {

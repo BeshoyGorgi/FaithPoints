@@ -83,7 +83,7 @@ tbody.addEventListener("click", async (e) => {
     });
 
     if (response.ok) {
-      document.getElementById(`bild-${id}`).src = "/images/placeholder.png";
+      document.getElementById(`bild-${id}`).src = "../images/platzhalter.png";
     } else {
       alert("Fehler beim Löschen des Bildes");
     }
