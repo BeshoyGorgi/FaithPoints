@@ -7,7 +7,7 @@ function stufenWert(stufe) {
   if (!stufe) return 9999;
   stufe = stufe.trim().toLowerCase();
 
-  if (stufe === "kita" || "Kita") return 0;
+  if (stufe === "kita" || stufe === "Kita") return 0;
 
   const num = parseInt(stufe);
   return isNaN(num) ? 9999 : num;
