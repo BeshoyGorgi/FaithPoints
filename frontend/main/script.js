@@ -566,7 +566,7 @@ searchInput.addEventListener("keydown", (e) => {
     if (!query) return;
 
     const rows = Array.from(tbody.querySelectorAll("tr"));
-    const match = rows.find(row => row.children[1].textContent.toLowerCase().includes(query));
+    const match = rows.find(row => row.children[0].textContent.toLowerCase().includes(query));
 
     if (match) {
       match.scrollIntoView({ behavior: "smooth", block: "center" });
