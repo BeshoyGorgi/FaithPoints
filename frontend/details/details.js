@@ -40,7 +40,7 @@ async function ladeKinderDetails() {
     tbody.innerHTML = "";
 
     // Kinder nach Klasse sortieren (Kita = kleinste Stufe)
-    kinderListe.sort((a, b) => stufenWert(a.klasse) - stufenWert(b.klasse));
+    kinderListe.sort((a, b) => stufenWert(b.klasse) - stufenWert(a.klasse));
 
     kinderListe.forEach(kind => {
   const tr = document.createElement("tr");
