@@ -141,6 +141,15 @@ tr:nth-child(even) {
     width: 90%;
     font-size: 0.85rem;
   }
+
+  .kind-bild {
+  width: 40px;
+  height: 40px;
+  }
+
+  .bild-buttons button {
+  padding: 2px 4px;
+  }
 }
 
 
