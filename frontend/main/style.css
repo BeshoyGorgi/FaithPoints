@@ -237,6 +237,51 @@ td[contenteditable="true"] {
   white-space: nowrap;
 }
 
+/* Suchleiste */
+#kinderSearch {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  width: 300px;       /* Standardbreite */
+  max-width: 80%;     /* Passt sich an kleinere Bildschirme an */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+
+/* Screenshot-Button */
+.screenshot-button {
+  width: 25px;
+  height: 25px;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;   /* verhindert, dass Hover das Layout verschiebt */
+}
+
+/* Bild exakt in Button einpassen */
+.screenshot-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 0.15s ease;
+  pointer-events: none; /* Klick geht auf den Button, nicht aufs Bild */
+  background-color: #0C2B4E;
+}
+
+/* Bild vergrößert sich visuell, Button bleibt exakt 25px */
+.screenshot-button:hover img {
+  transform: scale(1.25);
+}
+
+
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   table { 
@@ -309,13 +354,3 @@ td[contenteditable="true"] {
   }
 }
 
-/* Suchleiste */
-#kinderSearch {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  width: 300px;       /* Standardbreite */
-  max-width: 80%;     /* Passt sich an kleinere Bildschirme an */
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}

@@ -577,3 +577,19 @@ searchInput.addEventListener("keydown", (e) => {
     }
   }
 });
+
+// ====== SCREENSHOT ======
+document.getElementById("screenshot").addEventListener("click", () => {
+  const node = document.querySelector("#meineTabelle");
+
+  htmlToImage.toPng(node)
+    .then(function (dataUrl) {
+      const link = document.createElement('a');
+      link.download = 'tabelle.png';
+      link.href = dataUrl;
+      link.click();
+    })
+    .catch(function (error) {
+      console.error('Fehler beim Screenshot:', error);
+    });
+});
