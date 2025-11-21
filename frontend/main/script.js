@@ -579,13 +579,19 @@ searchInput.addEventListener("keydown", (e) => {
 });
 
 // ====== SCREENSHOT ======
-document.getElementById("screenshot").addEventListener("click", () => {
+document.getElementById("screenshot").addEventListener("click", () => { 
   const node = document.querySelector("#meineTabelle");
+
+  // Heutiges Datum (YYYY-MM-DD)
+  const today = new Date().toISOString().split("T")[0];
 
   htmlToImage.toPng(node)
     .then(function (dataUrl) {
       const link = document.createElement('a');
-      link.download = 'tabelle.png';
+
+      // Dateiname: Punkteverteilung_YYYY-MM-DD.png
+      link.download = `Punkteverteilung(${today}).png`;
+
       link.href = dataUrl;
       link.click();
     })
