@@ -1,12 +1,12 @@
 body {
   font-family: "Segoe UI", sans-serif;
-  background: #1A3D64;
+  background: #1A3D64 !important;
   text-align: center;
   padding: 2rem;
 }
 
 h1 {
-  color: #F4F4F4; 
+  color: #F4F4F4 !important; 
   margin-bottom: 1rem;
 }
 
@@ -14,39 +14,39 @@ table {
   border-collapse: collapse;
   margin: 0 auto 1rem auto;
   width: 80%;
-  background: #F4F4F4;
+  background: #F4F4F4 !important;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
 }
 
 th, td {
-  border: 1px solid #ddd;
+  border: 1px solid #ddd !important;
   padding: 0.8rem 1.2rem;
   text-align: center;
 }
 
 th {
-  background: #0C2B4E;
-  color: white;
+  background: #0C2B4E !important;
+  color: white !important;
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f2f2f2 !important;
 }
 
 #zurueckButton {
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #0C2B4E;
-  color: #F4F4F4;
+  background-color: #0C2B4E !important;
+  color: #F4F4F4 !important;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 #zurueckButton:hover {
-  background-color: #1D546C;
+  background-color: #1D546C !important;
 }
 
 #logoutButton {
@@ -54,20 +54,20 @@ tr:nth-child(even) {
   top: 20px;
   right: 20px;
   padding: 0.5rem 1rem;
-  background-color: #ff5c5c;
-  color: white;
+  background-color: #ff5c5c !important;
+  color: white !important;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
   font-size: 1rem;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2) !important;
   transition: all 0.2s ease;
   z-index: 1000;
 }
 
 #logoutButton:hover {
-  background-color: #e04b4b;
+  background-color: #e04b4b !important;
   transform: scale(1.05);
 }
 
@@ -123,7 +123,7 @@ tr:nth-child(even) {
   width: 300px;       /* Standardbreite */
   max-width: 80%;     /* Passt sich an kleinere Bildschirme an */
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccc !important;
   font-size: 1rem;
 }
 
@@ -169,7 +169,7 @@ tr:nth-child(even) {
   height: 80px;
   object-fit: cover;
   border-radius: 10px;
-  border: 2px solid #ccc;
+  border: 2px solid #ccc !important;
 }
 
 .bild-buttons {
@@ -180,8 +180,8 @@ tr:nth-child(even) {
 }
 
 .bild-buttons button {
-  background-color: #0C2B4E;
-  color: white;
+  background-color: #0C2B4E !important;
+  color: white !important;
   border: none;
   border-radius: 5px;
   padding: 4px 8px;
@@ -190,5 +190,5 @@ tr:nth-child(even) {
 }
 
 .bild-buttons button:hover {
-  background-color: #1D546C;
+  background-color: #1D546C !important;
 }

@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1D546C);
+  background: linear-gradient(135deg, #1D546C) !important;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -15,13 +15,13 @@ body {
   background-size: cover; */
   
 .login-container {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   padding: 40px 30px;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
   width: 350px;
   text-align: center;
-  border: 2px solid #ddd;
+  border: 2px solid #ddd !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,7 +30,7 @@ body {
 .login-container h1 {
   margin-bottom: 30px;
   font-size: 30px;
-  color: #53b2a2;
+  color: #53b2a2 !important;
 }
 
 .login-container input[type="password"],
@@ -39,7 +39,7 @@ body {
   max-width: 300px;
   padding: 12px 15px;
   margin-bottom: 20px;
-  border: 2px solid #ccc;
+  border: 2px solid #ccc !important;
   border-radius: 8px;
   font-size: 16px;
   transition: border 0.3s;
@@ -47,7 +47,7 @@ body {
 
 .login-container input[type="password"]:focus,
 .login-container input[type="email"]:focus {
-  border-color: #55bcab;
+  border-color: #55bcab !important;
   outline: none;
 }
 
@@ -58,15 +58,15 @@ body {
   margin-bottom: 15px;
   border: none;
   border-radius: 8px;
-  background-color: #1D546C;
-  color: #fff;
+  background-color: #1D546C !important;
+  color: #fff !important;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
 }
 
 .login-container button:hover {
-  background-color: #53b2a2;
+  background-color: #53b2a2 !important;
   transform: translateY(-2px);
 }
 
@@ -78,7 +78,7 @@ body {
 #errorMessage {
   margin-top: 10px;
   font-size: 14px;
-  color: #e04b4b;
+  color: #e04b4b !important;
 }
 
 
