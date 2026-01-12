@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FaithPoints - Tabelle</title>
-  <link rel="stylesheet" href="/main/style.css"/>
+  <link rel="stylesheet" href="../main/style.css"/>
 </head>
 <body>
   <!-- Navbar -->
@@ -17,7 +17,32 @@
   <div class="wrapper">
     <h1>Punkteverteilung</h1>
       
-    <input type="text" id="kinderSearch" placeholder="Nach Kind suchen..." style="margin-bottom: 1rem; padding:0.5rem; width: 300px;">
+    <!-- Augeen und Suchfunktion -->
+    <div class="search-row">
+    <!-- Suchfunktion -->
+  <input type="text" id="kinderSearch" placeholder="Nach Kind suchen...">
+
+  <button id="toggleMarkierungen"
+          class="mark-toggle"
+          type="button"
+          aria-label="Markierungen ausblenden"
+          title="Markierungen ausblenden">
+    <!-- Auge an -->
+    <svg class="eye-on" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+
+    <!-- Auge aus -->
+    <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 3l18 18"></path>
+      <path d="M10.6 10.6a3 3 0 0 0 4.2 4.2"></path>
+      <path d="M9.5 5.5C10.3 5.2 11.1 5 12 5c6.5 0 10 7 10 7a18 18 0 0 1-4.2 5.1"></path>
+      <path d="M6.2 6.2A18 18 0 0 0 2 12s3.5 7 10 7c1.8 0 3.4-.5 4.8-1.2"></path>
+    </svg>
+  </button>
+</div>
+
     
     <div class="table-container">
       <table id="meineTabelle">
@@ -60,7 +85,7 @@
   <!-- Tooltip -->
   <div id="customTooltip" class="tooltip"></div>
   
-  <script type="module" src="/main/script.js"></script>
+  <script type="module" src="../main/script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script> <!-- Screenshot -->
 </body>
 </html>

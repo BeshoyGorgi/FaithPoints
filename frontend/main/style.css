@@ -248,6 +248,59 @@ td[contenteditable="true"] {
   font-size: 1rem;
 }
 
+/* Augen */
+.search-row{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.mark-toggle{
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.10);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mark-toggle:hover{
+  background: rgba(255,255,255,0.16);
+}
+
+.mark-toggle svg{
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.eye-on{ display:block; }
+.eye-off{ display:none; }
+
+body.markierungen-aus .eye-on{ display:none; }
+body.markierungen-aus .eye-off{ display:block; }
+
+/* NUR AUSBLENDEN: zeitbasierte Orange/Rot-Zellen (werden per data-Attribut markiert) */
+body.markierungen-aus td[data-farbmarkierung="1"]{
+  background-color: transparent !important;
+}
+
+/* Gelb (duplicate / contenteditable) ebenfalls nur ausblenden */
+body.markierungen-aus td[contenteditable="true"],
+body.markierungen-aus .duplicate{
+  background-color: transparent !important;
+  outline: none !important;
+}
+
 
 /* Screenshot-Button */
 .screenshot-button {

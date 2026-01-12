@@ -12,6 +12,21 @@ const RED_AFTER_MINUTES = 14 * 24 * 60;    //  28 * 24 * 60   4 Wochen
 
 let aktiveZelle = null;
 
+const toggleMarkBtn = document.getElementById("toggleMarkierungen");
+const MARK_KEY = "fp_hide_markierungen";
+
+function setMarkierungenAus(aus) {
+  document.body.classList.toggle("markierungen-aus", aus);
+  localStorage.setItem(MARK_KEY, aus ? "1" : "0");
+}
+
+setMarkierungenAus(localStorage.getItem(MARK_KEY) === "1");
+
+toggleMarkBtn?.addEventListener("click", () => {
+  const aktuellAus = document.body.classList.contains("markierungen-aus");
+  setMarkierungenAus(!aktuellAus);
+});
+
 
 const email = localStorage.getItem("email");
 const stufenAnzeige = document.getElementById("stufenAnzeige");
@@ -40,11 +55,24 @@ function updateCellColor(row) {
 
   // Funktion für Farbupdate, aber NUR wenn keine manuelle Änderung passiert ist
   const setColor = (cell, diff) => {
-    if (cell.dataset.manualReset === "true") return; // manuell geändert → Farbe bleibt neutral
-    if (diff >= RED_AFTER_MINUTES) cell.style.backgroundColor = "red";
-    else if (diff >= ORANGE_AFTER_MINUTES) cell.style.backgroundColor = "orange";
-    else cell.style.backgroundColor = ""; // sonst neutral
-  };
+  if (cell.dataset.manualReset === "true") {
+    // Wenn manuell neutral: auch nicht als farbig markieren
+    cell.dataset.farbmarkierung = "0";
+    return;
+  }
+
+  if (diff >= RED_AFTER_MINUTES) {
+    cell.style.backgroundColor = "red";
+    cell.dataset.farbmarkierung = "1";
+  } else if (diff >= ORANGE_AFTER_MINUTES) {
+    cell.style.backgroundColor = "orange";
+    cell.dataset.farbmarkierung = "1";
+  } else {
+    cell.style.backgroundColor = "";
+    cell.dataset.farbmarkierung = "0";
+  }
+};
+
 
 
   setColor(zellen.hymne, diffHymne);
