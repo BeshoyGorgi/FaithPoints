@@ -238,17 +238,18 @@ td[contenteditable="true"] {
 }
 
 /* Suchleiste */
-#kinderSearch {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  width: 300px;       /* Standardbreite */
-  max-width: 80%;     /* Passt sich an kleinere Bildschirme an */
-  border-radius: 5px;
+#kinderSearch{
+  height: 38px;
+  padding: 0 12px;
+  width: 300px;
+  max-width: 80%;
+  border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1rem;
+  margin: 0;             
+  box-sizing: border-box;
 }
 
-/* Augen */
 .search-row{
   display: flex;
   align-items: center;
@@ -257,20 +258,21 @@ td[contenteditable="true"] {
   margin-bottom: 1rem;
 }
 
+/* Auge */
 .mark-toggle{
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.10);
-  display: inline-flex;
+  width: 38px;                
+  height: 38px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
-.mark-toggle:hover{
-  background: rgba(255,255,255,0.16);
+.mark-toggle:hover svg{
+  opacity: 0.8;
 }
 
 .mark-toggle svg{
@@ -370,6 +372,27 @@ body.markierungen-aus .duplicate{
      padding: 0.4rem 0.7rem; font-size: 0.9rem; 
     }
 
+    /* Suche + Auge kleiner */
+    #kinderSearch{
+      height: 34px;
+      width: 260px;
+      font-size: 0.95rem;
+    }
+
+    .mark-toggle{
+      width: 34px;
+      height: 34px;
+    }
+
+    .mark-toggle svg{
+      width: 20px;
+      height: 20px;
+    }
+
+    .search-row{
+      gap: 8px;
+    }
+    
 }
 
 @media (max-width: 480px) {
@@ -405,5 +428,27 @@ body.markierungen-aus .duplicate{
   .logout-button {
      padding: 0.3rem 0.6rem; font-size: 0.85rem; 
   }
+
+    /* Suche + Auge noch kleiner */
+  #kinderSearch{
+    height: 32px;
+    width: 220px;
+    font-size: 0.9rem;
+  }
+
+  .mark-toggle{
+    width: 32px;
+    height: 32px;
+  }
+
+  .mark-toggle svg{
+    width: 18px;
+    height: 18px;
+  }
+
+  .search-row{
+    gap: 6px;
+  }
+
 }
 
