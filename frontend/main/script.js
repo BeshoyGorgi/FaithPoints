@@ -630,6 +630,6 @@ document.getElementById("screenshot").addEventListener("click", () => {
 
 // ====== Placements ======
 document.getElementById("goPlacements")?.addEventListener("click", () => {
-  window.location.href = "../placements/placements.html";
+  window.location.href = "/placements/placements.html";
 });
 
