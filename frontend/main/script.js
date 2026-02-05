@@ -627,3 +627,9 @@ document.getElementById("screenshot").addEventListener("click", () => {
       console.error('Fehler beim Screenshot:', error);
     });
 });
+
+// ====== Placements ======
+document.getElementById("goPlacements")?.addEventListener("click", () => {
+  window.location.href = "/platzierungen/platzierungen.html";
+});
+

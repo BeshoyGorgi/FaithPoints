@@ -271,6 +271,14 @@ td[contenteditable="true"] {
   cursor: pointer;
 }
 
+/* Buttons (Auge + Pokal) untereinander */
+.icon-row{
+  display: flex;
+  align-items: center; 
+  gap: 0px;            
+}
+
+
 .mark-toggle:hover svg{
   opacity: 0.8;
 }
@@ -389,6 +397,10 @@ body.markierungen-aus .duplicate{
       height: 20px;
     }
 
+    .icon-stack{ 
+      gap: 5px; 
+    }
+
     .search-row{
       gap: 8px;
     }
@@ -444,6 +456,10 @@ body.markierungen-aus .duplicate{
   .mark-toggle svg{
     width: 18px;
     height: 18px;
+  }
+
+  .icon-stack{ 
+    gap: 4px; 
   }
 
   .search-row{
