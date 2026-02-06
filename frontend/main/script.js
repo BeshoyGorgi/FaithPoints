@@ -573,6 +573,11 @@ function sortiereNachGesamt() {
   zeilen.forEach(z => tbody.appendChild(z));
 }
 
+// ====== Placements ======
+document.getElementById("goPlacements")?.addEventListener("click", () => {
+  window.location.href = "/placements/placements.html";
+});
+
 // === Navigation zur Details-Seite ===
 document.getElementById("zuDetails")?.addEventListener("click", () => {
   window.location.href = "/details/details.html";
@@ -628,8 +633,5 @@ document.getElementById("screenshot").addEventListener("click", () => {
     });
 });
 
-// ====== Placements ======
-document.getElementById("goPlacements")?.addEventListener("click", () => {
-  window.location.href = "/placements/placements.html";
-});
+
 
