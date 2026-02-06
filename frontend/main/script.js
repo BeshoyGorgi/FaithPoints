@@ -575,7 +575,7 @@ function sortiereNachGesamt() {
 
 // ====== Placements ======
 document.getElementById("goPlacements")?.addEventListener("click", () => {
-  window.location.href = "../placements/placements.html";
+  window.location.href = "/placements/placements.html";
 });
 
 // === Navigation zur Details-Seite ===
