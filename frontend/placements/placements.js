@@ -90,4 +90,32 @@ async function loadPlacements() {
   }).join("");
 }
 
+
+// ===== Screenshot (ohne Navbar) =====
+document.getElementById("placementsScreenshot")?.addEventListener("click", () => {
+  // Nur den Bereich der Seite screenshotten, den du willst:
+  // (Wrapper oder podium-wrap – hier podium-wrap ist am saubersten)
+  const node = document.querySelector(".podium-wrap");
+
+  if (!node) return;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // htmlToImage kommt vom CDN script (window.htmlToImage)
+  window.htmlToImage.toPng(node, {
+    backgroundColor: "#1D546C" // dein Hintergrund
+  })
+  .then((dataUrl) => {
+    const link = document.createElement("a");
+    link.download = `Placements(${today}).png`;
+    link.href = dataUrl;
+    link.click();
+  })
+  .catch((err) => {
+    console.error("Fehler beim Screenshot:", err);
+    alert("Screenshot Fehler – siehe Console.");
+  });
+});
+
+
 loadPlacements();

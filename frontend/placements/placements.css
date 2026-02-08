@@ -42,6 +42,60 @@ body{
   z-index:1000;
 }
 
+
+/* Titel + Icon nebeneinander */
+.stufen-anzeige{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stufen-anzeige .title{
+  font-weight: 900;
+}
+
+/* Icon-Button (nur Icon sichtbar, keine Fläche) */
+.icon-btn{
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn svg{
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.95;
+}
+
+.icon-btn:hover svg{
+  opacity: 0.75;
+}
+
+/* Responsive: Icon etwas kleiner */
+@media (max-width: 560px){
+  .icon-btn{
+    width: 30px;
+    height: 30px;
+  }
+  .icon-btn svg{
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
 .header-logo{
   width:50px;
   height:50px;
@@ -386,4 +440,8 @@ body{
   position: relative;
   z-index: 2;
 }
+
+
+
+
 
