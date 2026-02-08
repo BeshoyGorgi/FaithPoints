@@ -220,7 +220,7 @@ body{
   padding: 18px 12px 22px;   /* ✅ mehr Platz oben + unten */
   display:flex;
   flex-direction:column;
-  gap:13px;                  /* ✅ größerer Abstand Textzeilen */
+  gap:15px;                  /* ✅ größerer Abstand Textzeilen */
   text-align:center;
 }
 
