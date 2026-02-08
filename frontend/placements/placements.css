@@ -128,7 +128,7 @@ body{
 .pillar[data-rank="2"]{ height:350px; }
 .pillar[data-rank="3"]{ height:330px; }
 .pillar[data-rank="4"]{ height:310px; }
-.pillar[data-rank="5"]{ height:300px; }
+.pillar[data-rank="5"]{ height:305px; }
 
 /* Hintergrund-Face */
 .podium-face{
@@ -197,10 +197,10 @@ body{
 .pillar[data-rank="4"] .medal{ background: var(--four); }
 .pillar[data-rank="5"] .medal{ background: var(--five); }
 
-/* ✅ Avatar zwischen Medaille und Name (weiter runter) */
+/* Avatar zwischen Medaille und Name (weiter runter) */
 .kid-avatar{
   position:absolute;
-  top: 150px;  /* ✅ weiter runter -> mehr Luft zur Medaille */
+  top: 160px;  /* ✅ weiter runter -> mehr Luft zur Medaille */
   left:50%;
   transform:translateX(-50%);
   width:78px;
