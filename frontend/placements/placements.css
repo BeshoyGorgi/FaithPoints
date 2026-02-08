@@ -254,11 +254,11 @@ body{
   }
 
   /* längere Säulen auch in 3er Layout */
-  .pillar[data-rank="1"]{ height:360px; }
-  .pillar[data-rank="2"]{ height:330px; }
-  .pillar[data-rank="3"]{ height:315px; }
-  .pillar[data-rank="4"]{ height:295px; }
-  .pillar[data-rank="5"]{ height:285px; }
+  .pillar[data-rank="1"]{ height:370px; }
+  .pillar[data-rank="2"]{ height:340px; }
+  .pillar[data-rank="3"]{ height:325px; }
+  .pillar[data-rank="4"]{ height:305px; }
+  .pillar[data-rank="5"]{ height:305px; }
 }
 
 @media (max-width: 560px){
@@ -274,11 +274,11 @@ body{
   }
 
   /* ✅ auch mobil länger */
-  .pillar[data-rank="1"]{ height:340px; }
-  .pillar[data-rank="2"]{ height:320px; }
-  .pillar[data-rank="3"]{ height:305px; }
-  .pillar[data-rank="4"]{ height:290px; }
-  .pillar[data-rank="5"]{ height:280px; }
+  .pillar[data-rank="1"]{ height:350px; }
+  .pillar[data-rank="2"]{ height:330px; }
+  .pillar[data-rank="3"]{ height:315px; }
+  .pillar[data-rank="4"]{ height:300px; }
+  .pillar[data-rank="5"]{ height:290px; }
 
   .rank-badge{ width:50px; height:50px; }
   .medal{ width:36px; height:36px; top:70px; }
