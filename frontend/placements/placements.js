@@ -7,13 +7,22 @@ backBtn?.addEventListener("click", () => {
   window.location.href = "/main/index.html";
 });
 
-function medalEmoji(rank) {
-  if (rank === 1) return "🥇";
-  if (rank === 2) return "🥈";
-  if (rank === 3) return "🥉";
-  if (rank === 4) return "🏅";
-  if (rank === 5) return "🎖️";
-  return "⭐";
+const DEFAULT_PLACEMENT_IMAGE = "/images/placements/default.png";
+
+function getPlacementImgSrc(rank, indexInRank) {
+  const folder = `/images/placements/${rank}`;
+  const file = indexInRank === 0 ? `${rank}.png` : `${rank}.${indexInRank}.png`;
+  return `${folder}/${file}`;
+}
+
+function safeText(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  }[c]));
 }
 
 async function loadPlacements() {
@@ -26,43 +35,59 @@ async function loadPlacements() {
   const res = await fetch(`${API_BASE_URL}/api/kinder?email=${encodeURIComponent(email)}`);
   const kids = await res.json();
 
-  // 1) Sortieren nach Punkten (absteigend)
-  const sorted = kids
-    .slice()
-    .sort((a, b) => Number(b.gesamt || 0) - Number(a.gesamt || 0));
+  // Sortiert nach Punkten (absteigend)
+  const sorted = kids.slice().sort((a, b) => Number(b.gesamt || 0) - Number(a.gesamt || 0));
 
-  // 2) Dense Ranking: 1,2,2,3...
+  // Ränge: 1,2,2,3 (keine Lücken)
   let rank = 0;
   let lastScore = null;
 
   const ranked = sorted.map((k) => {
     const score = Number(k.gesamt || 0);
-
     if (lastScore === null || score !== lastScore) {
-      rank += 1;              // nur bei neuer Punktzahl Rang erhöhen
+      rank += 1;
       lastScore = score;
     }
-
-    return { ...k, score, rank };
+    return { ...k, rank, score };
   });
 
-  // 3) Alle Kinder anzeigen, die Rang <= 5 haben (inkl. Gleichstände)
-  const show = ranked.filter(k => k.rank <= 5);
+  // Alle Kids mit Rang 1–5 anzeigen (inkl. Gleichstände)
+  const shown = ranked.filter(k => k.rank <= 5);
 
-  // 4) Render: jedes Kind eigenes Podest (auch wenn gleicher Rang)
-  podium.innerHTML = show.map((k, i) => `
-    <div class="pillar" data-rank="${k.rank}" style="animation-delay:${i * 80}ms">
-      <div class="podium-face"></div>
+  // ✅ pro Rang mitzählen (für 1.png, 1.1.png, 1.2.png...)
+  const rankCounter = {};
 
-      <div class="rank-badge">#${k.rank}</div>
-      <div class="medal">${medalEmoji(k.rank)}</div>
+  podium.innerHTML = shown.map((k, idx) => {
+    const medalEmoji =
+      k.rank === 1 ? "🥇" :
+      k.rank === 2 ? "🥈" :
+      k.rank === 3 ? "🥉" : "🏅";
 
-      <div class="pillar-content">
-        <div class="kid-name">${k.name ?? "-"}</div>
-        <div class="kid-score">${k.score} Punkte</div>
+    rankCounter[k.rank] = (rankCounter[k.rank] || 0);
+    const indexInRank = rankCounter[k.rank];
+    rankCounter[k.rank] += 1;
+
+    const imgSrc = getPlacementImgSrc(k.rank, indexInRank);
+
+    return `
+      <div class="pillar" data-rank="${k.rank}" style="animation-delay:${60 + idx * 80}ms">
+        <div class="podium-face"></div>
+
+        <div class="rank-badge">${k.rank}</div>
+        <div class="medal" aria-hidden="true">${medalEmoji}</div>
+
+        <img class="kid-avatar"
+             src="${imgSrc}"
+             alt="Bild von ${safeText(k.name)}"
+             onerror="this.src='${DEFAULT_PLACEMENT_IMAGE}';" />
+
+        <div class="pillar-content">
+          <div class="kid-name">${safeText(k.name) || "-"}</div>
+          <div class="kid-score">${k.score} Punkte</div>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 loadPlacements();

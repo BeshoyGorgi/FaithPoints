@@ -261,6 +261,28 @@ body{
 .tie-name{ font-weight:800; }
 .tie-score{ font-weight:800; opacity:.95; }
 
+/* Kind-Bild zwischen Medaille und Name */
+.kid-avatar{
+  position:absolute;
+  top: 108px;                 /* sitzt unter der Medaille */
+  left:50%;
+  transform: translateX(-50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+  opacity: 0;
+  animation: avatarIn 600ms ease forwards;
+  animation-delay: 320ms;
+}
+
+@keyframes avatarIn{
+  from{ opacity:0; transform:translateX(-50%) translateY(-8px); }
+  to{ opacity:1; transform:translateX(-50%) translateY(0); }
+}
+
 /* RESPONSIVE */
 @media (max-width: 520px){
   .navbar{ height:60px; padding:0 10px; }
@@ -276,4 +298,10 @@ body{
 
   .rank-badge{ width:44px; height:44px; }
   .medal{ width:32px; height:32px; }
+
+  .kid-avatar{
+    width: 58px;
+    height: 58px;
+    top: 102px;
+  }
 }
