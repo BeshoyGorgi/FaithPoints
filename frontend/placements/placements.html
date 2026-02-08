@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Platzierungen – Top 5</title>
-  <link rel="stylesheet" href="/placements/placements.css">
+  <link rel="stylesheet" href="../placements/placements.css">
 </head>
 <body>
   <nav class="navbar">
@@ -20,8 +20,12 @@
     <section class="podium-wrap" aria-label="Top 5 Podium">
       <div id="podium" class="podium"></div>
     </section>
-
   </main>
+
+  <div class="confetti" aria-hidden="true"></div>
+
+  <canvas id="confettiCanvas"></canvas>
+  <script type="module" src="/placements/confetti.js"></script>
 
   <script type="module" src="/placements/placements.js"></script>
 </body>

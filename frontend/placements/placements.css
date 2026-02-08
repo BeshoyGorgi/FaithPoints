@@ -220,7 +220,7 @@ body{
   padding: 18px 12px 22px;   /* ✅ mehr Platz oben + unten */
   display:flex;
   flex-direction:column;
-  gap:10px;                  /* ✅ größerer Abstand Textzeilen */
+  gap:13px;                  /* ✅ größerer Abstand Textzeilen */
   text-align:center;
 }
 
@@ -284,3 +284,107 @@ body{
   .medal{ width:36px; height:36px; top:70px; }
   .kid-avatar{ width:70px; height:70px; top:145px; }
 }
+
+
+/* ================= FESTLICHER HINTERGRUND (KONFETTI) ================= */
+
+/* damit Konfetti hinter allem bleibt */
+.confetti{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* sorgt dafür, dass dein Inhalt über dem Konfetti liegt */
+.wrapper{
+  position: relative;
+  z-index: 2;
+}
+
+/* Konfetti-Partikel (CSS-only) */
+.confetti::before,
+.confetti::after{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background-repeat: repeat;
+  opacity: 0.35;
+  filter: blur(0.2px);
+  animation: confettiMove 14s linear infinite;
+}
+
+/* Ebene 1: kleine, schnelle Partikel */
+.confetti::before{
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.85) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(247,201,72,0.95) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(217,222,231,0.95) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(209,154,102,0.95) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(138,209,255,0.95) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(182,255,179,0.95) 0 2px, transparent 3px);
+
+  background-size: 120px 120px;
+  transform: rotate(8deg);
+}
+
+/* Ebene 2: größere, langsamere Partikel */
+.confetti::after{
+  opacity: 0.22;
+  background-image:
+    radial-gradient(circle, rgba(247,201,72,0.9) 0 3px, transparent 4px),
+    radial-gradient(circle, rgba(138,209,255,0.9) 0 3px, transparent 4px),
+    radial-gradient(circle, rgba(182,255,179,0.9) 0 3px, transparent 4px),
+    radial-gradient(circle, rgba(255,255,255,0.8) 0 3px, transparent 4px);
+
+  background-size: 180px 180px;
+  transform: rotate(-10deg);
+  animation-duration: 22s;
+}
+
+@keyframes confettiMove{
+  0%   { transform: translate3d(0,0,0) rotate(8deg); }
+  100% { transform: translate3d(-8%, 10%, 0) rotate(8deg); }
+}
+
+/* ================= EXTRA GLANZ (optional aber sehr gut) ================= */
+
+/* leichte „Sternen-Glow“ Atmosphäre hinter Podesten */
+.podium{
+  position: relative;
+}
+
+.podium::before{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,255,255,0.18), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(247,201,72,0.18), transparent 45%),
+    radial-gradient(circle at 30% 80%, rgba(138,209,255,0.16), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(182,255,179,0.14), transparent 45%);
+  filter: blur(2px);
+  z-index: -1;
+}
+
+
+
+
+/* ===== Confetti Canvas JS (liegt über Hintergrund, aber unter Inhalt) ===== */
+#confettiCanvas{
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inhalt soll drüber liegen */
+.navbar,
+.wrapper{
+  position: relative;
+  z-index: 2;
+}
+
