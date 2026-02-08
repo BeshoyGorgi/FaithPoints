@@ -69,14 +69,17 @@ body{
   cursor:pointer;
   transition:transform .15s ease, filter .15s ease;
 }
-.back-button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+.back-button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+}
 
 /* PAGE */
 .wrapper{
   width:95%;
-  max-width:1100px;           /* etwas breiter */
+  max-width:1100px;
   margin:0 auto;
-  padding: 10px 0 30px;       /* mehr Luft unten */
+  padding: 10px 0 30px;
 }
 
 .headline{
@@ -89,9 +92,9 @@ body{
 .podium{
   display:grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 22px;                  /* ✅ mehr Abstand */
+  gap: 22px;                 /* mehr Abstand */
   align-items:end;
-  padding: 20px 18px 26px;    /* ✅ Innenabstand */
+  padding: 20px 18px 26px;   /* Innenabstand */
 }
 
 /* PODIUM CARD */
@@ -103,7 +106,6 @@ body{
   border: 1px solid var(--glassBorder);
   box-shadow: var(--shadow);
   backdrop-filter: blur(8px);
-  min-height: 220px;          /* gibt Platz für Text */
   padding-top: 16px;
 
   transform: translateY(18px) scale(.98);
@@ -121,12 +123,12 @@ body{
   to{ transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* Höhen pro Platz */
-.pillar[data-rank="1"]{ height:320px; }
-.pillar[data-rank="2"]{ height:285px; }
-.pillar[data-rank="3"]{ height:265px; }
-.pillar[data-rank="4"]{ height:245px; }
-.pillar[data-rank="5"]{ height:235px; }
+/* ✅ LÄNGERE HÖHEN pro Platz */
+.pillar[data-rank="1"]{ height:380px; }
+.pillar[data-rank="2"]{ height:350px; }
+.pillar[data-rank="3"]{ height:330px; }
+.pillar[data-rank="4"]{ height:310px; }
+.pillar[data-rank="5"]{ height:300px; }
 
 /* Hintergrund-Face */
 .podium-face{
@@ -169,7 +171,7 @@ body{
 /* Medal */
 .medal{
   position:absolute;
-  top:82px;
+  top:74px; /* ✅ etwas höher für mehr Platz zur Avatar/Name Zone */
   left:50%;
   transform:translateX(-50%) translateY(-6px);
   width:40px;
@@ -195,14 +197,14 @@ body{
 .pillar[data-rank="4"] .medal{ background: var(--four); }
 .pillar[data-rank="5"] .medal{ background: var(--five); }
 
-/* ✅ Avatar zwischen Medaille und Name */
+/* ✅ Avatar zwischen Medaille und Name (weiter runter) */
 .kid-avatar{
   position:absolute;
-  top: 135px;
+  top: 150px;  /* ✅ weiter runter -> mehr Luft zur Medaille */
   left:50%;
   transform:translateX(-50%);
-  width:76px;
-  height:76px;
+  width:78px;
+  height:78px;
   border-radius:999px;
   object-fit:cover;
   border: 3px solid rgba(255,255,255,0.85);
@@ -210,24 +212,25 @@ body{
   background: rgba(255,255,255,0.15);
 }
 
-/* Content unten */
+/* ✅ Content unten mit mehr Abstand */
 .pillar-content{
   position:absolute;
   left:0; right:0;
   bottom:0;
-  padding: 14px 12px 16px;   /* ✅ mehr Platz */
+  padding: 18px 12px 22px;   /* ✅ mehr Platz oben + unten */
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:10px;                  /* ✅ größerer Abstand Textzeilen */
   text-align:center;
 }
 
 .kid-name{
   font-weight:1000;
-  font-size:1.05rem;
-  line-height:1.15;
+  font-size:1.08rem;
+  line-height:1.2;
   text-shadow: 0 8px 20px rgba(0,0,0,0.28);
-  padding: 0 6px;
+  padding: 0 8px;
+  word-break: break-word;
 }
 
 .kid-score{
@@ -249,6 +252,13 @@ body{
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
+
+  /* längere Säulen auch in 3er Layout */
+  .pillar[data-rank="1"]{ height:360px; }
+  .pillar[data-rank="2"]{ height:330px; }
+  .pillar[data-rank="3"]{ height:315px; }
+  .pillar[data-rank="4"]{ height:295px; }
+  .pillar[data-rank="5"]{ height:285px; }
 }
 
 @media (max-width: 560px){
@@ -263,7 +273,14 @@ body{
     padding: 14px 10px 18px;
   }
 
+  /* ✅ auch mobil länger */
+  .pillar[data-rank="1"]{ height:340px; }
+  .pillar[data-rank="2"]{ height:320px; }
+  .pillar[data-rank="3"]{ height:305px; }
+  .pillar[data-rank="4"]{ height:290px; }
+  .pillar[data-rank="5"]{ height:280px; }
+
   .rank-badge{ width:50px; height:50px; }
-  .medal{ width:36px; height:36px; top:78px; }
-  .kid-avatar{ width:70px; height:70px; top:130px; }
+  .medal{ width:36px; height:36px; top:70px; }
+  .kid-avatar{ width:70px; height:70px; top:145px; }
 }
