@@ -200,7 +200,7 @@ body{
 /* Avatar zwischen Medaille und Name (weiter runter) */
 .kid-avatar{
   position:absolute;
-  top: 160px;  /* ✅ weiter runter -> mehr Luft zur Medaille */
+  top: 140px;  /* ✅ weiter runter -> mehr Luft zur Medaille */
   left:50%;
   transform:translateX(-50%);
   width:78px;
