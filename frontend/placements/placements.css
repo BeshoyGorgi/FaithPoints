@@ -86,9 +86,10 @@ body{
   margin-top:10px;
 }
 
+/* ✅ WICHTIGE ÄNDERUNG: Auto-fit Grid für beliebig viele Podeste */
 .podium{
   display:grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap:12px;
   align-items:end;
 }
@@ -106,11 +107,16 @@ body{
 }
 
 /* Höhe pro Platz (1 höchste, 5 niedrigste) */
-.pillar[data-rank="1"]{ height:260px; animation-delay: 60ms; }
-.pillar[data-rank="2"]{ height:220px; animation-delay: 140ms; }
-.pillar[data-rank="3"]{ height:200px; animation-delay: 220ms; }
-.pillar[data-rank="4"]{ height:180px; animation-delay: 300ms; }
-.pillar[data-rank="5"]{ height:165px; animation-delay: 380ms; }
+.pillar[data-rank="1"]{ height:260px; }
+.pillar[data-rank="2"]{ height:220px; }
+.pillar[data-rank="3"]{ height:200px; }
+.pillar[data-rank="4"]{ height:180px; }
+.pillar[data-rank="5"]{ height:165px; }
+
+/* ✅ Falls durch Gleichstand mehr Podeste gerendert werden */
+.pillar:not([data-rank="1"]):not([data-rank="2"]):not([data-rank="3"]):not([data-rank="4"]):not([data-rank="5"]){
+  height:150px;
+}
 
 @keyframes rise{
   to{ transform: translateY(0) scale(1); opacity: 1; }
@@ -147,12 +153,8 @@ body{
   box-shadow: 0 10px 22px rgba(0,0,0,0.18);
   opacity:0;
   animation: pop 520ms cubic-bezier(.2,.8,.2,1) forwards;
+  animation-delay: 240ms;
 }
-.pillar[data-rank="1"] .rank-badge{ animation-delay: 250ms; }
-.pillar[data-rank="2"] .rank-badge{ animation-delay: 330ms; }
-.pillar[data-rank="3"] .rank-badge{ animation-delay: 410ms; }
-.pillar[data-rank="4"] .rank-badge{ animation-delay: 490ms; }
-.pillar[data-rank="5"] .rank-badge{ animation-delay: 570ms; }
 
 @keyframes pop{
   to{ transform:translateX(-50%) scale(1); opacity:1; }
@@ -174,6 +176,7 @@ body{
   box-shadow: 0 10px 22px rgba(0,0,0,0.16);
   opacity:0;
   animation: floatIn 600ms ease forwards;
+  animation-delay: 260ms;
 }
 
 @keyframes floatIn{
@@ -181,11 +184,11 @@ body{
   100%{ opacity:1; transform:translateX(-50%) translateY(0); }
 }
 
-.pillar[data-rank="1"] .medal{ background: var(--gold); animation-delay: 260ms; }
-.pillar[data-rank="2"] .medal{ background: var(--silver); animation-delay: 340ms; }
-.pillar[data-rank="3"] .medal{ background: var(--bronze); animation-delay: 420ms; }
-.pillar[data-rank="4"] .medal{ background: var(--four); animation-delay: 500ms; }
-.pillar[data-rank="5"] .medal{ background: var(--five); animation-delay: 580ms; }
+.pillar[data-rank="1"] .medal{ background: var(--gold); }
+.pillar[data-rank="2"] .medal{ background: var(--silver); }
+.pillar[data-rank="3"] .medal{ background: var(--bronze); }
+.pillar[data-rank="4"] .medal{ background: var(--four); }
+.pillar[data-rank="5"] .medal{ background: var(--five); }
 
 /* Content unten */
 .pillar-content{
@@ -265,25 +268,12 @@ body{
 .tie-score{ font-weight:800; opacity:.95; }
 
 /* RESPONSIVE */
-@media (max-width: 900px){
-  .podium{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  /* bei 3 Spalten sieht man 1-3 oben, 4-5 darunter */
-  .pillar[data-rank="4"], .pillar[data-rank="5"]{
-    height:160px;
-  }
-}
-
 @media (max-width: 520px){
   .navbar{ height:60px; padding:0 10px; }
   body{ padding-top:60px; }
   .header-logo{ width:40px; height:40px; }
   .stufen-anzeige{ font-size:1rem; }
 
-  .podium{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .pillar[data-rank="1"]{ height:230px; }
   .pillar[data-rank="2"]{ height:210px; }
   .pillar[data-rank="3"]{ height:190px; }
