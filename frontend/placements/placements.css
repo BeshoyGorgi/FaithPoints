@@ -226,12 +226,6 @@ body{
 }
 .empty .kid-name{ opacity:.85; }
 
-/* LISTE FÜR GLEICHSTAND >5 */
-.list-wrap{
-  margin-top:18px;
-  text-align:left;
-}
-
 .sub{
   font-size:1rem;
   margin: 0 0 10px;
