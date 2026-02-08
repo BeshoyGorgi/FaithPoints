@@ -382,7 +382,6 @@ body{
 }
 
 /* Inhalt soll drüber liegen */
-.navbar,
 .wrapper{
   position: relative;
   z-index: 2;
