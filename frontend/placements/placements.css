@@ -3,8 +3,6 @@
   --nav1:#0C2B4E;
   --nav2:#1D546C;
 
-  --glass: rgba(255,255,255,0.12);
-  --glass2: rgba(255,255,255,0.18);
   --text:#fff;
 
   --gold:#f7c948;
@@ -12,6 +10,10 @@
   --bronze:#d19a66;
   --four:#8ad1ff;
   --five:#b6ffb3;
+
+  --glass: rgba(255,255,255,0.10);
+  --glassBorder: rgba(255,255,255,0.18);
+  --shadow: 0 18px 40px rgba(0,0,0,0.25);
 }
 
 *{ box-sizing:border-box; }
@@ -51,7 +53,7 @@ body{
   flex:1;
   text-align:center;
   font-size:1.2rem;
-  font-weight:800;
+  font-weight:900;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -61,126 +63,129 @@ body{
   background:#ff5c5c;
   color:#fff;
   border:none;
-  border-radius:8px;
-  padding:0.5rem 1rem;
-  font-weight:800;
+  border-radius:10px;
+  padding:0.55rem 1rem;
+  font-weight:900;
   cursor:pointer;
   transition:transform .15s ease, filter .15s ease;
 }
-.back-button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+.back-button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
 /* PAGE */
 .wrapper{
   width:95%;
-  max-width:980px;
+  max-width:1100px;           /* etwas breiter */
   margin:0 auto;
+  padding: 10px 0 30px;       /* mehr Luft unten */
 }
 
 .headline{
-  margin:18px 0 14px;
-  font-weight:900;
+  margin:18px 0 18px;
+  font-weight:1000;
+  letter-spacing: .5px;
 }
 
-/* PODIUM */
-.podium-wrap{
-  margin-top:10px;
-}
-
-/* ✅ WICHTIGE ÄNDERUNG: Auto-fit Grid für beliebig viele Podeste */
+/* PODIUM GRID */
 .podium{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap:12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 22px;                  /* ✅ mehr Abstand */
   align-items:end;
+  padding: 20px 18px 26px;    /* ✅ Innenabstand */
 }
 
-/* Jede Säule */
+/* PODIUM CARD */
 .pillar{
   position:relative;
-  border-radius:16px 16px 12px 12px;
+  border-radius:18px;
   overflow:hidden;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.14);
-  transform: translateY(14px) scale(.98);
+  background: var(--glass);
+  border: 1px solid var(--glassBorder);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  min-height: 220px;          /* gibt Platz für Text */
+  padding-top: 16px;
+
+  transform: translateY(18px) scale(.98);
   opacity: 0;
   animation: rise 650ms cubic-bezier(.2,.8,.2,1) forwards;
+  transition: transform .18s ease, filter .18s ease;
 }
 
-/* Höhe pro Platz (1 höchste, 5 niedrigste) */
-.pillar[data-rank="1"]{ height:260px; }
-.pillar[data-rank="2"]{ height:220px; }
-.pillar[data-rank="3"]{ height:200px; }
-.pillar[data-rank="4"]{ height:180px; }
-.pillar[data-rank="5"]{ height:165px; }
-
-/* ✅ Falls durch Gleichstand mehr Podeste gerendert werden */
-.pillar:not([data-rank="1"]):not([data-rank="2"]):not([data-rank="3"]):not([data-rank="4"]):not([data-rank="5"]){
-  height:150px;
+.pillar:hover{
+  transform: translateY(-6px) scale(1.02);
+  filter: brightness(1.04);
 }
 
 @keyframes rise{
   to{ transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* Podest-Farbe */
+/* Höhen pro Platz */
+.pillar[data-rank="1"]{ height:320px; }
+.pillar[data-rank="2"]{ height:285px; }
+.pillar[data-rank="3"]{ height:265px; }
+.pillar[data-rank="4"]{ height:245px; }
+.pillar[data-rank="5"]{ height:235px; }
+
+/* Hintergrund-Face */
 .podium-face{
   position:absolute;
   inset:0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
 }
 
-.pillar[data-rank="1"] .podium-face{ background: linear-gradient(180deg, rgba(247,201,72,.55), rgba(255,255,255,0.10)); }
-.pillar[data-rank="2"] .podium-face{ background: linear-gradient(180deg, rgba(217,222,231,.55), rgba(255,255,255,0.10)); }
-.pillar[data-rank="3"] .podium-face{ background: linear-gradient(180deg, rgba(209,154,102,.55), rgba(255,255,255,0.10)); }
-.pillar[data-rank="4"] .podium-face{ background: linear-gradient(180deg, rgba(138,209,255,.45), rgba(255,255,255,0.10)); }
-.pillar[data-rank="5"] .podium-face{ background: linear-gradient(180deg, rgba(182,255,179,.40), rgba(255,255,255,0.10)); }
+/* Podestfarben */
+.pillar[data-rank="1"] .podium-face{ background: linear-gradient(180deg, rgba(247,201,72,.50), rgba(255,255,255,0.10)); }
+.pillar[data-rank="2"] .podium-face{ background: linear-gradient(180deg, rgba(217,222,231,.50), rgba(255,255,255,0.10)); }
+.pillar[data-rank="3"] .podium-face{ background: linear-gradient(180deg, rgba(209,154,102,.48), rgba(255,255,255,0.10)); }
+.pillar[data-rank="4"] .podium-face{ background: linear-gradient(180deg, rgba(138,209,255,.40), rgba(255,255,255,0.10)); }
+.pillar[data-rank="5"] .podium-face{ background: linear-gradient(180deg, rgba(182,255,179,.36), rgba(255,255,255,0.10)); }
 
-/* Nummer-Kreis wie im Bild */
+/* Rank Badge */
 .rank-badge{
   position:absolute;
-  top:12px;
+  top:14px;
   left:50%;
-  transform:translateX(-50%) scale(.8);
-  width:48px;
-  height:48px;
+  transform:translateX(-50%) scale(.85);
+  width:56px;
+  height:56px;
   border-radius:999px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
+  font-weight:1000;
   color:#0C2B4E;
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.22);
   opacity:0;
   animation: pop 520ms cubic-bezier(.2,.8,.2,1) forwards;
-  animation-delay: 240ms;
 }
 
 @keyframes pop{
   to{ transform:translateX(-50%) scale(1); opacity:1; }
 }
 
-/* Medaille */
+/* Medal */
 .medal{
   position:absolute;
-  top:62px;
+  top:82px;
   left:50%;
   transform:translateX(-50%) translateY(-6px);
-  width:34px;
-  height:34px;
+  width:40px;
+  height:40px;
   border-radius:999px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:18px;
-  box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+  font-size:20px;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.18);
   opacity:0;
   animation: floatIn 600ms ease forwards;
-  animation-delay: 260ms;
 }
 
 @keyframes floatIn{
-  0%{ opacity:0; transform:translateX(-50%) translateY(-10px); }
+  0%{ opacity:0; transform:translateX(-50%) translateY(-12px); }
   100%{ opacity:1; transform:translateX(-50%) translateY(0); }
 }
 
@@ -190,118 +195,75 @@ body{
 .pillar[data-rank="4"] .medal{ background: var(--four); }
 .pillar[data-rank="5"] .medal{ background: var(--five); }
 
+/* ✅ Avatar zwischen Medaille und Name */
+.kid-avatar{
+  position:absolute;
+  top: 135px;
+  left:50%;
+  transform:translateX(-50%);
+  width:76px;
+  height:76px;
+  border-radius:999px;
+  object-fit:cover;
+  border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 14px 26px rgba(0,0,0,0.25);
+  background: rgba(255,255,255,0.15);
+}
+
 /* Content unten */
 .pillar-content{
   position:absolute;
   left:0; right:0;
   bottom:0;
-  padding:12px 10px;
+  padding: 14px 12px 16px;   /* ✅ mehr Platz */
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:8px;
   text-align:center;
 }
 
 .kid-name{
-  font-weight:900;
-  font-size:1rem;
+  font-weight:1000;
+  font-size:1.05rem;
   line-height:1.15;
-  text-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  text-shadow: 0 8px 20px rgba(0,0,0,0.28);
+  padding: 0 6px;
 }
 
 .kid-score{
-  font-weight:800;
+  font-weight:900;
   opacity:.95;
-  font-size:.95rem;
-}
-
-.kid-sub{
-  font-size:.85rem;
-  opacity:.85;
-}
-
-/* Platzhalter */
-.empty{
-  opacity:.75;
-}
-.empty .kid-name{ opacity:.85; }
-
-.sub{
   font-size:1rem;
-  margin: 0 0 10px;
-  opacity:.95;
-}
-
-.ties{
-  display:grid;
-  gap:10px;
-}
-
-.tie-card{
-  background: var(--glass);
-  border: 1px solid var(--glass2);
-  border-radius: 14px;
-  padding: 12px 14px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  transform: translateY(10px);
-  opacity:0;
-  animation: fadeUp 520ms ease forwards;
-}
-@keyframes fadeUp{ to{ transform:translateY(0); opacity:1; } }
-
-.tie-left{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.tie-rank{ font-weight:900; }
-.tie-name{ font-weight:800; }
-.tie-score{ font-weight:800; opacity:.95; }
-
-/* Kind-Bild zwischen Medaille und Name */
-.kid-avatar{
-  position:absolute;
-  top: 108px;                 /* sitzt unter der Medaille */
-  left:50%;
-  transform: translateX(-50%);
-  width: 68px;
-  height: 68px;
-  border-radius: 999px;
-  object-fit: cover;
-  border: 3px solid rgba(255,255,255,0.85);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
-  opacity: 0;
-  animation: avatarIn 600ms ease forwards;
-  animation-delay: 320ms;
-}
-
-@keyframes avatarIn{
-  from{ opacity:0; transform:translateX(-50%) translateY(-8px); }
-  to{ opacity:1; transform:translateX(-50%) translateY(0); }
 }
 
 /* RESPONSIVE */
-@media (max-width: 520px){
+@media (max-width: 1100px){
+  .podium{
+    gap: 16px;
+    padding: 16px 12px 20px;
+  }
+}
+
+@media (max-width: 900px){
+  .podium{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 560px){
   .navbar{ height:60px; padding:0 10px; }
   body{ padding-top:60px; }
   .header-logo{ width:40px; height:40px; }
   .stufen-anzeige{ font-size:1rem; }
 
-  .pillar[data-rank="1"]{ height:230px; }
-  .pillar[data-rank="2"]{ height:210px; }
-  .pillar[data-rank="3"]{ height:190px; }
-  .pillar[data-rank="4"]{ height:175px; }
-  .pillar[data-rank="5"]{ height:165px; }
-
-  .rank-badge{ width:44px; height:44px; }
-  .medal{ width:32px; height:32px; }
-
-  .kid-avatar{
-    width: 58px;
-    height: 58px;
-    top: 102px;
+  .podium{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 14px 10px 18px;
   }
+
+  .rank-badge{ width:50px; height:50px; }
+  .medal{ width:36px; height:36px; top:78px; }
+  .kid-avatar{ width:70px; height:70px; top:130px; }
 }
