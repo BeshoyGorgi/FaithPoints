@@ -448,11 +448,17 @@ function sperreInput(input) {
 
 function sucheKind() {
   const query = (suchInput.value || "").trim().toLowerCase();
+  if (!query) return;
 
   const cards = Array.from(document.querySelectorAll(".kind-card"));
   const match = cards.find(card =>
     (card.dataset.kindName || "").includes(query)
   );
+
+  if (!match) {
+    alert("Kein passendes Kind gefunden.");
+    return;
+  }
 
   oeffneKindCard(match);
   hervorheben(match);
@@ -520,14 +526,20 @@ suchInput?.addEventListener("keydown", (e) => {
   }
 });
 
-document.getElementById("zurueckButton").addEventListener("click", () => {
-  window.location.href = "/main/index.html";
-});
+const zurueckButton = document.getElementById("zurueckButton");
+if (zurueckButton) {
+  zurueckButton.addEventListener("click", () => {
+    window.location.href = "/main/index.html";
+  });
+}
 
-document.getElementById("logoutButton").addEventListener("click", () => {
-  localStorage.removeItem("email");
-  localStorage.removeItem(OPEN_KIND_KEY);
-  window.location.href = "/login/login.html";
-});
+const logoutButton = document.getElementById("logoutButton");
+if (logoutButton) {
+  logoutButton.addEventListener("click", () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem(OPEN_KIND_KEY);
+    window.location.href = "/login/login.html";
+  });
+}
 
 ladeHymnenUebersicht();
