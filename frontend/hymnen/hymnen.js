@@ -2,6 +2,8 @@ import { API_BASE_URL } from "../config.js";
 
 const kinderListe = document.getElementById("kinderListe");
 const statusBox = document.getElementById("statusBox");
+const suchInput = document.getElementById("kindSuche");
+const suchButton = document.getElementById("suchButton");
 
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
@@ -28,7 +30,7 @@ async function ladeHymnenUebersicht() {
       return;
     }
 
-    statusBox.textContent = "Klicke auf ein Kind, um die Hymnen-Einträge zu sehen.";
+    statusBox.textContent = "Klicke auf ein Kind oder benutze die Suche.";
 
     daten.forEach(kind => {
       const card = baueKindCard(kind);
@@ -40,6 +42,7 @@ async function ladeHymnenUebersicht() {
       const card = document.querySelector(`.kind-card[data-kind-id="${openKindId}"]`);
       if (card) {
         oeffneKindCard(card);
+        hervorheben(card);
         card.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       localStorage.removeItem(OPEN_KIND_KEY);
@@ -54,6 +57,7 @@ function baueKindCard(kind) {
   const card = document.createElement("article");
   card.className = "kind-card";
   card.dataset.kindId = kind.kind_id;
+  card.dataset.kindName = (kind.kind_name || "").toLowerCase();
 
   const header = document.createElement("button");
   header.className = "kind-header";
@@ -89,7 +93,7 @@ function baueKindCard(kind) {
     head.className = "details-head";
     head.innerHTML = `
       <div>Name der Hymne</div>
-      <div>Punkte</div>
+      <div>Punkte / Datum</div>
       <div>Speichern</div>
     `;
     details.appendChild(head);
@@ -117,7 +121,10 @@ function baueHymnenZeile(eintrag) {
       value="${escapeAttribute(eintrag.titel || "")}"
       placeholder="Name der Hymne eingeben"
     />
-    <div class="readonly-box">${Number(eintrag.punkte) || 0}</div>
+    <div class="punkte-datum-box">
+      <span class="punkte-wert">${Number(eintrag.punkte) || 0} Punkte</span>
+      <span class="punkte-datum">${formatDatum(eintrag.created_at)}</span>
+    </div>
     <div class="row-actions">
       <button type="button" class="save-button">Speichern</button>
     </div>
@@ -170,6 +177,37 @@ function baueHymnenZeile(eintrag) {
   return row;
 }
 
+function sucheKind() {
+  const query = (suchInput.value || "").trim().toLowerCase();
+
+  if (!query) {
+    statusBox.textContent = "Bitte gib einen Namen ein.";
+    return;
+  }
+
+  const cards = Array.from(document.querySelectorAll(".kind-card"));
+  const match = cards.find(card =>
+    (card.dataset.kindName || "").includes(query)
+  );
+
+  if (!match) {
+    statusBox.textContent = `Kein Kind mit "${suchInput.value}" gefunden.`;
+    return;
+  }
+
+  oeffneKindCard(match);
+  hervorheben(match);
+  match.scrollIntoView({ behavior: "smooth", block: "center" });
+  statusBox.textContent = `Kind gefunden: ${match.querySelector(".kind-name")?.textContent || ""}`;
+}
+
+function hervorheben(card) {
+  card.classList.add("suchtreffer");
+  setTimeout(() => {
+    card.classList.remove("suchtreffer");
+  }, 2000);
+}
+
 function schliesseAlleCards() {
   document.querySelectorAll(".kind-card").forEach(card => {
     card.classList.remove("aktiv");
@@ -185,6 +223,13 @@ function oeffneKindCard(card) {
   if (details) details.classList.add("offen");
 }
 
+function formatDatum(value) {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleString("de-DE");
+}
+
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
@@ -198,6 +243,15 @@ function escapeHtml(str) {
 function escapeAttribute(str) {
   return escapeHtml(str);
 }
+
+suchButton?.addEventListener("click", sucheKind);
+
+suchInput?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sucheKind();
+  }
+});
 
 document.getElementById("zurueckButton").addEventListener("click", () => {
   window.location.href = "/main/index.html";

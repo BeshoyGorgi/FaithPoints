@@ -576,6 +576,11 @@ document.getElementById("zuDetails")?.addEventListener("click", () => {
   window.location.href = "/details/details.html";
 });
 
+// === Navigation zur Hymnen-Seite ===
+document.getElementById("zuHymnen")?.addEventListener("click", () => {
+  window.location.href = "/hymnen/hymnen.html";
+});
+
 // === Logout ===
 document.getElementById("logoutButton")?.addEventListener("click", () => {
   localStorage.removeItem("email");

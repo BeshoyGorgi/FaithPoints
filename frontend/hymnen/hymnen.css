@@ -2,6 +2,11 @@
   box-sizing: border-box;
 }
 
+h1 {
+  color: #F4F4F4; 
+  margin-bottom: 1rem;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -67,6 +72,42 @@ body {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.search-row-hymnen {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 18px 0 10px 0;
+  flex-wrap: wrap;
+}
+
+.search-input-hymnen {
+  flex: 1;
+  min-width: 260px;
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.96rem;
+}
+
+.search-button-hymnen {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.search-button-hymnen:hover {
+  background: #1d4ed8;
+}
+
+.suchtreffer {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
 .info-text {
@@ -144,7 +185,7 @@ body {
 
 .details-head {
   display: grid;
-  grid-template-columns: 1.4fr 180px 140px;
+  grid-template-columns: 1.4fr 260px 140px;
   gap: 12px;
   padding: 16px 0 10px 0;
   font-weight: 700;
@@ -153,7 +194,7 @@ body {
 
 .hymnen-row {
   display: grid;
-  grid-template-columns: 1.4fr 180px 140px;
+  grid-template-columns: 1.4fr 260px 140px;
   gap: 12px;
   align-items: center;
   padding: 10px 0;
@@ -174,6 +215,30 @@ body {
   background: #eef2ff;
   border: 1px solid #c7d2fe;
   font-weight: 700;
+}
+
+.punkte-datum-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.punkte-wert {
+  color: #1e3a8a;
+}
+
+.punkte-datum {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
 }
 
 .row-actions {
