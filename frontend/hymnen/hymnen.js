@@ -60,9 +60,18 @@ function baueKindCard(kind) {
   card.dataset.kindId = kind.kind_id;
   card.dataset.kindName = (kind.kind_name || "").toLowerCase();
 
+  const headerRow = document.createElement("div");
+  headerRow.className = "kind-header-row";
+
   const header = document.createElement("button");
   header.className = "kind-header";
   header.type = "button";
+
+  const plusButton = document.createElement("button");
+  plusButton.className = "plus-button";
+  plusButton.type = "button";
+  plusButton.textContent = "+";
+  plusButton.title = "Neue Hymne hinzufügen";
 
   const details = document.createElement("div");
   details.className = "kind-details";
@@ -83,12 +92,175 @@ function baueKindCard(kind) {
     }
   });
 
+  header.addEventListener("dblclick", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    plusButton.classList.toggle("sichtbar");
+  });
+
+  plusButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    schliesseAlleCards();
+    details.classList.add("offen");
+    card.classList.add("aktiv");
+
+    fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige);
+  });
+
   baueDetailsInhalt(details, kind, punkteAnzeige);
 
-  card.appendChild(header);
+  headerRow.appendChild(header);
+  headerRow.appendChild(plusButton);
+
+  card.appendChild(headerRow);
   card.appendChild(details);
 
   return card;
+}
+
+function stelleDetailsGrundgeruestSicher(details) {
+  const leerText = details.querySelector(".leer-text");
+  if (leerText) {
+    leerText.remove();
+  }
+
+  const hatHead = details.querySelector(".details-head");
+  if (!hatHead) {
+    const head = document.createElement("div");
+    head.className = "details-head";
+    head.innerHTML = `
+      <div>Name der Hymne</div>
+      <div>Punkte / Datum</div>
+      <div>Aktionen</div>
+    `;
+    details.prepend(head);
+  }
+}
+
+function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
+  const vorhandeneNeueZeile = details.querySelector(".hymnen-row.neu");
+  if (vorhandeneNeueZeile) {
+    const vorhandenesInput = vorhandeneNeueZeile.querySelector(".hymnen-input");
+    vorhandenesInput?.focus();
+    return;
+  }
+
+  stelleDetailsGrundgeruestSicher(details);
+
+  const row = document.createElement("div");
+  row.className = "hymnen-row neu";
+
+  row.innerHTML = `
+    <input
+      class="hymnen-input"
+      type="text"
+      value=""
+      placeholder="Name der Hymne eingeben"
+    />
+    <div class="punkte-datum-box">
+      <input
+        class="punkte-input"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+        placeholder="Punkte"
+      />
+      <span class="punkte-datum">${formatDatum(new Date().toISOString())}</span>
+    </div>
+    <div class="row-actions">
+      <button type="button" class="save-button">Speichern</button>
+      <button type="button" class="delete-button">Abbrechen</button>
+    </div>
+  `;
+
+  const head = details.querySelector(".details-head");
+  if (head && head.nextSibling) {
+    details.insertBefore(row, head.nextSibling);
+  } else {
+    details.appendChild(row);
+  }
+
+  const titelInput = row.querySelector(".hymnen-input");
+  const punkteInput = row.querySelector(".punkte-input");
+  const saveButton = row.querySelector(".save-button");
+  const cancelButton = row.querySelector(".delete-button");
+
+  titelInput.focus();
+
+  saveButton.addEventListener("click", async () => {
+    try {
+      const titel = titelInput.value.trim();
+      const punkte = Number(punkteInput.value);
+
+      if (!titel) {
+        alert("Bitte gib den Namen der Hymne ein.");
+        return;
+      }
+
+      if (!Number.isFinite(punkte) || punkte < 0) {
+        alert("Bitte gib eine gültige Punktzahl ein.");
+        return;
+      }
+
+      saveButton.disabled = true;
+      saveButton.textContent = "Speichert...";
+
+      const response = await fetch(`${API_BASE_URL}/api/hymnen`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          kind_id: kind.kind_id,
+          titel,
+          punkte
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Erstellen der neuen Hymne");
+      }
+
+      localStorage.setItem(OPEN_KIND_KEY, String(kind.kind_id));
+      await ladeHymnenUebersicht();
+
+    } catch (err) {
+      console.error(err);
+      saveButton.disabled = false;
+      saveButton.textContent = "Speichern";
+      alert("Fehler beim Speichern der neuen Hymne.");
+    }
+  });
+
+  cancelButton.addEventListener("click", () => {
+    row.remove();
+
+    const restRows = details.querySelectorAll(".hymnen-row");
+    if (restRows.length === 0) {
+      details.innerHTML = `
+        <div class="leer-text">
+          Für dieses Kind gibt es noch keine einzelnen Hymnen-Einträge.
+        </div>
+      `;
+    }
+  });
+
+  titelInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveButton.click();
+    }
+  });
+
+  punkteInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveButton.click();
+    }
+  });
 }
 
 function baueDetailsInhalt(details, kind, punkteAnzeige) {
