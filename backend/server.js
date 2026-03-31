@@ -259,6 +259,67 @@ app.get("/api/hymnen", async (req, res) => {
   }
 });
 
+app.post("/api/hymnen", async (req, res) => {
+  const { kind_id, titel = "", punkte = 0 } = req.body;
+
+  if (!kind_id) {
+    return res.status(400).json({ error: "kind_id ist erforderlich" });
+  }
+
+  const punkteZahl = Number(punkte);
+
+  if (!Number.isFinite(punkteZahl) || punkteZahl < 0) {
+    return res.status(400).json({ error: "Ungültige Punktzahl" });
+  }
+
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const kindResult = await client.query(
+      `
+        SELECT id, name, hymne, gesamt
+        FROM kinder
+        WHERE id = $1
+      `,
+      [kind_id]
+    );
+
+    if (kindResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Kind nicht gefunden" });
+    }
+
+    const insertResult = await client.query(
+      `
+        INSERT INTO hymnen_eintraege (kind_id, titel, punkte, created_at)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING id, kind_id, titel, punkte, created_at
+      `,
+      [kind_id, titel.trim(), punkteZahl]
+    );
+
+    await client.query("COMMIT");
+
+    res.status(201).json({
+      success: true,
+      eintrag: insertResult.rows[0],
+      kind: {
+        id: kindResult.rows[0].id,
+        name: kindResult.rows[0].name,
+        hymne: Number(kindResult.rows[0].hymne) || 0,
+        gesamt: Number(kindResult.rows[0].gesamt) || 0
+      }
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+
 app.put("/api/hymnen/:id", async (req, res) => {
   const { id } = req.params;
   const { titel = "" } = req.body;
