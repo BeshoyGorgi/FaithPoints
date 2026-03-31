@@ -126,21 +126,6 @@ body {
   font-size: 0.96rem;
 }
 
-.search-button-hymnen {
-  border: none;
-  border-radius: 10px;
-  padding: 11px 16px;
-  cursor: pointer;
-  background: #0C2B4E;
-  color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.search-button-hymnen:hover {
-  background: #1d4ed8;
-}
-
 .suchtreffer {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
@@ -392,11 +377,6 @@ body {
     font-size: 0.9rem;
   }
 
-  .search-button-hymnen {
-    padding: 10px 12px;
-    font-size: 0.88rem;
-  }
-
   .kind-header-row {
     padding: 0 12px;
     gap: 8px;
@@ -460,13 +440,6 @@ body {
   .search-input-hymnen {
     padding: 9px 11px;
     font-size: 0.88rem;
-  }
-
-  .search-button-hymnen {
-    width: fit-content;
-    justify-self: start;
-    padding: 9px 12px;
-    font-size: 0.85rem;
   }
 
   .kind-header {

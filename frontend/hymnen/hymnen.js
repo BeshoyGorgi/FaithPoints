@@ -2,7 +2,6 @@ import { API_BASE_URL } from "../config.js";
 
 const kinderListe = document.getElementById("kinderListe");
 const suchInput = document.getElementById("kindSuche");
-const suchButton = document.getElementById("suchButton");
 
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
@@ -513,8 +512,6 @@ function escapeHtml(str) {
 function escapeAttribute(str) {
   return escapeHtml(str);
 }
-
-suchButton?.addEventListener("click", sucheKind);
 
 suchInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
