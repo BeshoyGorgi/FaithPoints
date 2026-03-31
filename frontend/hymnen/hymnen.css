@@ -326,6 +326,7 @@ body {
   font-size: 0.95rem;
 }
 
+/* Tablet */
 @media (max-width: 800px) {
   .details-head {
     display: none;
@@ -342,5 +343,138 @@ body {
 
   .row-actions {
     justify-content: flex-start;
+  }
+}
+
+/* Handy */
+@media (max-width: 700px) {
+  body {
+    padding-top: 82px;
+  }
+
+  .navbar {
+    grid-template-columns: 42px 1fr auto;
+    gap: 8px;
+    padding: 8px 10px;
+    min-height: 62px;
+  }
+
+  .header-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .seiten-titel {
+    font-size: 0.95rem;
+  }
+
+  .logout-button,
+  .back-button,
+  .save-button,
+  .delete-button {
+    min-width: auto;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  .wrapper {
+    padding: 14px 12px 20px;
+  }
+
+  .search-row-hymnen {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .search-input-hymnen {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .search-button-hymnen {
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+
+  .kind-header-row {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .kind-header {
+    padding: 14px 0;
+    gap: 8px;
+  }
+
+  .kind-name {
+    font-size: 1rem;
+  }
+
+  .kind-punkte {
+    font-size: 0.9rem;
+  }
+
+  .plus-button {
+    min-width: 46px;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Sehr kleine Handys */
+@media (max-width: 480px) {
+  body {
+    padding-top: 78px;
+  }
+
+  .navbar {
+    grid-template-columns: 38px 1fr auto;
+    gap: 6px;
+    padding: 8px;
+    min-height: 58px;
+  }
+
+  .header-logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .seiten-titel {
+    font-size: 0.82rem;
+    line-height: 1.05;
+  }
+
+  .logout-button,
+  .back-button,
+  .save-button,
+  .delete-button {
+    padding: 7px 9px;
+    font-size: 0.76rem;
+  }
+
+  .search-row-hymnen {
+    grid-template-columns: 1fr;
+  }
+
+  .search-input-hymnen {
+    padding: 9px 11px;
+    font-size: 0.88rem;
+  }
+
+  .search-button-hymnen {
+    width: fit-content;
+    justify-self: start;
+    padding: 9px 12px;
+    font-size: 0.85rem;
+  }
+
+  .kind-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kind-punkte {
+    white-space: normal;
   }
 }
