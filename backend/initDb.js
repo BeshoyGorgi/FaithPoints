@@ -22,8 +22,19 @@ export async function createTableIfNotExists() {
         last_updated_anwesenheit_u TIMESTAMP DEFAULT NOW()
       );
     `);
-    console.log("✅ Tabelle 'kinder' ist bereit!");
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS hymnen_eintraege (
+        id SERIAL PRIMARY KEY,
+        kind_id INT NOT NULL REFERENCES kinder(id) ON DELETE CASCADE,
+        titel VARCHAR(255) DEFAULT '',
+        punkte INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
+    console.log("✅ Tabellen 'kinder' und 'hymnen_eintraege' sind bereit!");
   } catch (err) {
-    console.error("❌ Fehler beim Erstellen der Tabelle:", err.message);
+    console.error("❌ Fehler beim Erstellen der Tabellen:", err.message);
   }
 }

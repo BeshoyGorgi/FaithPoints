@@ -102,36 +102,188 @@ app.post("/api/kinder", async (req, res) => {
   }
 });
 
+//Neu
 app.put("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;
-  const fields = Object.keys(req.body);
-  const values = Object.values(req.body);
 
-  const jetzt = new Date();
+  const feldMap = {
+    name: "name",
+    hymne: "hymne",
+    verhalten: "verhalten",
+    anwesenheit_G: "anwesenheit_g",
+    anwesenheit_U: "anwesenheit_u",
+    gesamt: "gesamt",
+    klasse: "klasse",
+    eltern: "eltern",
+    telefon: "telefon",
+    bildurl: "bildurl",
+    lastUpdatedHymne: "last_updated_hymne",
+    lastUpdatedAnwesenheitG: "last_updated_anwesenheit_g",
+    lastUpdatedAnwesenheitU: "last_updated_anwesenheit_u"
+  };
 
-  if ("hymne" in req.body) {
-    fields.push("last_updated_hymne");
-    values.push(jetzt);
-  }
-  if ("anwesenheit_G" in req.body) {
-    fields.push("last_updated_anwesenheit_g");
-    values.push(jetzt);
-  }
-  if ("anwesenheit_U" in req.body) {
-    fields.push("last_updated_anwesenheit_u");
-    values.push(jetzt);
-  }
+  const client = await db.connect();
 
-  if (fields.length === 0) return res.status(400).json({ error: "Keine Felder zum Aktualisieren" });
-
-  const setString = fields.map((f, i) => `${f} = $${i + 1}`).join(", ");
   try {
-    await db.query(`UPDATE kinder SET ${setString} WHERE id = $${fields.length + 1}`, [...values, id]);
-    res.json({ success: true });
+    await client.query("BEGIN");
+
+    const vorherResult = await client.query(
+      "SELECT hymne FROM kinder WHERE id = $1",
+      [id]
+    );
+
+    if (vorherResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Kind nicht gefunden" });
+    }
+
+    const vorherigeHymne = Number(vorherResult.rows[0].hymne) || 0;
+
+    const updates = [];
+    const values = [];
+
+    Object.entries(req.body).forEach(([key, value]) => {
+      const dbFeld = feldMap[key];
+      if (!dbFeld) return;
+      updates.push(`${dbFeld} = $${updates.length + 1}`);
+      values.push(value);
+    });
+
+    if ("hymne" in req.body && !("lastUpdatedHymne" in req.body)) {
+      updates.push(`last_updated_hymne = $${updates.length + 1}`);
+      values.push(new Date());
+    }
+
+    if ("anwesenheit_G" in req.body && !("lastUpdatedAnwesenheitG" in req.body)) {
+      updates.push(`last_updated_anwesenheit_g = $${updates.length + 1}`);
+      values.push(new Date());
+    }
+
+    if ("anwesenheit_U" in req.body && !("lastUpdatedAnwesenheitU" in req.body)) {
+      updates.push(`last_updated_anwesenheit_u = $${updates.length + 1}`);
+      values.push(new Date());
+    }
+
+    if (updates.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ error: "Keine gültigen Felder zum Aktualisieren" });
+    }
+
+    const updateQuery = `
+      UPDATE kinder
+      SET ${updates.join(", ")}
+      WHERE id = $${values.length + 1}
+      RETURNING *
+    `;
+
+    const updateResult = await client.query(updateQuery, [...values, id]);
+
+    if ("hymne" in req.body) {
+      const neueHymne = Number(req.body.hymne) || 0;
+      const diff = neueHymne - vorherigeHymne;
+
+      if (diff > 0) {
+        await client.query(
+          `
+            INSERT INTO hymnen_eintraege (kind_id, titel, punkte)
+            VALUES ($1, '', $2)
+          `,
+          [id, diff]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+    res.json(updateResult.rows[0]);
+  } catch (err) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+app.get("/api/hymnen", async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  try {
+    const result = await db.query(
+      `
+        SELECT
+          k.id AS kind_id,
+          k.name AS kind_name,
+          k.hymne AS gesamt_hymne,
+          h.id AS eintrag_id,
+          h.titel,
+          h.punkte,
+          h.created_at
+        FROM kinder k
+        LEFT JOIN hymnen_eintraege h ON h.kind_id = k.id
+        WHERE k.user_email = $1
+        ORDER BY k.name ASC, h.created_at ASC, h.id ASC
+      `,
+      [email]
+    );
+
+    const gruppiert = [];
+    const map = new Map();
+
+    for (const row of result.rows) {
+      if (!map.has(row.kind_id)) {
+        const kindObj = {
+          kind_id: row.kind_id,
+          kind_name: row.kind_name,
+          gesamt_hymne: Number(row.gesamt_hymne) || 0,
+          eintraege: []
+        };
+        map.set(row.kind_id, kindObj);
+        gruppiert.push(kindObj);
+      }
+
+      if (row.eintrag_id) {
+        map.get(row.kind_id).eintraege.push({
+          id: row.eintrag_id,
+          titel: row.titel || "",
+          punkte: Number(row.punkte) || 0,
+          created_at: row.created_at
+        });
+      }
+    }
+
+    res.json(gruppiert);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.put("/api/hymnen/:id", async (req, res) => {
+  const { id } = req.params;
+  const { titel = "" } = req.body;
+
+  try {
+    const result = await db.query(
+      `
+        UPDATE hymnen_eintraege
+        SET titel = $1
+        WHERE id = $2
+        RETURNING *
+      `,
+      [titel, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Hymnen-Eintrag nicht gefunden" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.delete("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;

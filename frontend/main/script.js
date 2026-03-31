@@ -239,6 +239,7 @@ function zeigeButtons(werte) {
   });
 }
 
+//NEU
 // === Punkte-Menü Klick ===
 punkteMenue.addEventListener("click", async (e) => {
   const button = e.target.closest("button");
@@ -252,26 +253,11 @@ punkteMenue.addEventListener("click", async (e) => {
   aktualisiereGesamt(zeile);
 
   const id = zeile.dataset.id;
+  const spaltenIndex = aktiveZelle.cellIndex;
+  const jetzt = new Date();
+
   try {
-    await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: zeile.children[0].textContent.trim(),
-        hymne: Number(zeile.children[1].textContent) || 0,
-        verhalten: Number(zeile.children[2].textContent) || 0,
-        anwesenheit_G: Number(zeile.children[3].textContent) || 0,
-        anwesenheit_U: Number(zeile.children[4].textContent) || 0,
-        gesamt: Number(zeile.children[5].textContent) || 0
-      }),
-    });
-
-    // **Timestamp sofort auf jetzt setzen**
-    const spaltenIndex = aktiveZelle.cellIndex;
-    const jetzt = new Date();
-
-    // Payload für DB
-    let payload = {
+    const payload = {
       name: zeile.children[0].textContent.trim(),
       hymne: Number(zeile.children[1].textContent) || 0,
       verhalten: Number(zeile.children[2].textContent) || 0,
@@ -280,40 +266,47 @@ punkteMenue.addEventListener("click", async (e) => {
       gesamt: Number(zeile.children[5].textContent) || 0
     };
 
-    // Timestamp nur für die geänderte Spalte setzen
     if (spaltenIndex === 1) payload.lastUpdatedHymne = jetzt;
     if (spaltenIndex === 3) payload.lastUpdatedAnwesenheitG = jetzt;
     if (spaltenIndex === 4) payload.lastUpdatedAnwesenheitU = jetzt;
 
-    // Update in DB
-    await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    // Timestamp auch im DOM speichern
+    if (!response.ok) {
+      throw new Error("Fehler beim Speichern der Punkte");
+    }
+
     if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = jetzt;
     if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = jetzt;
     if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = jetzt;
 
-
-    // **Hintergrund neutral setzen**
     aktiveZelle.style.backgroundColor = "";
-    // manualReset muss false sein, damit Zeit wieder zählt
     aktiveZelle.dataset.manualReset = "false";
+    updateCellColor(zeile);
 
-    updateCellColor(zeile); // Farbe sofort neu berechnen
+    // WICHTIG:
+    // Nur wenn in der Hymne-Spalte Punkte positiv vergeben werden,
+    // soll zur Hymnen-Seite gewechselt werden.
+    if (spaltenIndex === 1 && wert > 0) {
+      localStorage.setItem("fp_open_hymnen_kind_id", id);
+      window.location.href = "/hymnen/hymnen.html";
+      return;
+    }
 
   } catch (err) {
     console.error("Fehler beim Speichern der Punkte:", err);
+    alert("Fehler beim Speichern der Punkte.");
   }
 
   sortiereNachGesamt();
   punkteMenue.classList.add("hidden");
   aktiveZelle = null;
 });
-
+//Ende
 
 // === Name bearbeiten bei Doppelklick ===
 tabelle.addEventListener("dblclick", (e) => {
