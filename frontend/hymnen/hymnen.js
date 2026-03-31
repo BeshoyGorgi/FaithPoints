@@ -164,9 +164,9 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
       />
       <input
         class="datum-input"
-        type="datetime-local"
-        value="${formatDateTimeLocal(new Date())}"
-      />
+        type="date"
+        value="${formatDateInput(new Date())}"
+        />
     </div>
     <div class="row-actions">
       <button type="button" class="save-button">Speichern</button>
@@ -222,7 +222,7 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
           kind_id: kind.kind_id,
           titel,
           punkte,
-          created_at: new Date(datum).toISOString()
+          created_at: new Date(`${datum}T00:00:00`).toISOString()
         })
       });
 
@@ -486,20 +486,18 @@ function formatDatum(value) {
   if (!value) return "-";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "-";
-  return d.toLocaleString("de-DE");
+  return d.toLocaleDateString("de-DE");
 }
 
-function formatDateTimeLocal(value) {
+function formatDateInput(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
 
   const jahr = d.getFullYear();
   const monat = String(d.getMonth() + 1).padStart(2, "0");
   const tag = String(d.getDate()).padStart(2, "0");
-  const stunde = String(d.getHours()).padStart(2, "0");
-  const minute = String(d.getMinutes()).padStart(2, "0");
 
-  return `${jahr}-${monat}-${tag}T${stunde}:${minute}`;
+  return `${jahr}-${monat}-${tag}`;
 }
 
 function escapeHtml(str) {

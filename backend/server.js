@@ -260,7 +260,7 @@ app.get("/api/hymnen", async (req, res) => {
 });
 
 app.post("/api/hymnen", async (req, res) => {
-  const { kind_id, titel = "", punkte = 0 } = req.body;
+  const { kind_id, titel = "", punkte = 0, created_at } = req.body;
 
   if (!kind_id) {
     return res.status(400).json({ error: "kind_id ist erforderlich" });
@@ -294,10 +294,15 @@ app.post("/api/hymnen", async (req, res) => {
     const insertResult = await client.query(
       `
         INSERT INTO hymnen_eintraege (kind_id, titel, punkte, created_at)
-        VALUES ($1, $2, $3, NOW())
+        VALUES ($1, $2, $3, $4)
         RETURNING id, kind_id, titel, punkte, created_at
       `,
-      [kind_id, titel.trim(), punkteZahl]
+      [
+        kind_id,
+        titel.trim(),
+        punkteZahl,
+        created_at ? new Date(created_at) : new Date()
+      ]
     );
 
     await client.query("COMMIT");
