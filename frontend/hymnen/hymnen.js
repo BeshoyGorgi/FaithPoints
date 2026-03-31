@@ -32,9 +32,20 @@ async function ladeHymnenUebersicht() {
 
     statusBox.textContent = "Klicke auf ein Kind oder benutze die Suche.";
 
-    daten.forEach(kind => {
-      const card = baueKindCard(kind);
-      kinderListe.appendChild(card);
+    daten.sort((a, b) => {
+  const punkteA = Number(a.gesamt_hymne) || 0;
+  const punkteB = Number(b.gesamt_hymne) || 0;
+
+  if (punkteB !== punkteA) {
+    return punkteB - punkteA; // größte Punktzahl zuerst
+  }
+
+  return (a.kind_name || "").localeCompare(b.kind_name || "", "de");    
+    });
+
+        daten.forEach(kind => {
+        const card = baueKindCard(kind);
+        kinderListe.appendChild(card);
     });
 
     const openKindId = localStorage.getItem(OPEN_KIND_KEY);

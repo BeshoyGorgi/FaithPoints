@@ -370,51 +370,45 @@ tabelle.addEventListener("dblclick", (e) => {
   if (!zelle) return;
 
   const spaltenIndex = zelle.cellIndex;
-  const anzahlSpalten = tabelle.rows[0].cells.length;
 
-  // Name-Spalte (0) und Gesamt-Spalte (letzte) ignorieren
-  if (spaltenIndex === 0 || spaltenIndex === anzahlSpalten - 1) return;
+  // Nicht Name (0) und nicht Gesamt (5) editierbar
+  if (spaltenIndex === 0 || spaltenIndex === 5) return;
 
-  const alterWert = zelle.textContent;
-
+  const alterWert = zelle.textContent.trim();
   zelle.contentEditable = "true";
   zelle.focus();
 
-  // Text markieren
   const range = document.createRange();
   range.selectNodeContents(zelle);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  const handleEnter = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      zelle.blur();
+    }
+  };
 
   const beenden = async () => {
     zelle.contentEditable = "false";
 
-    // Wert sicher in Zahl umwandeln
-    zelle.textContent = Number(zelle.textContent) || 0;
+    const alterWertNum = Number(alterWert) || 0;
+    const neuerWertNum = Number(zelle.textContent) || 0;
+
+    // Wert sicher als Zahl setzen
+    zelle.textContent = neuerWertNum;
 
     const zeile = zelle.parentElement;
     aktualisiereGesamt(zeile);
 
     const id = zeile.dataset.id;
+
     try {
-      await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: zeile.children[0].textContent.trim(),
-          hymne: Number(zeile.children[1].textContent) || 0,
-          verhalten: Number(zeile.children[2].textContent) || 0,
-          anwesenheit_G: Number(zeile.children[3].textContent) || 0,
-          anwesenheit_U: Number(zeile.children[4].textContent) || 0,
-          gesamt: Number(zeile.children[5].textContent) || 0
-        }),
-      });
-      const spaltenIndex = zelle.cellIndex;
       const jetzt = new Date();
 
-      // Payload für DB
-      let payload = {
+      const payload = {
         name: zeile.children[0].textContent.trim(),
         hymne: Number(zeile.children[1].textContent) || 0,
         verhalten: Number(zeile.children[2].textContent) || 0,
@@ -423,51 +417,53 @@ tabelle.addEventListener("dblclick", (e) => {
         gesamt: Number(zeile.children[5].textContent) || 0
       };
 
-      // Timestamp nur für geänderte Spalte setzen
+      // Timestamp nur für die geänderte Spalte setzen
       if (spaltenIndex === 1) payload.lastUpdatedHymne = jetzt;
       if (spaltenIndex === 3) payload.lastUpdatedAnwesenheitG = jetzt;
       if (spaltenIndex === 4) payload.lastUpdatedAnwesenheitU = jetzt;
 
-      // Update in DB
-      await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/kinder/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Speichern der Punkte");
+      }
 
       // Timestamp auch im DOM speichern
       if (spaltenIndex === 1) zeile.dataset.lastUpdatedHymne = jetzt;
       if (spaltenIndex === 3) zeile.dataset.lastUpdatedAnwesenheitG = jetzt;
       if (spaltenIndex === 4) zeile.dataset.lastUpdatedAnwesenheitU = jetzt;
 
-     
-      // Wenn Zelle neu geändert wurde, darf sie später wieder automatisch orange/rot werden
-      aktiveZelle.dataset.manualReset = "false";
+      zelle.dataset.manualReset = "false";
+      updateCellColor(zeile);
+      sortiereNachGesamt();
 
-      updateCellColor(zeile); // Farbe sofort neu berechnen
+      zelle.removeEventListener("blur", beenden);
+      zelle.removeEventListener("keydown", handleEnter);
 
+      // Nur bei manueller Änderung in der Hymne-Spalte weiterleiten
+      if (spaltenIndex === 1 && neuerWertNum !== alterWertNum) {
+        localStorage.setItem("fp_open_hymnen_kind_id", id);
+        window.location.href = "/hymnen/hymnen.html";
+        return;
+      }
 
     } catch (err) {
       console.error("Fehler beim Speichern der Punkte:", err);
       alert("Fehler bei der Verbindung zum Server.");
+
       zelle.textContent = alterWert;
-    }
+      aktualisiereGesamt(zelle.parentElement);
 
-    zelle.removeEventListener("blur", beenden);
-    zelle.removeEventListener("keydown", handleEnter);
-  };
-
-  const handleEnter = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault(); // kein Zeilenumbruch
-      beenden();
-    } else if (event.key === "Escape") {
-      zelle.textContent = alterWert; // Änderung verwerfen
-      beenden();
+      zelle.removeEventListener("blur", beenden);
+      zelle.removeEventListener("keydown", handleEnter);
     }
   };
 
-  zelle.addEventListener("blur", beenden);
+  zelle.addEventListener("blur", beenden, { once: true });
   zelle.addEventListener("keydown", handleEnter);
 });
 
