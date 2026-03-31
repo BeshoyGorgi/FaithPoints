@@ -92,12 +92,6 @@ function baueKindCard(kind) {
     }
   });
 
-  header.addEventListener("dblclick", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    plusButton.classList.toggle("sichtbar");
-  });
-
   plusButton.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();

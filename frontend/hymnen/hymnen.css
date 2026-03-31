@@ -274,7 +274,9 @@ body {
 }
 
 .plus-button {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
@@ -287,10 +289,8 @@ body {
   align-self: center;
 }
 
-.plus-button.sichtbar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.plus-button:hover {
+  background: #15803d;
 }
 
 .plus-button:hover {
