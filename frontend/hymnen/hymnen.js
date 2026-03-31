@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
 const kinderListe = document.getElementById("kinderListe");
-const statusBox = document.getElementById("statusBox");
 const suchInput = document.getElementById("kindSuche");
 const suchButton = document.getElementById("suchButton");
 
@@ -14,8 +13,7 @@ async function ladeHymnenUebersicht() {
       window.location.href = "/login/login.html";
       return;
     }
-
-    statusBox.textContent = "Lade Hymnen...";
+    
     kinderListe.innerHTML = "";
 
     const response = await fetch(`${API_BASE_URL}/api/hymnen?email=${encodeURIComponent(email)}`);
@@ -24,13 +22,6 @@ async function ladeHymnenUebersicht() {
     }
 
     const daten = await response.json();
-
-    if (!Array.isArray(daten) || daten.length === 0) {
-      statusBox.textContent = "Noch keine Hymnen-Daten vorhanden.";
-      return;
-    }
-
-    statusBox.textContent = "Klicke auf ein Kind oder benutze die Suche.";
 
     daten.sort((a, b) => {
   const punkteA = Number(a.gesamt_hymne) || 0;
@@ -60,7 +51,6 @@ async function ladeHymnenUebersicht() {
     }
   } catch (err) {
     console.error(err);
-    statusBox.textContent = "Fehler beim Laden der Hymnen-Seite.";
   }
 }
 
@@ -200,7 +190,7 @@ function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
         saveButton.disabled = false;
       }, 900);
 
-      statusBox.textContent = `Hymne für ${kind.kind_name} gespeichert.`;
+
     } catch (err) {
       console.error(err);
       saveButton.textContent = "Fehler";
@@ -248,7 +238,6 @@ function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
         `;
       }
 
-      statusBox.textContent = `Die Hymne "${hymnName}" von ${kind.kind_name} wurde gelöscht.`;
     } catch (err) {
       console.error(err);
       deleteButton.disabled = false;
@@ -276,25 +265,14 @@ function sperreInput(input) {
 function sucheKind() {
   const query = (suchInput.value || "").trim().toLowerCase();
 
-  if (!query) {
-    statusBox.textContent = "Bitte gib einen Namen ein.";
-    return;
-  }
-
   const cards = Array.from(document.querySelectorAll(".kind-card"));
   const match = cards.find(card =>
     (card.dataset.kindName || "").includes(query)
   );
 
-  if (!match) {
-    statusBox.textContent = `Kein Kind mit "${suchInput.value}" gefunden.`;
-    return;
-  }
-
   oeffneKindCard(match);
   hervorheben(match);
   match.scrollIntoView({ behavior: "smooth", block: "center" });
-  statusBox.textContent = `Kind gefunden: ${match.querySelector(".kind-name")?.textContent || ""}`;
 }
 
 function hervorheben(card) {

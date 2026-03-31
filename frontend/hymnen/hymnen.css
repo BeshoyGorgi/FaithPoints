@@ -2,11 +2,6 @@
   box-sizing: border-box;
 }
 
-h1 {
-  color: #F4F4F4; 
-  margin-bottom: 1rem;
-}
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -133,15 +128,6 @@ body {
   margin-top: 8px;
   margin-bottom: 24px;
   color: #4b5563;
-}
-
-.status-box {
-  margin-bottom: 20px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #e0ecff;
-  color: #1e3a8a;
-  font-weight: 600;
 }
 
 .kinder-liste {
