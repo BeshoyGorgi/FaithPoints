@@ -55,7 +55,6 @@ body {
   margin-top: 20px;
 }
 
-.logout-button,
 .back-button,
 .save-button,
 .delete-button {
@@ -69,18 +68,15 @@ body {
   text-align: center;
 }
 
-.logout-button {
-  background: #dc2626;
-  color: white;
-}
-
 .back-button {
-  background: #0C2B4E;
+  background-color: #0f66c9;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
   color: white;
 }
 
 .back-button:hover {
-  background-color: #1d4ed8;
+  background-color: #1D546C;
+  transform: scale(1.05);
 }
 
 .save-button {
@@ -369,7 +365,6 @@ body {
     font-size: 0.95rem;
   }
 
-  .logout-button,
   .back-button,
   .save-button,
   .delete-button {
@@ -441,7 +436,6 @@ body {
     line-height: 1.05;
   }
 
-  .logout-button,
   .back-button,
   .save-button,
   .delete-button {
