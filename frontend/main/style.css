@@ -5,7 +5,7 @@
   left: 0;
   width: 100%;
   height: 70px; /* etwas mehr Platz für Button */
-  background-color: linear-gradient(90deg, #0C2B4E, #1D546C);
+  background: linear-gradient(90deg, #0C2B4E, #1D546C);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -274,8 +274,8 @@ td[contenteditable="true"] {
 /* Buttons (Auge + Pokal) untereinander */
 .icon-row{
   display: flex;
-  align-items: center; 
-  gap: 0px;            
+  align-items: center;
+  gap: 4px;
 }
 
 
@@ -310,39 +310,6 @@ body.markierungen-aus .duplicate{
   background-color: transparent !important;
   outline: none !important;
 }
-
-
-/* Screenshot-Button */
-.screenshot-button {
-  width: 25px;
-  height: 25px;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  background: none;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;   /* verhindert, dass Hover das Layout verschiebt */
-}
-
-/* Bild exakt in Button einpassen */
-.screenshot-button img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transition: transform 0.15s ease;
-  pointer-events: none; /* Klick geht auf den Button, nicht aufs Bild */
-  background-color: #0C2B4E;
-}
-
-/* Bild vergrößert sich visuell, Button bleibt exakt 25px */
-.screenshot-button:hover img {
-  transform: scale(1.25);
-}
-
 
 
 /* ================= RESPONSIVE ================= */
