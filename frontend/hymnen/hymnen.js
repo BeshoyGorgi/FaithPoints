@@ -162,7 +162,11 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
         value="0"
         placeholder="Punkte"
       />
-      <span class="punkte-datum">${formatDatum(new Date().toISOString())}</span>
+      <input
+        class="datum-input"
+        type="datetime-local"
+        value="${formatDateTimeLocal(new Date())}"
+      />
     </div>
     <div class="row-actions">
       <button type="button" class="save-button">Speichern</button>
@@ -179,6 +183,7 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
 
   const titelInput = row.querySelector(".hymnen-input");
   const punkteInput = row.querySelector(".punkte-input");
+  const datumInput = row.querySelector(".datum-input");
   const saveButton = row.querySelector(".save-button");
   const cancelButton = row.querySelector(".delete-button");
 
@@ -188,6 +193,7 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
     try {
       const titel = titelInput.value.trim();
       const punkte = Number(punkteInput.value);
+      const datum = datumInput.value;
 
       if (!titel) {
         alert("Bitte gib den Namen der Hymne ein.");
@@ -196,6 +202,11 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
 
       if (!Number.isFinite(punkte) || punkte < 0) {
         alert("Bitte gib eine gültige Punktzahl ein.");
+        return;
+      }
+
+      if (!datum) {
+        alert("Bitte wähle ein Datum aus.");
         return;
       }
 
@@ -210,7 +221,8 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
         body: JSON.stringify({
           kind_id: kind.kind_id,
           titel,
-          punkte
+          punkte,
+          created_at: new Date(datum).toISOString()
         })
       });
 
@@ -250,6 +262,13 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
   });
 
   punkteInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveButton.click();
+    }
+  });
+
+  datumInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       saveButton.click();
@@ -468,6 +487,19 @@ function formatDatum(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "-";
   return d.toLocaleString("de-DE");
+}
+
+function formatDateTimeLocal(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const jahr = d.getFullYear();
+  const monat = String(d.getMonth() + 1).padStart(2, "0");
+  const tag = String(d.getDate()).padStart(2, "0");
+  const stunde = String(d.getHours()).padStart(2, "0");
+  const minute = String(d.getMinutes()).padStart(2, "0");
+
+  return `${jahr}-${monat}-${tag}T${stunde}:${minute}`;
 }
 
 function escapeHtml(str) {
