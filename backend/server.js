@@ -314,22 +314,6 @@ app.delete("/api/hymnen/:id", async (req, res) => {
     }
 
     const eintrag = eintragResult.rows[0];
-    const punkte = Number(eintrag.punkte) || 0;
-
-    const neuesHymne = Math.max(0, (Number(eintrag.hymne) || 0) - punkte);
-    const neuesGesamt = Math.max(0, (Number(eintrag.gesamt) || 0) - punkte);
-
-    await client.query(
-      `
-        UPDATE kinder
-        SET
-          hymne = $1,
-          gesamt = $2,
-          last_updated_hymne = NOW()
-        WHERE id = $3
-      `,
-      [neuesHymne, neuesGesamt, eintrag.kind_id]
-    );
 
     await client.query(
       `DELETE FROM hymnen_eintraege WHERE id = $1`,
@@ -343,13 +327,13 @@ app.delete("/api/hymnen/:id", async (req, res) => {
       geloeschter_eintrag: {
         id: eintrag.id,
         titel: eintrag.titel,
-        punkte
+        punkte: Number(eintrag.punkte) || 0
       },
       kind: {
         id: eintrag.kind_id,
         name: eintrag.kind_name,
-        hymne: neuesHymne,
-        gesamt: neuesGesamt
+        hymne: Number(eintrag.hymne) || 0,
+        gesamt: Number(eintrag.gesamt) || 0
       }
     });
   } catch (err) {
