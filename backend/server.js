@@ -284,6 +284,81 @@ app.put("/api/hymnen/:id", async (req, res) => {
   }
 });
 
+app.delete("/api/hymnen/:id", async (req, res) => {
+  const { id } = req.params;
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const eintragResult = await client.query(
+      `
+        SELECT
+          h.id,
+          h.kind_id,
+          h.titel,
+          h.punkte,
+          k.name AS kind_name,
+          k.hymne,
+          k.gesamt
+        FROM hymnen_eintraege h
+        JOIN kinder k ON k.id = h.kind_id
+        WHERE h.id = $1
+      `,
+      [id]
+    );
+
+    if (eintragResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Hymnen-Eintrag nicht gefunden" });
+    }
+
+    const eintrag = eintragResult.rows[0];
+    const punkte = Number(eintrag.punkte) || 0;
+
+    const neuesHymne = Math.max(0, (Number(eintrag.hymne) || 0) - punkte);
+    const neuesGesamt = Math.max(0, (Number(eintrag.gesamt) || 0) - punkte);
+
+    await client.query(
+      `
+        UPDATE kinder
+        SET
+          hymne = $1,
+          gesamt = $2,
+          last_updated_hymne = NOW()
+        WHERE id = $3
+      `,
+      [neuesHymne, neuesGesamt, eintrag.kind_id]
+    );
+
+    await client.query(
+      `DELETE FROM hymnen_eintraege WHERE id = $1`,
+      [id]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      geloeschter_eintrag: {
+        id: eintrag.id,
+        titel: eintrag.titel,
+        punkte
+      },
+      kind: {
+        id: eintrag.kind_id,
+        name: eintrag.kind_name,
+        hymne: neuesHymne,
+        gesamt: neuesGesamt
+      }
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
 
 app.delete("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;

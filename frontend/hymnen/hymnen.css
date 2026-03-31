@@ -60,6 +60,21 @@ body {
   color: white;
 }
 
+.delete-button {
+  background: #dc2626;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #b91c1c;
+}
+
+.hymnen-input.gesperrt {
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+}
+
 .wrapper {
   max-width: 1100px;
   margin: 0 auto;
@@ -185,7 +200,7 @@ body {
 
 .details-head {
   display: grid;
-  grid-template-columns: 1.4fr 260px 140px;
+  grid-template-columns: 1.4fr 260px 240px;
   gap: 12px;
   padding: 16px 0 10px 0;
   font-weight: 700;
@@ -194,7 +209,7 @@ body {
 
 .hymnen-row {
   display: grid;
-  grid-template-columns: 1.4fr 260px 140px;
+  grid-template-columns: 1.4fr 260px 240px;
   gap: 12px;
   align-items: center;
   padding: 10px 0;
@@ -244,6 +259,8 @@ body {
 .row-actions {
   display: flex;
   justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .leer-text {

@@ -71,6 +71,8 @@ function baueKindCard(kind) {
     <span class="kind-punkte">${Number(kind.gesamt_hymne) || 0} Punkte</span>
   `;
 
+  const punkteAnzeige = header.querySelector(".kind-punkte");
+
   header.addEventListener("click", () => {
     const istOffen = details.classList.contains("offen");
     schliesseAlleCards();
@@ -80,6 +82,17 @@ function baueKindCard(kind) {
     }
   });
 
+  baueDetailsInhalt(details, kind, punkteAnzeige);
+
+  card.appendChild(header);
+  card.appendChild(details);
+
+  return card;
+}
+
+function baueDetailsInhalt(details, kind, punkteAnzeige) {
+  details.innerHTML = "";
+
   const eintraege = Array.isArray(kind.eintraege) ? kind.eintraege : [];
 
   if (eintraege.length === 0) {
@@ -88,28 +101,23 @@ function baueKindCard(kind) {
         Für dieses Kind gibt es noch keine einzelnen Hymnen-Einträge.
       </div>
     `;
-  } else {
-    const head = document.createElement("div");
-    head.className = "details-head";
-    head.innerHTML = `
-      <div>Name der Hymne</div>
-      <div>Punkte / Datum</div>
-      <div>Speichern</div>
-    `;
-    details.appendChild(head);
-
-    eintraege.forEach(eintrag => {
-      details.appendChild(baueHymnenZeile(eintrag));
-    });
+    return;
   }
 
-  card.appendChild(header);
-  card.appendChild(details);
+  const head = document.createElement("div");
+  head.className = "details-head";
+  head.innerHTML = `
+    <div>Name der Hymne</div>
+    <div>Punkte / Datum</div>
+  `;
+  details.appendChild(head);
 
-  return card;
+  eintraege.forEach(eintrag => {
+    details.appendChild(baueHymnenZeile(eintrag, kind, details, punkteAnzeige));
+  });
 }
 
-function baueHymnenZeile(eintrag) {
+function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
   const row = document.createElement("div");
   row.className = "hymnen-row";
   row.dataset.eintragId = eintrag.id;
@@ -127,14 +135,34 @@ function baueHymnenZeile(eintrag) {
     </div>
     <div class="row-actions">
       <button type="button" class="save-button">Speichern</button>
+      <button type="button" class="delete-button">Löschen</button>
     </div>
   `;
 
   const input = row.querySelector(".hymnen-input");
   const saveButton = row.querySelector(".save-button");
+  const deleteButton = row.querySelector(".delete-button");
+
+  if ((eintrag.titel || "").trim() !== "") {
+    sperreInput(input);
+  }
+
+  input.addEventListener("dblclick", () => {
+    input.readOnly = false;
+    input.classList.remove("gesperrt");
+    input.focus();
+    input.select();
+  });
 
   saveButton.addEventListener("click", async () => {
     try {
+      const titel = input.value.trim();
+
+      if (!titel) {
+        alert("Bitte gib zuerst den Namen der Hymne ein.");
+        return;
+      }
+
       saveButton.disabled = true;
       saveButton.textContent = "Speichert...";
 
@@ -144,7 +172,7 @@ function baueHymnenZeile(eintrag) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          titel: input.value.trim()
+          titel
         })
       });
 
@@ -152,11 +180,16 @@ function baueHymnenZeile(eintrag) {
         throw new Error("Fehler beim Speichern der Hymne");
       }
 
+      input.value = titel;
+      sperreInput(input);
+
       saveButton.textContent = "Gespeichert";
       setTimeout(() => {
         saveButton.textContent = "Speichern";
         saveButton.disabled = false;
       }, 900);
+
+      statusBox.textContent = `Hymne für ${kind.kind_name} gespeichert.`;
     } catch (err) {
       console.error(err);
       saveButton.textContent = "Fehler";
@@ -164,6 +197,52 @@ function baueHymnenZeile(eintrag) {
         saveButton.textContent = "Speichern";
         saveButton.disabled = false;
       }, 1200);
+    }
+  });
+
+  deleteButton.addEventListener("click", async () => {
+    const hymnName = input.value.trim() || "ohne Namen";
+    const bestaetigt = confirm(
+      `Möchtest du die Hymne "${hymnName}" von ${kind.kind_name} wirklich löschen?`
+    );
+
+    if (!bestaetigt) return;
+
+    try {
+      deleteButton.disabled = true;
+      deleteButton.textContent = "Löscht...";
+
+      const response = await fetch(`${API_BASE_URL}/api/hymnen/${eintrag.id}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Löschen der Hymne");
+      }
+
+      const result = await response.json();
+
+      row.remove();
+
+      if (punkteAnzeige && result.kind) {
+        punkteAnzeige.textContent = `${Number(result.kind.hymne) || 0} Punkte`;
+      }
+
+      const restRows = details.querySelectorAll(".hymnen-row");
+      if (restRows.length === 0) {
+        details.innerHTML = `
+          <div class="leer-text">
+            Für dieses Kind gibt es noch keine einzelnen Hymnen-Einträge.
+          </div>
+        `;
+      }
+
+      statusBox.textContent = `Die Hymne "${hymnName}" von ${kind.kind_name} wurde gelöscht.`;
+    } catch (err) {
+      console.error(err);
+      deleteButton.disabled = false;
+      deleteButton.textContent = "Löschen";
+      alert("Fehler beim Löschen der Hymne.");
     }
   });
 
@@ -175,6 +254,12 @@ function baueHymnenZeile(eintrag) {
   });
 
   return row;
+}
+
+function sperreInput(input) {
+  input.readOnly = true;
+  input.classList.add("gesperrt");
+  input.title = "Doppelklick zum Bearbeiten";
 }
 
 function sucheKind() {
