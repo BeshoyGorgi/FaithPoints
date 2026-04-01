@@ -12,27 +12,31 @@
   <link rel="stylesheet" href="/details/details.css">
 </head>
 <body>
-  <img src="..\images\logo.jpeg" alt="Logo" class="header-logo">
-  <h1>Kinder-Details</h1>
-  
-  <input type="text" id="kinderSearch" placeholder="Nach Kind suchen..." style="margin-bottom: 1rem; padding:0.5rem; width: 300px;">
+  <nav class="navbar">
+    <img src="../images/logo.jpeg" alt="Logo" class="header-logo">
+    <div class="seiten-titel">Kontakt-Übersicht</div>
+    <button id="zurueckButton" class="back-button">Zurück</button>
+  </nav>
 
-  <table id="kinderDetails">
-    <thead>
-      <tr>
-        <th>Bild</th>
-        <th>Name</th>
-        <th>Klasse</th>
-        <th>Eltern</th>
-        <th>Telefon</th>
-      </tr>
-    </thead>
-    <tbody>
-      
-    </tbody>
-  </table>
+  <main class="wrapper">
+    <h1>Kontakte</h1>
 
-  <button id="zurueckButton">Zurück</button>
+    <input type="text" id="kinderSearch" placeholder="Nach Kind suchen...">
+
+    <table id="kinderDetails">
+      <thead>
+        <tr>
+          <th>Bild</th>
+          <th>Name</th>
+          <th>Klasse</th>
+          <th>Eltern</th>
+          <th>Telefon</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </main>
 
   <script type="module" src="/details/details.js"></script>
 </body>

@@ -21,11 +21,40 @@ body {
   background: #1A3D64;
   text-align: center;
   padding: 2rem;
+  padding-top: 95px;
 }
 
 h1 {
   color: #F4F4F4; 
   margin-bottom: 1rem;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: linear-gradient(90deg, #0C2B4E, #1D546C);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.seiten-titel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: whitesmoke;
+  text-align: center;
+  white-space: nowrap;
 }
 
 table {
@@ -136,6 +165,17 @@ tr:nth-child(even) {
     font-size: 0.85rem;
   }
 
+  .navbar {
+    grid-template-columns: 42px 1fr auto;
+    gap: 8px;
+    padding: 8px 10px;
+    min-height: 62px;
+  }
+
+  .seiten-titel {
+    font-size: 0.95rem;
+  }
+
   th, td {
     padding: 0.5rem 0.8rem;
   }
@@ -175,6 +215,18 @@ tr:nth-child(even) {
     margin-bottom: 1rem;
   }
 
+  .navbar {
+    grid-template-columns: 38px 1fr auto;
+    gap: 6px;
+    padding: 8px;
+    min-height: 58px;
+  }
+
+   .seiten-titel {
+    font-size: 0.82rem;
+    line-height: 1.05;
+  }
+
   table {
     width: 100%;
     table-layout: fixed;
@@ -196,13 +248,16 @@ tr:nth-child(even) {
     vertical-align: middle;
   }
 
-  #zurueckButton {
-    position: static;
-    display: block;
-    font-size: 0.8rem;
-    padding: 0.45rem 0.8rem;
-    margin: 0 auto 1rem auto;
-  }
+ #zurueckButton {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: block;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.8rem;
+  margin: 0;
+  z-index: 1000;
+}
 
   .header-logo {
     width: 35px;
