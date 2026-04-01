@@ -381,7 +381,7 @@ body {
   width: 100%;
   padding: 11px 14px;
   border-radius: 10px;
-  background-color: #0f66c9;
+  background-color: #355c7d;
   color: white;
   text-decoration: none;
   text-align: center;
@@ -392,7 +392,7 @@ body {
 }
 
 .lehrplan-button:hover {
-  background-color: #1D546C;
+  background-color: #1d6f92;
   transform: scale(1.01);
 }
 
