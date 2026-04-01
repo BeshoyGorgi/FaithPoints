@@ -2,6 +2,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background: #1A3D64;
+  color: #F4F4F4;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;

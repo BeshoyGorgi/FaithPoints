@@ -1,3 +1,13 @@
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background: #1D546C;
+  color: #F4F4F4;
+}
+
 /* ================= NAVBAR ================= */
 .navbar {
   position: fixed;
