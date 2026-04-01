@@ -62,6 +62,7 @@ table {
   margin: 0 auto 1rem auto;
   width: 80%;
   background: #F4F4F4;
+  color: #111;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -71,6 +72,10 @@ th, td {
   border: 1px solid #ddd;
   padding: 0.8rem 1.2rem;
   text-align: center;
+}
+
+td {
+  color: #111;
 }
 
 th {

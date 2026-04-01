@@ -166,8 +166,3 @@ ladeKinderDetails();
 document.getElementById("zurueckButton").addEventListener("click", () => {
   window.location.href = "/main/index.html";
 });
-
-document.getElementById("logoutButton").addEventListener("click", () => {
-  localStorage.removeItem("email");
-  window.location.href = "/login/login.html";
-});
