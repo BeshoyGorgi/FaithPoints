@@ -1,4 +1,4 @@
-const STORAGE_KEY = "lehrplan_hymnen_frontend";
+import { API_BASE_URL } from "../config.js";
 
 const KATEGORIEN = [
   "Bonus-Hymne",
@@ -15,39 +15,63 @@ const KATEGORIEN = [
 ];
 
 const ordnerListe = document.getElementById("ordnerListe");
+const zurueckButton = document.getElementById("zurueckButton");
 
-let daten = ladeDaten();
+let daten = leeresDatenObjekt();
 
-renderAlleOrdner();
+init();
 
-function ladeDaten() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+async function init() {
+  const email = localStorage.getItem("email");
 
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-
-      KATEGORIEN.forEach((kategorie) => {
-        if (!Array.isArray(parsed[kategorie])) {
-          parsed[kategorie] = [];
-        }
-      });
-
-      return parsed;
-    } catch (error) {
-      console.error("Fehler beim Laden aus localStorage:", error);
-    }
+  if (!email) {
+    window.location.href = "/login/login.html";
+    return;
   }
 
-  const startDaten = {};
-  KATEGORIEN.forEach((kategorie) => {
-    startDaten[kategorie] = [];
-  });
-  return startDaten;
+  await ladeDatenVomServer();
+  renderAlleOrdner();
 }
 
-function speichereDaten() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(daten));
+function leeresDatenObjekt() {
+  const obj = {};
+  KATEGORIEN.forEach((kategorie) => {
+    obj[kategorie] = [];
+  });
+  return obj;
+}
+
+async function ladeDatenVomServer() {
+  const email = localStorage.getItem("email");
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/lehrplan?email=${encodeURIComponent(email)}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Fehler beim Laden des Lehrplans");
+    }
+
+    const eintraege = await response.json();
+
+    daten = leeresDatenObjekt();
+
+    eintraege.forEach((eintrag) => {
+      if (!daten[eintrag.kategorie]) {
+        daten[eintrag.kategorie] = [];
+      }
+
+      daten[eintrag.kategorie].push({
+        id: eintrag.id,
+        name: eintrag.titel,
+        checked: !!eintrag.erledigt
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    alert("Fehler beim Laden des Lehrplans.");
+  }
 }
 
 function renderAlleOrdner() {
@@ -72,6 +96,7 @@ function baueOrdnerCard(kategorie) {
 
   const icon = document.createElement("span");
   icon.className = "ordner-icon";
+  icon.textContent = "📁";
 
   const name = document.createElement("span");
   name.className = "ordner-name";
@@ -189,22 +214,50 @@ function zeigeAddForm(content, kategorie, countElement) {
 
   input.focus();
 
-  function speichereNeueHymne() {
+  async function speichereNeueHymne() {
     const text = input.value.trim();
+    const email = localStorage.getItem("email");
 
     if (!text) {
       alert("Bitte gib einen Hymnennamen ein.");
       return;
     }
 
-    daten[kategorie].push({
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-      name: text,
-      checked: false
-    });
+    try {
+      saveButton.disabled = true;
+      saveButton.textContent = "Speichert...";
 
-    speichereDaten();
-    renderOrdnerInhalt(content, kategorie, countElement);
+      const response = await fetch(`${API_BASE_URL}/api/lehrplan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          kategorie,
+          titel: text
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Speichern");
+      }
+
+      const neuerEintrag = await response.json();
+
+      daten[kategorie].push({
+        id: neuerEintrag.id,
+        name: neuerEintrag.titel,
+        checked: !!neuerEintrag.erledigt
+      });
+
+      renderOrdnerInhalt(content, kategorie, countElement);
+    } catch (error) {
+      console.error(error);
+      alert("Fehler beim Speichern der Hymne.");
+      saveButton.disabled = false;
+      saveButton.textContent = "Speichern";
+    }
   }
 
   saveButton.addEventListener("click", speichereNeueHymne);
@@ -252,27 +305,76 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   row.appendChild(text);
   row.appendChild(actions);
 
-  checkbox.addEventListener("change", () => {
-    const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
-    if (!eintrag) return;
+  checkbox.addEventListener("change", async () => {
+    const email = localStorage.getItem("email");
+    const vorher = !checkbox.checked;
 
-    eintrag.checked = checkbox.checked;
-    speichereDaten();
+    try {
+      checkbox.disabled = true;
 
-    if (checkbox.checked) {
-      row.classList.add("erledigt");
-    } else {
-      row.classList.remove("erledigt");
+      const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          erledigt: checkbox.checked
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Aktualisieren der Checkbox");
+      }
+
+      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+      if (eintrag) {
+        eintrag.checked = checkbox.checked;
+      }
+
+      if (checkbox.checked) {
+        row.classList.add("erledigt");
+      } else {
+        row.classList.remove("erledigt");
+      }
+    } catch (error) {
+      console.error(error);
+      checkbox.checked = vorher;
+      alert("Fehler beim Speichern der Checkbox.");
+    } finally {
+      checkbox.disabled = false;
     }
   });
 
-  deleteButton.addEventListener("click", () => {
+  deleteButton.addEventListener("click", async () => {
     const bestaetigt = confirm(`Möchtest du "${hymne.name}" wirklich löschen?`);
     if (!bestaetigt) return;
 
-    daten[kategorie] = daten[kategorie].filter((item) => item.id !== hymne.id);
-    speichereDaten();
-    renderOrdnerInhalt(content, kategorie, countElement);
+    const email = localStorage.getItem("email");
+
+    try {
+      deleteButton.disabled = true;
+      deleteButton.textContent = "Löscht...";
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/lehrplan/${hymne.id}?email=${encodeURIComponent(email)}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Löschen");
+      }
+
+      daten[kategorie] = daten[kategorie].filter((item) => item.id !== hymne.id);
+      renderOrdnerInhalt(content, kategorie, countElement);
+    } catch (error) {
+      console.error(error);
+      deleteButton.disabled = false;
+      deleteButton.textContent = "Löschen";
+      alert("Fehler beim Löschen der Hymne.");
+    }
   });
 
   text.addEventListener("dblclick", () => {
@@ -312,24 +414,55 @@ function starteBearbeitung(textElement, hymne, kategorie, content, countElement)
   input.focus();
   input.select();
 
-  function beenden(uebernehmen) {
-    const neuerText = input.value.trim();
+  let fertig = false;
 
-    if (uebernehmen) {
-      if (!neuerText) {
-        alert("Der Name darf nicht leer sein.");
-        input.focus();
-        return;
+  async function beenden(uebernehmen) {
+    if (fertig) return;
+    fertig = true;
+
+    const neuerText = input.value.trim();
+    const email = localStorage.getItem("email");
+
+    if (!uebernehmen) {
+      renderOrdnerInhalt(content, kategorie, countElement);
+      return;
+    }
+
+    if (!neuerText) {
+      alert("Der Name darf nicht leer sein.");
+      fertig = false;
+      input.focus();
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          titel: neuerText
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Bearbeiten");
       }
 
       const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
       if (eintrag) {
         eintrag.name = neuerText;
-        speichereDaten();
       }
-    }
 
-    renderOrdnerInhalt(content, kategorie, countElement);
+      renderOrdnerInhalt(content, kategorie, countElement);
+    } catch (error) {
+      console.error(error);
+      alert("Fehler beim Bearbeiten der Hymne.");
+      fertig = false;
+      input.focus();
+    }
   }
 
   saveButton.addEventListener("click", () => beenden(true));
@@ -350,8 +483,6 @@ function starteBearbeitung(textElement, hymne, kategorie, content, countElement)
     beenden(true);
   });
 }
-
-const zurueckButton = document.getElementById("zurueckButton");
 
 if (zurueckButton) {
   zurueckButton.addEventListener("click", () => {

@@ -24,22 +24,38 @@ export async function createTableIfNotExists() {
     `);
 
     await db.query(`
-    CREATE TABLE IF NOT EXISTS hymnen_eintraege (
-      id SERIAL PRIMARY KEY,
-      kind_id INT NOT NULL REFERENCES kinder(id) ON DELETE CASCADE,
-      titel VARCHAR(255) DEFAULT '',
-      kategorie VARCHAR(150) DEFAULT '',
-      punkte INT NOT NULL DEFAULT 0,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `);
+      CREATE TABLE IF NOT EXISTS hymnen_eintraege (
+        id SERIAL PRIMARY KEY,
+        kind_id INT NOT NULL REFERENCES kinder(id) ON DELETE CASCADE,
+        titel VARCHAR(255) DEFAULT '',
+        kategorie VARCHAR(150) DEFAULT '',
+        punkte INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
 
-  await db.query(`
-    ALTER TABLE hymnen_eintraege
-    ADD COLUMN IF NOT EXISTS kategorie VARCHAR(150) DEFAULT '';
-  `);
+    await db.query(`
+      ALTER TABLE hymnen_eintraege
+      ADD COLUMN IF NOT EXISTS kategorie VARCHAR(150) DEFAULT '';
+    `);
 
-    console.log("✅ Tabellen 'kinder' und 'hymnen_eintraege' sind bereit!");
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS lehrplan_eintraege (
+        id SERIAL PRIMARY KEY,
+        user_email VARCHAR(255) NOT NULL,
+        kategorie VARCHAR(150) NOT NULL,
+        titel VARCHAR(255) NOT NULL,
+        erledigt BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
+    await db.query(`
+      ALTER TABLE lehrplan_eintraege
+      ADD COLUMN IF NOT EXISTS erledigt BOOLEAN NOT NULL DEFAULT FALSE;
+    `);
+
+    console.log("✅ Tabellen 'kinder', 'hymnen_eintraege' und 'lehrplan_eintraege' sind bereit!");
   } catch (err) {
     console.error("❌ Fehler beim Erstellen der Tabellen:", err.message);
   }

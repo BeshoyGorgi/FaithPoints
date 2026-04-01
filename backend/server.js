@@ -362,6 +362,147 @@ app.put("/api/hymnen/:id", async (req, res) => {
   }
 });
 
+// === API: Lehrplan ===
+app.get("/api/lehrplan", async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  try {
+    const result = await db.query(
+      `
+        SELECT id, user_email, kategorie, titel, erledigt, created_at
+        FROM lehrplan_eintraege
+        WHERE user_email = $1
+        ORDER BY created_at ASC, id ASC
+      `,
+      [email]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/lehrplan", async (req, res) => {
+  const { email, kategorie, titel } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  if (!kategorie || !kategorie.trim()) {
+    return res.status(400).json({ error: "Kategorie ist erforderlich" });
+  }
+
+  if (!titel || !titel.trim()) {
+    return res.status(400).json({ error: "Titel ist erforderlich" });
+  }
+
+  try {
+    const result = await db.query(
+      `
+        INSERT INTO lehrplan_eintraege (user_email, kategorie, titel, erledigt)
+        VALUES ($1, $2, $3, false)
+        RETURNING id, user_email, kategorie, titel, erledigt, created_at
+      `,
+      [email, kategorie.trim(), titel.trim()]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/lehrplan/:id", async (req, res) => {
+  const { id } = req.params;
+  const { email, titel, erledigt } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  const updates = [];
+  const values = [];
+
+  if (typeof titel === "string") {
+    if (!titel.trim()) {
+      return res.status(400).json({ error: "Titel darf nicht leer sein" });
+    }
+    updates.push(`titel = $${values.length + 1}`);
+    values.push(titel.trim());
+  }
+
+  if (typeof erledigt === "boolean") {
+    updates.push(`erledigt = $${values.length + 1}`);
+    values.push(erledigt);
+  }
+
+  if (updates.length === 0) {
+    return res.status(400).json({ error: "Keine gültigen Felder zum Aktualisieren" });
+  }
+
+  const idPos = values.length + 1;
+  const emailPos = values.length + 2;
+
+  values.push(id, email);
+
+  try {
+    const result = await db.query(
+      `
+        UPDATE lehrplan_eintraege
+        SET ${updates.join(", ")}
+        WHERE id = $${idPos} AND user_email = $${emailPos}
+        RETURNING id, user_email, kategorie, titel, erledigt, created_at
+      `,
+      values
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Lehrplan-Eintrag nicht gefunden" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/lehrplan/:id", async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  try {
+    const result = await db.query(
+      `
+        DELETE FROM lehrplan_eintraege
+        WHERE id = $1 AND user_email = $2
+        RETURNING id, user_email, kategorie, titel, erledigt, created_at
+      `,
+      [id, email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Lehrplan-Eintrag nicht gefunden" });
+    }
+
+    res.json({
+      success: true,
+      geloescht: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete("/api/hymnen/:id", async (req, res) => {
   const { id } = req.params;
   const client = await db.connect();
