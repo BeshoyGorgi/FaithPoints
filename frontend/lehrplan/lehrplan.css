@@ -1,0 +1,425 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background: #1A3D64;
+  color: #F4F4F4;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1A3D64;
+  color: #1f2937;
+  padding-top: 95px;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: linear-gradient(90deg, #0C2B4E, #1D546C);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+  z-index: 1000;
+}
+
+.header-logo {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.seiten-mitte {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.seiten-titel {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: whitesmoke;
+  text-align: center;
+}
+
+.drive-link {
+  color: #4da3ff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+}
+
+.drive-link:hover {
+  color: #7bbcff;
+}
+
+.drive-link:visited {
+  color: #4da3ff;
+}
+
+.drive-link i {
+  color: inherit;
+}
+
+.back-button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+  background-color: #0f66c9;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #1D546C;
+  transform: scale(1.05);
+}
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1A3D64;
+  color: #111827;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.page-title {
+  margin: 0 0 18px 0;
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+  position: relative;
+  padding-bottom: 14px;
+}
+
+.page-title::after {
+  content: "";
+  display: block;
+  width: 140px;
+  height: 2px;
+  margin: 12px auto 0;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+}
+
+.page-subtitle {
+  margin: 0 0 28px 0;
+  text-align: center;
+  color: #dbeafe;
+}
+
+.ordner-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ordner-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+  border: 2px solid transparent;
+}
+
+.ordner-card.offen {
+  border-color: #2563eb;
+}
+
+.ordner-header {
+  width: 100%;
+  border: none;
+  background: white;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.ordner-header:hover {
+  background: #f8fafc;
+}
+
+.ordner-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ordner-icon {
+  font-size: 1.2rem;
+}
+
+.ordner-name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.ordner-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ordner-count {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #2563eb;
+  white-space: nowrap;
+}
+
+.plus-button {
+  border: none;
+  border-radius: 10px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 12px;
+  background: #16a34a;
+  color: white;
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plus-button:hover {
+  background: #15803d;
+}
+
+.ordner-content {
+  display: none;
+  padding: 0 18px 18px 18px;
+  border-top: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.ordner-card.offen .ordner-content {
+  display: block;
+}
+
+.empty-text {
+  padding: 18px 4px 4px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.add-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.add-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.save-button,
+.cancel-button,
+.delete-button,
+.edit-save-button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.save-button,
+.edit-save-button {
+  background: #2563eb;
+  color: white;
+}
+
+.save-button:hover,
+.edit-save-button:hover {
+  background: #1d4ed8;
+}
+
+.cancel-button {
+  background: #94a3b8;
+  color: white;
+}
+
+.cancel-button:hover {
+  background: #64748b;
+}
+
+.hymnen-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.hymne-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px 14px;
+  transition: 0.2s ease;
+}
+
+.hymne-row.erledigt {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.hymne-check {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hymne-text {
+  flex: 1;
+  font-size: 1rem;
+  color: #111827;
+  word-break: break-word;
+  cursor: default;
+}
+
+.hymne-row.erledigt .hymne-text {
+  color: #166534;
+  font-weight: 700;
+}
+
+.hymne-edit-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.hymne-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.delete-button {
+  background: #dc2626;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #b91c1c;
+}
+
+.edit-hint {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+@media (max-width: 700px) {
+  body {
+    padding-top: 82px;
+  }
+
+  .navbar {
+    gap: 8px;
+    padding: 8px 10px;
+    min-height: 62px;
+  }
+
+  .header-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .seiten-mitte {
+    gap: 8px;
+  }
+
+  .seiten-titel {
+    font-size: 0.95rem;
+  }
+
+  .back-button {
+    min-width: auto;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding-top: 78px;
+  }
+
+  .navbar {
+    gap: 6px;
+    padding: 8px;
+    min-height: 58px;
+  }
+
+  .header-logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .seiten-mitte {
+    gap: 6px;
+  }
+
+  .seiten-titel {
+    font-size: 0.82rem;
+    line-height: 1.05;
+  }
+
+  .back-button {
+    padding: 7px 9px;
+    font-size: 0.76rem;
+  }
+}

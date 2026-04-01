@@ -6,16 +6,17 @@ const suchInput = document.getElementById("kindSuche");
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
 const HYMNNEN_KATEGORIEN = [
-  "Al Khamasin (50 hl. Tage)",
-  "Apostelfastenzeit",
-  "Das Kreuzfest",
+  "Bonus-Hymne",
+  "Jährlich",
   "Geburt Christi",
   "Große Fastenzeit",
-  "Jährlich",
+  "Das Kreuzfest",
   "Karwoche",
-  "Kiahk",
+  "Al Khamasin (50 hl. Tage)",
+  "Apostelfastenzeit",
+  "Marienfastenzeit",
   "Koptisches Neujahr (Neiruzfest)",
-  "Marienfastenzeit"
+  "Kiahk"
 ];
 
 async function ladeHymnenUebersicht() {
