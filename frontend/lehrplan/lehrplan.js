@@ -393,6 +393,10 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   return "";
   }
 
+  function hatVollstaendigenZeitraum() {
+  return !!(hymne.startDate && hymne.endDate);
+  }
+
   function aktualisiereDateInputPlaceholder(input) {
     if (input.value) {
       input.classList.remove("show-placeholder");
