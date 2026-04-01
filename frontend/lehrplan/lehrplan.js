@@ -336,36 +336,38 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   const zeitraumBox = document.createElement("div");
   zeitraumBox.className = "zeitraum-box";
 
-  const vonWrap = document.createElement("label");
-  vonWrap.className = "date-field";
-
-  const vonLabel = document.createElement("span");
-  vonLabel.textContent = "Von";
+  const startInputWrap = document.createElement("div");
+  startInputWrap.className = "date-input-wrap";
 
   const vonInput = document.createElement("input");
   vonInput.type = "date";
   vonInput.className = "date-input";
   vonInput.value = hymne.startDate || "";
 
-  vonWrap.appendChild(vonLabel);
-  vonWrap.appendChild(vonInput);
+  const startPlaceholder = document.createElement("span");
+  startPlaceholder.className = "fake-placeholder";
+  startPlaceholder.textContent = "Anfangsdatum auswählen...";
 
-  const bisWrap = document.createElement("label");
-  bisWrap.className = "date-field";
+  startInputWrap.appendChild(vonInput);
+  startInputWrap.appendChild(startPlaceholder);
 
-  const bisLabel = document.createElement("span");
-  bisLabel.textContent = "Bis";
+  const endInputWrap = document.createElement("div");
+  endInputWrap.className = "date-input-wrap";
 
   const bisInput = document.createElement("input");
   bisInput.type = "date";
   bisInput.className = "date-input";
   bisInput.value = hymne.endDate || "";
 
-  bisWrap.appendChild(bisLabel);
-  bisWrap.appendChild(bisInput);
+  const endPlaceholder = document.createElement("span");
+  endPlaceholder.className = "fake-placeholder";
+  endPlaceholder.textContent = "Enddatum auswählen...";
 
-  zeitraumBox.appendChild(vonWrap);
-  zeitraumBox.appendChild(bisWrap);
+  endInputWrap.appendChild(bisInput);
+  endInputWrap.appendChild(endPlaceholder);
+
+  zeitraumBox.appendChild(startInputWrap);
+  zeitraumBox.appendChild(endInputWrap);
 
   info.appendChild(titleLine);
   info.appendChild(zeitraumBox);
@@ -386,6 +388,18 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   row.appendChild(info);
   row.appendChild(actions);
 
+  function hatGespeichertenZeitraum() {
+    return !!(hymne.startDate || hymne.endDate);
+  }
+
+  function aktualisiereDateInputPlaceholder(input) {
+    if (input.value) {
+      input.classList.remove("show-placeholder");
+    } else {
+      input.classList.add("show-placeholder");
+    }
+  }
+
   function aktualisiereZeitraumAnzeige() {
     const zeitraumText = formatiereZeitraum(hymne.startDate, hymne.endDate);
 
@@ -397,7 +411,16 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       dateLabel.style.display = "none";
     }
 
-    zeitraumBox.style.display = hymne.checked ? "flex" : "none";
+    if (!hymne.checked) {
+      zeitraumBox.style.display = "none";
+    } else if (hatGespeichertenZeitraum()) {
+      zeitraumBox.style.display = "none";
+    } else {
+      zeitraumBox.style.display = "flex";
+    }
+
+    aktualisiereDateInputPlaceholder(vonInput);
+    aktualisiereDateInputPlaceholder(bisInput);
   }
 
   aktualisiereZeitraumAnzeige();
