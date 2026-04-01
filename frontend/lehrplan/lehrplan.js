@@ -96,7 +96,6 @@ function baueOrdnerCard(kategorie) {
 
   const icon = document.createElement("span");
   icon.className = "ordner-icon";
-  icon.textContent = "📁";
 
   const name = document.createElement("span");
   name.className = "ordner-name";
