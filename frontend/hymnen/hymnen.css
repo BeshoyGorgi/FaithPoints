@@ -52,10 +52,42 @@ body {
   border-radius: 50%;
 }
 
+.seiten-mitte {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
 .seiten-titel {
   font-size: 1.2rem;
   font-weight: bold;
   color: whitesmoke;
+  text-align: center;
+}
+
+.drive-link {
+  color: #4da3ff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+}
+
+.drive-link:hover {
+  color: #7bbcff;
+}
+
+.drive-link:visited {
+  color: #4da3ff;
+}
+
+.drive-link i {
+  color: inherit;
 }
 
 .zurueck-wrapper {
@@ -370,9 +402,18 @@ body {
   margin-bottom: 12px;
   }
 
-  .seiten-titel {
-    font-size: 0.95rem;
-  }
+  .seiten-mitte {
+  gap: 8px;
+}
+
+.seiten-titel {
+  font-size: 0.95rem;
+}
+
+.drive-logo {
+  width: 22px;
+  height: 22px;
+}
 
   .back-button,
   .save-button,
@@ -440,10 +481,19 @@ body {
     height: 38px;
   }
 
-  .seiten-titel {
-    font-size: 0.82rem;
-    line-height: 1.05;
-  }
+  .seiten-mitte {
+  gap: 6px;
+}
+
+.seiten-titel {
+  font-size: 0.82rem;
+  line-height: 1.05;
+}
+
+.drive-logo {
+  width: 18px;
+  height: 18px;
+}
 
   .back-button,
   .save-button,
