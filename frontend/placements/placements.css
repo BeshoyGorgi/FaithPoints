@@ -115,7 +115,7 @@ body{
 }
 
 .back-button{
-  background:#ff5c5c;
+  background:#0f66c9;
   color:#fff;
   border:none;
   border-radius:10px;
@@ -126,6 +126,7 @@ body{
 }
 .back-button:hover{
   transform:translateY(-1px);
+  background-color: #1D546C;
   filter:brightness(1.05);
 }
 
