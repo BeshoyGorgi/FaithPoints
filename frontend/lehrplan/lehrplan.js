@@ -388,8 +388,9 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   row.appendChild(info);
   row.appendChild(actions);
 
-  function hatGespeichertenZeitraum() {
-    return !!(hymne.startDate || hymne.endDate);
+  function formatiereZeitraum(start, end) {
+  if (start && end) return `${formatiereDatum(start)} - ${formatiereDatum(end)}`;
+  return "";
   }
 
   function aktualisiereDateInputPlaceholder(input) {
@@ -413,7 +414,7 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 
     if (!hymne.checked) {
       zeitraumBox.style.display = "none";
-    } else if (hatGespeichertenZeitraum()) {
+    } else if (hatVollstaendigenZeitraum()) {
       zeitraumBox.style.display = "none";
     } else {
       zeitraumBox.style.display = "flex";
