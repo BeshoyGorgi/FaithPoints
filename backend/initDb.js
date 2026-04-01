@@ -46,6 +46,8 @@ export async function createTableIfNotExists() {
         kategorie VARCHAR(150) NOT NULL,
         titel VARCHAR(255) NOT NULL,
         erledigt BOOLEAN NOT NULL DEFAULT FALSE,
+        start_datum DATE NULL,
+        end_datum DATE NULL,
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
@@ -53,6 +55,16 @@ export async function createTableIfNotExists() {
     await db.query(`
       ALTER TABLE lehrplan_eintraege
       ADD COLUMN IF NOT EXISTS erledigt BOOLEAN NOT NULL DEFAULT FALSE;
+    `);
+
+    await db.query(`
+      ALTER TABLE lehrplan_eintraege
+      ADD COLUMN IF NOT EXISTS start_datum DATE NULL;
+    `);
+
+    await db.query(`
+      ALTER TABLE lehrplan_eintraege
+      ADD COLUMN IF NOT EXISTS end_datum DATE NULL;
     `);
 
     console.log("✅ Tabellen 'kinder', 'hymnen_eintraege' und 'lehrplan_eintraege' sind bereit!");

@@ -21,6 +21,33 @@ let daten = leeresDatenObjekt();
 
 init();
 
+function normalisiereDatumFuerInput(value) {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    return value.slice(0, 10);
+  }
+
+  const d = new Date(value);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatiereDatum(value) {
+  if (!value) return "";
+  const datum = new Date(`${normalisiereDatumFuerInput(value)}T00:00:00`);
+  return datum.toLocaleDateString("de-DE");
+}
+
+function formatiereZeitraum(start, end) {
+  if (start && end) return `${formatiereDatum(start)} - ${formatiereDatum(end)}`;
+  if (start) return `ab ${formatiereDatum(start)}`;
+  if (end) return `bis ${formatiereDatum(end)}`;
+  return "";
+}
+
 async function init() {
   const email = localStorage.getItem("email");
 
@@ -65,7 +92,9 @@ async function ladeDatenVomServer() {
       daten[eintrag.kategorie].push({
         id: eintrag.id,
         name: eintrag.titel,
-        checked: !!eintrag.erledigt
+        checked: !!eintrag.erledigt,
+        startDate: normalisiereDatumFuerInput(eintrag.start_datum),
+        endDate: normalisiereDatumFuerInput(eintrag.end_datum)
       });
     });
   } catch (error) {
@@ -247,7 +276,9 @@ function zeigeAddForm(content, kategorie, countElement) {
       daten[kategorie].push({
         id: neuerEintrag.id,
         name: neuerEintrag.titel,
-        checked: !!neuerEintrag.erledigt
+        checked: !!neuerEintrag.erledigt,
+        startDate: normalisiereDatumFuerInput(neuerEintrag.start_datum),
+        endDate: normalisiereDatumFuerInput(neuerEintrag.end_datum)
       });
 
       renderOrdnerInhalt(content, kategorie, countElement);
@@ -286,9 +317,58 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   checkbox.type = "checkbox";
   checkbox.checked = !!hymne.checked;
 
+  const info = document.createElement("div");
+  info.className = "hymne-info";
+
+  const titleLine = document.createElement("div");
+  titleLine.className = "hymne-title-line";
+
   const text = document.createElement("span");
   text.className = "hymne-text";
   text.textContent = hymne.name;
+
+  const dateLabel = document.createElement("span");
+  dateLabel.className = "hymne-date-label";
+
+  titleLine.appendChild(text);
+  titleLine.appendChild(dateLabel);
+
+  const zeitraumBox = document.createElement("div");
+  zeitraumBox.className = "zeitraum-box";
+
+  const vonWrap = document.createElement("label");
+  vonWrap.className = "date-field";
+
+  const vonLabel = document.createElement("span");
+  vonLabel.textContent = "Von";
+
+  const vonInput = document.createElement("input");
+  vonInput.type = "date";
+  vonInput.className = "date-input";
+  vonInput.value = hymne.startDate || "";
+
+  vonWrap.appendChild(vonLabel);
+  vonWrap.appendChild(vonInput);
+
+  const bisWrap = document.createElement("label");
+  bisWrap.className = "date-field";
+
+  const bisLabel = document.createElement("span");
+  bisLabel.textContent = "Bis";
+
+  const bisInput = document.createElement("input");
+  bisInput.type = "date";
+  bisInput.className = "date-input";
+  bisInput.value = hymne.endDate || "";
+
+  bisWrap.appendChild(bisLabel);
+  bisWrap.appendChild(bisInput);
+
+  zeitraumBox.appendChild(vonWrap);
+  zeitraumBox.appendChild(bisWrap);
+
+  info.appendChild(titleLine);
+  info.appendChild(zeitraumBox);
 
   const actions = document.createElement("div");
   actions.className = "hymne-actions";
@@ -296,20 +376,122 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   const deleteButton = document.createElement("button");
   deleteButton.className = "delete-button";
   deleteButton.type = "button";
-  deleteButton.textContent = "Löschen";
+  deleteButton.textContent = "−";
+  deleteButton.title = "Eintrag löschen";
+  deleteButton.setAttribute("aria-label", `Eintrag ${hymne.name} löschen`);
 
   actions.appendChild(deleteButton);
 
   row.appendChild(checkbox);
-  row.appendChild(text);
+  row.appendChild(info);
   row.appendChild(actions);
+
+  function aktualisiereZeitraumAnzeige() {
+    const zeitraumText = formatiereZeitraum(hymne.startDate, hymne.endDate);
+
+    if (zeitraumText) {
+      dateLabel.textContent = `(${zeitraumText})`;
+      dateLabel.style.display = "inline-flex";
+    } else {
+      dateLabel.textContent = "";
+      dateLabel.style.display = "none";
+    }
+
+    zeitraumBox.style.display = hymne.checked ? "flex" : "none";
+  }
+
+  aktualisiereZeitraumAnzeige();
 
   checkbox.addEventListener("change", async () => {
     const email = localStorage.getItem("email");
-    const vorher = !checkbox.checked;
+    const vorherChecked = !checkbox.checked;
+    const vorherStart = hymne.startDate;
+    const vorherEnd = hymne.endDate;
 
     try {
       checkbox.disabled = true;
+      vonInput.disabled = true;
+      bisInput.disabled = true;
+
+      const body = {
+        email,
+        erledigt: checkbox.checked
+      };
+
+      // Wenn Check entfernt wird -> Datum löschen
+      if (!checkbox.checked) {
+        body.start_datum = null;
+        body.end_datum = null;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Aktualisieren der Checkbox");
+      }
+
+      hymne.checked = checkbox.checked;
+
+      if (!checkbox.checked) {
+        hymne.startDate = "";
+        hymne.endDate = "";
+        vonInput.value = "";
+        bisInput.value = "";
+      }
+
+      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+      if (eintrag) {
+        eintrag.checked = hymne.checked;
+        eintrag.startDate = hymne.startDate;
+        eintrag.endDate = hymne.endDate;
+      }
+
+      row.classList.toggle("erledigt", checkbox.checked);
+      aktualisiereZeitraumAnzeige();
+    } catch (error) {
+      console.error(error);
+      checkbox.checked = vorherChecked;
+      hymne.checked = vorherChecked;
+      hymne.startDate = vorherStart;
+      hymne.endDate = vorherEnd;
+      vonInput.value = vorherStart || "";
+      bisInput.value = vorherEnd || "";
+      row.classList.toggle("erledigt", vorherChecked);
+      aktualisiereZeitraumAnzeige();
+      alert("Fehler beim Speichern der Checkbox.");
+    } finally {
+      checkbox.disabled = false;
+      vonInput.disabled = false;
+      bisInput.disabled = false;
+    }
+  });
+
+  async function speichereZeitraum() {
+    if (!checkbox.checked) return;
+
+    const email = localStorage.getItem("email");
+    const neuesStart = vonInput.value || null;
+    const neuesEnde = bisInput.value || null;
+
+    if (neuesStart && neuesEnde && neuesStart > neuesEnde) {
+      alert("Das Von-Datum darf nicht nach dem Bis-Datum liegen.");
+      vonInput.value = hymne.startDate || "";
+      bisInput.value = hymne.endDate || "";
+      return;
+    }
+
+    const vorherStart = hymne.startDate;
+    const vorherEnd = hymne.endDate;
+
+    try {
+      vonInput.disabled = true;
+      bisInput.disabled = true;
 
       const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
         method: "PUT",
@@ -318,32 +500,43 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
         },
         body: JSON.stringify({
           email,
-          erledigt: checkbox.checked
+          erledigt: true,
+          start_datum: neuesStart,
+          end_datum: neuesEnde
         })
       });
 
       if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren der Checkbox");
+        throw new Error("Fehler beim Speichern des Zeitraums");
       }
+
+      hymne.startDate = neuesStart || "";
+      hymne.endDate = neuesEnde || "";
 
       const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
       if (eintrag) {
-        eintrag.checked = checkbox.checked;
+        eintrag.startDate = hymne.startDate;
+        eintrag.endDate = hymne.endDate;
+        eintrag.checked = true;
       }
 
-      if (checkbox.checked) {
-        row.classList.add("erledigt");
-      } else {
-        row.classList.remove("erledigt");
-      }
+      aktualisiereZeitraumAnzeige();
     } catch (error) {
       console.error(error);
-      checkbox.checked = vorher;
-      alert("Fehler beim Speichern der Checkbox.");
+      hymne.startDate = vorherStart;
+      hymne.endDate = vorherEnd;
+      vonInput.value = vorherStart || "";
+      bisInput.value = vorherEnd || "";
+      aktualisiereZeitraumAnzeige();
+      alert("Fehler beim Speichern des Datums.");
     } finally {
-      checkbox.disabled = false;
+      vonInput.disabled = false;
+      bisInput.disabled = false;
     }
-  });
+  }
+
+  vonInput.addEventListener("change", speichereZeitraum);
+  bisInput.addEventListener("change", speichereZeitraum);
 
   deleteButton.addEventListener("click", async () => {
     const bestaetigt = confirm(`Möchtest du "${hymne.name}" wirklich löschen?`);
@@ -353,7 +546,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 
     try {
       deleteButton.disabled = true;
-      deleteButton.textContent = "Löscht...";
 
       const response = await fetch(
         `${API_BASE_URL}/api/lehrplan/${hymne.id}?email=${encodeURIComponent(email)}`,
@@ -371,7 +563,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     } catch (error) {
       console.error(error);
       deleteButton.disabled = false;
-      deleteButton.textContent = "Löschen";
       alert("Fehler beim Löschen der Hymne.");
     }
   });
@@ -384,8 +575,10 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 }
 
 function starteBearbeitung(textElement, hymne, kategorie, content, countElement) {
-  const row = textElement.parentElement;
-  if (!row) return;
+  const row = textElement.closest(".hymne-row");
+  const textParent = textElement.parentElement;
+
+  if (!row || !textParent) return;
 
   const alterText = hymne.name;
 
@@ -408,7 +601,7 @@ function starteBearbeitung(textElement, hymne, kategorie, content, countElement)
   }
 
   actions.prepend(saveButton);
-  row.replaceChild(input, textElement);
+  textParent.replaceChild(input, textElement);
 
   input.focus();
   input.select();

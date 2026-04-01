@@ -373,7 +373,7 @@ app.get("/api/lehrplan", async (req, res) => {
   try {
     const result = await db.query(
       `
-        SELECT id, user_email, kategorie, titel, erledigt, created_at
+        SELECT id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
         FROM lehrplan_eintraege
         WHERE user_email = $1
         ORDER BY created_at ASC, id ASC
@@ -388,7 +388,7 @@ app.get("/api/lehrplan", async (req, res) => {
 });
 
 app.post("/api/lehrplan", async (req, res) => {
-  const { email, kategorie, titel } = req.body;
+  const { email, kategorie, titel, start_datum = null, end_datum = null } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "E-Mail ist erforderlich" });
@@ -402,14 +402,18 @@ app.post("/api/lehrplan", async (req, res) => {
     return res.status(400).json({ error: "Titel ist erforderlich" });
   }
 
+  if (start_datum && end_datum && start_datum > end_datum) {
+    return res.status(400).json({ error: "Startdatum darf nicht nach Enddatum liegen" });
+  }
+
   try {
     const result = await db.query(
       `
-        INSERT INTO lehrplan_eintraege (user_email, kategorie, titel, erledigt)
-        VALUES ($1, $2, $3, false)
-        RETURNING id, user_email, kategorie, titel, erledigt, created_at
+        INSERT INTO lehrplan_eintraege (user_email, kategorie, titel, erledigt, start_datum, end_datum)
+        VALUES ($1, $2, $3, false, $4, $5)
+        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
       `,
-      [email, kategorie.trim(), titel.trim()]
+      [email, kategorie.trim(), titel.trim(), start_datum || null, end_datum || null]
     );
 
     res.status(201).json(result.rows[0]);
@@ -420,10 +424,14 @@ app.post("/api/lehrplan", async (req, res) => {
 
 app.put("/api/lehrplan/:id", async (req, res) => {
   const { id } = req.params;
-  const { email, titel, erledigt } = req.body;
+  const { email, titel, erledigt, start_datum, end_datum } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  if (start_datum && end_datum && start_datum > end_datum) {
+    return res.status(400).json({ error: "Startdatum darf nicht nach Enddatum liegen" });
   }
 
   const updates = [];
@@ -440,6 +448,26 @@ app.put("/api/lehrplan/:id", async (req, res) => {
   if (typeof erledigt === "boolean") {
     updates.push(`erledigt = $${values.length + 1}`);
     values.push(erledigt);
+
+    // Wenn Check entfernt wird:
+    // nur Datum löschen, Name bleibt bestehen
+    if (!erledigt) {
+      updates.push(`start_datum = NULL`);
+      updates.push(`end_datum = NULL`);
+    }
+  }
+
+  // Datumsfelder nur setzen, wenn nicht gerade explizit auf erledigt = false gesetzt wird
+  if (erledigt !== false) {
+    if ("start_datum" in req.body) {
+      updates.push(`start_datum = $${values.length + 1}`);
+      values.push(start_datum || null);
+    }
+
+    if ("end_datum" in req.body) {
+      updates.push(`end_datum = $${values.length + 1}`);
+      values.push(end_datum || null);
+    }
   }
 
   if (updates.length === 0) {
@@ -457,7 +485,7 @@ app.put("/api/lehrplan/:id", async (req, res) => {
         UPDATE lehrplan_eintraege
         SET ${updates.join(", ")}
         WHERE id = $${idPos} AND user_email = $${emailPos}
-        RETURNING id, user_email, kategorie, titel, erledigt, created_at
+        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
       `,
       values
     );
