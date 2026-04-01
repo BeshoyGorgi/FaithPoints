@@ -5,6 +5,19 @@ const suchInput = document.getElementById("kindSuche");
 
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
+const HYMNNEN_KATEGORIEN = [
+  "Al Khamasin (50 hl. Tage)",
+  "Apostelfastenzeit",
+  "Das Kreuzfest",
+  "Geburt Christi",
+  "Große Fastenzeit",
+  "Jährlich",
+  "Karwoche",
+  "Kiahk",
+  "Koptisches Neujahr (Neiruzfest)",
+  "Marienfastenzeit"
+];
+
 async function ladeHymnenUebersicht() {
   try {
     const email = localStorage.getItem("email");
@@ -124,10 +137,11 @@ function stelleDetailsGrundgeruestSicher(details) {
     const head = document.createElement("div");
     head.className = "details-head";
     head.innerHTML = `
-      <div>Name der Hymne</div>
-      <div>Punkte / Datum</div>
-      <div>Aktionen</div>
-    `;
+    <div>Name der Hymne</div>
+    <div>Kategorie</div>
+    <div>Punkte / Datum</div>
+    <div>Aktionen</div>
+  `;
     details.prepend(head);
   }
 }
@@ -146,32 +160,38 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
   row.className = "hymnen-row neu";
 
   row.innerHTML = `
+  <input
+    class="hymnen-input"
+    type="text"
+    value=""
+    placeholder="Name der Hymne eingeben"
+  />
+
+  <select class="kategorie-select">
+    ${baueKategorieOptionen()}
+  </select>
+
+  <div class="punkte-datum-box">
     <input
-      class="hymnen-input"
-      type="text"
-      value=""
-      placeholder="Name der Hymne eingeben"
+      class="punkte-input"
+      type="number"
+      min="0"
+      step="1"
+      value="0"
+      placeholder="Punkte"
     />
-    <div class="punkte-datum-box">
-      <input
-        class="punkte-input"
-        type="number"
-        min="0"
-        step="1"
-        value="0"
-        placeholder="Punkte"
-      />
-      <input
-        class="datum-input"
-        type="date"
-        value="${formatDateInput(new Date())}"
-        />
-    </div>
-    <div class="row-actions">
-      <button type="button" class="save-button">Speichern</button>
-      <button type="button" class="delete-button">Abbrechen</button>
-    </div>
-  `;
+    <input
+      class="datum-input"
+      type="date"
+      value="${formatDateInput(new Date())}"
+    />
+  </div>
+
+  <div class="row-actions">
+    <button type="button" class="save-button">Speichern</button>
+    <button type="button" class="delete-button">Abbrechen</button>
+  </div>
+`;
 
   const head = details.querySelector(".details-head");
   if (head && head.nextSibling) {
@@ -183,6 +203,7 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
   const titelInput = row.querySelector(".hymnen-input");
   const punkteInput = row.querySelector(".punkte-input");
   const datumInput = row.querySelector(".datum-input");
+  const kategorieSelect = row.querySelector(".kategorie-select");
   const saveButton = row.querySelector(".save-button");
   const cancelButton = row.querySelector(".delete-button");
 
@@ -191,11 +212,17 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
   saveButton.addEventListener("click", async () => {
     try {
       const titel = titelInput.value.trim();
+      const kategorie = kategorieSelect.value.trim();
       const punkte = Number(punkteInput.value);
       const datum = datumInput.value;
 
       if (!titel) {
         alert("Bitte gib den Namen der Hymne ein.");
+        return;
+      }
+
+      if (!kategorie) {
+        alert("Bitte wähle eine Kategorie aus.");
         return;
       }
 
@@ -217,9 +244,10 @@ function fuegeNeueHymnenZeileEin(details, kind, punkteAnzeige) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
+          body: JSON.stringify({
           kind_id: kind.kind_id,
           titel,
+          kategorie,
           punkte,
           created_at: new Date(`${datum}T00:00:00`).toISOString()
         })
@@ -293,7 +321,9 @@ function baueDetailsInhalt(details, kind, punkteAnzeige) {
   head.className = "details-head";
   head.innerHTML = `
     <div>Name der Hymne</div>
+    <div>Kategorie</div>
     <div>Punkte / Datum</div>
+    <div>Aktionen</div>
   `;
   details.appendChild(head);
 
@@ -308,25 +338,32 @@ function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
   row.dataset.eintragId = eintrag.id;
 
   row.innerHTML = `
-    <input
-      class="hymnen-input"
-      type="text"
-      value="${escapeAttribute(eintrag.titel || "")}"
-      placeholder="Name der Hymne eingeben"
-    />
-    <div class="punkte-datum-box">
-      <span class="punkte-wert">${Number(eintrag.punkte) || 0} Punkte</span>
-      <span class="punkte-datum">${formatDatum(eintrag.created_at)}</span>
-    </div>
-    <div class="row-actions">
-      <button type="button" class="save-button">Speichern</button>
-      <button type="button" class="delete-button">Löschen</button>
-    </div>
-  `;
+  <input
+    class="hymnen-input"
+    type="text"
+    value="${escapeAttribute(eintrag.titel || "")}"
+    placeholder="Name der Hymne eingeben"
+  />
+
+  <select class="kategorie-select">
+    ${baueKategorieOptionen(eintrag.kategorie || "")}
+  </select>
+
+  <div class="punkte-datum-box">
+    <span class="punkte-wert">${Number(eintrag.punkte) || 0} Punkte</span>
+    <span class="punkte-datum">${formatDatum(eintrag.created_at)}</span>
+  </div>
+
+  <div class="row-actions">
+    <button type="button" class="save-button">Speichern</button>
+    <button type="button" class="delete-button">Löschen</button>
+  </div>
+`;
 
   const input = row.querySelector(".hymnen-input");
   const saveButton = row.querySelector(".save-button");
   const deleteButton = row.querySelector(".delete-button");
+  const kategorieSelect = row.querySelector(".kategorie-select");
 
   if ((eintrag.titel || "").trim() !== "") {
     sperreInput(input);
@@ -342,9 +379,15 @@ function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
   saveButton.addEventListener("click", async () => {
     try {
       const titel = input.value.trim();
+      const kategorie = kategorieSelect.value.trim();
 
       if (!titel) {
         alert("Bitte gib zuerst den Namen der Hymne ein.");
+        return;
+      }
+
+      if (!kategorie) {
+        alert("Bitte wähle zuerst eine Kategorie aus.");
         return;
       }
 
@@ -357,8 +400,9 @@ function baueHymnenZeile(eintrag, kind, details, punkteAnzeige) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          titel
-        })
+        titel,
+        kategorie
+      })
       });
 
       if (!response.ok) {
@@ -503,6 +547,18 @@ function formatDateInput(value) {
   const tag = String(d.getDate()).padStart(2, "0");
 
   return `${jahr}-${monat}-${tag}`;
+}
+
+
+function baueKategorieOptionen(selectedValue = "") {
+  const ersteOption = `<option value="">Bitte wählen</option>`;
+
+  const optionen = HYMNNEN_KATEGORIEN.map(kategorie => {
+    const selected = kategorie === selectedValue ? "selected" : "";
+    return `<option value="${escapeAttribute(kategorie)}" ${selected}>${escapeHtml(kategorie)}</option>`;
+  }).join("");
+
+  return ersteOption + optionen;
 }
 
 function escapeHtml(str) {

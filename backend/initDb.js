@@ -24,14 +24,20 @@ export async function createTableIfNotExists() {
     `);
 
     await db.query(`
-      CREATE TABLE IF NOT EXISTS hymnen_eintraege (
-        id SERIAL PRIMARY KEY,
-        kind_id INT NOT NULL REFERENCES kinder(id) ON DELETE CASCADE,
-        titel VARCHAR(255) DEFAULT '',
-        punkte INT NOT NULL DEFAULT 0,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `);
+    CREATE TABLE IF NOT EXISTS hymnen_eintraege (
+      id SERIAL PRIMARY KEY,
+      kind_id INT NOT NULL REFERENCES kinder(id) ON DELETE CASCADE,
+      titel VARCHAR(255) DEFAULT '',
+      kategorie VARCHAR(150) DEFAULT '',
+      punkte INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+  `);
+
+  await db.query(`
+    ALTER TABLE hymnen_eintraege
+    ADD COLUMN IF NOT EXISTS kategorie VARCHAR(150) DEFAULT '';
+  `);
 
     console.log("✅ Tabellen 'kinder' und 'hymnen_eintraege' sind bereit!");
   } catch (err) {

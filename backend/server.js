@@ -218,6 +218,7 @@ app.get("/api/hymnen", async (req, res) => {
           k.hymne AS gesamt_hymne,
           h.id AS eintrag_id,
           h.titel,
+          h.kategorie,
           h.punkte,
           h.created_at
         FROM kinder k
@@ -245,11 +246,12 @@ app.get("/api/hymnen", async (req, res) => {
 
       if (row.eintrag_id) {
         map.get(row.kind_id).eintraege.push({
-          id: row.eintrag_id,
-          titel: row.titel || "",
-          punkte: Number(row.punkte) || 0,
-          created_at: row.created_at
-        });
+        id: row.eintrag_id,
+        titel: row.titel || "",
+        kategorie: row.kategorie || "",
+        punkte: Number(row.punkte) || 0,
+        created_at: row.created_at
+      });
       }
     }
 
@@ -260,7 +262,11 @@ app.get("/api/hymnen", async (req, res) => {
 });
 
 app.post("/api/hymnen", async (req, res) => {
-  const { kind_id, titel = "", punkte = 0, created_at } = req.body;
+  const { kind_id, titel = "", kategorie = "", punkte = 0, created_at } = req.body;
+
+  if (!kategorie || !kategorie.trim()) {
+  return res.status(400).json({ error: "Kategorie ist erforderlich" });
+}
 
   if (!kind_id) {
     return res.status(400).json({ error: "kind_id ist erforderlich" });
@@ -293,13 +299,14 @@ app.post("/api/hymnen", async (req, res) => {
 
     const insertResult = await client.query(
       `
-        INSERT INTO hymnen_eintraege (kind_id, titel, punkte, created_at)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, kind_id, titel, punkte, created_at
+        INSERT INTO hymnen_eintraege (kind_id, titel, kategorie, punkte, created_at)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, kind_id, titel, kategorie, punkte, created_at
       `,
       [
         kind_id,
         titel.trim(),
+        kategorie.trim(),
         punkteZahl,
         created_at ? new Date(created_at) : new Date()
       ]
@@ -327,17 +334,22 @@ app.post("/api/hymnen", async (req, res) => {
 
 app.put("/api/hymnen/:id", async (req, res) => {
   const { id } = req.params;
-  const { titel = "" } = req.body;
+  const { titel = "", kategorie = "" } = req.body;
+
+  if (!kategorie || !kategorie.trim()) {
+    return res.status(400).json({ error: "Kategorie ist erforderlich" });
+  }
 
   try {
     const result = await db.query(
       `
         UPDATE hymnen_eintraege
-        SET titel = $1
-        WHERE id = $2
+        SET titel = $1,
+            kategorie = $2
+        WHERE id = $3
         RETURNING *
       `,
-      [titel, id]
+      [titel.trim(), kategorie.trim(), id]
     );
 
     if (result.rows.length === 0) {
