@@ -41,23 +41,46 @@
 
   <h1 class="hymnen-titel">Hymnen</h1>
 
-    <div class="search-row-hymnen">
-        <input
-         type="text"
-         id="kindSuche"
-         class="search-input-hymnen"
-         placeholder="Nach einem Kind suchen..."
-          />
-    </div>
+<section class="monat-filter-box">
+  <label for="monatSuche" class="monat-filter-label">Datum suchen (Monat / Jahr)</label>
 
-    <div class="lehrplan-bereich">
-      <a href="/lehrplan/lehrplan.html" class="lehrplan-button">Lehrplan</a>
-    </div>
+  <div class="monat-filter-row">
+    <input type="month" id="monatSuche" class="monat-filter-input" />
+
+    <button id="monatSucheButton" class="filter-button" type="button">
+      Suchen
+    </button>
+
+    <button id="monatResetButton" class="filter-button secondary" type="button">
+      Zurücksetzen
+    </button>
+
+    <button id="monatScreenshotButton" class="filter-button export" type="button">
+      Screenshot herunterladen
+    </button>
+  </div>
+
+  <div id="monatInfo" class="monat-info"></div>
+</section>
+
+<div class="search-row-hymnen">
+  <input
+    type="text"
+    id="kindSuche"
+    class="search-input-hymnen"
+    placeholder="Nach einem Kind suchen..."
+  />
+</div>
+
+<div class="lehrplan-bereich">
+  <a href="/lehrplan/lehrplan.html" class="lehrplan-button">Lehrplan</a>
+</div>
 
     <section id="kinderListe" class="kinder-liste"></section>
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script type="module" src="/hymnen/hymnen.js"></script>
 </body>
 </html>

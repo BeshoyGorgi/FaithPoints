@@ -2,6 +2,14 @@ import { API_BASE_URL } from "../config.js";
 
 const kinderListe = document.getElementById("kinderListe");
 const suchInput = document.getElementById("kindSuche");
+const monatSucheInput = document.getElementById("monatSuche");
+const monatSucheButton = document.getElementById("monatSucheButton");
+const monatResetButton = document.getElementById("monatResetButton");
+const monatScreenshotButton = document.getElementById("monatScreenshotButton");
+const monatInfo = document.getElementById("monatInfo");
+
+let alleKinderDaten = [];
+let aktiverMonatsFilter = "";
 
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
@@ -19,6 +27,224 @@ const HYMNNEN_KATEGORIEN = [
   "Kiahk"
 ];
 
+function normalisiereDatum(value) {
+  if (!value) return "";
+  if (typeof value === "string") {
+    return value.slice(0, 10);
+  }
+
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const jahr = d.getFullYear();
+  const monat = String(d.getMonth() + 1).padStart(2, "0");
+  const tag = String(d.getDate()).padStart(2, "0");
+
+  return `${jahr}-${monat}-${tag}`;
+}
+
+function holeMonatsGrenzen(monatWert) {
+  if (!monatWert) return null;
+
+  const [jahr, monat] = monatWert.split("-").map(Number);
+  if (!jahr || !monat) return null;
+
+  const start = `${jahr}-${String(monat).padStart(2, "0")}-01`;
+  const letzterTagDate = new Date(jahr, monat, 0);
+  const ende = `${jahr}-${String(monat).padStart(2, "0")}-${String(letzterTagDate.getDate()).padStart(2, "0")}`;
+
+  return { start, ende };
+}
+
+function formatiereMonatJahr(monatWert) {
+  if (!monatWert) return "";
+  const [jahr, monat] = monatWert.split("-").map(Number);
+  const d = new Date(jahr, monat - 1, 1);
+
+  return d.toLocaleDateString("de-DE", {
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function eintragPasstZumMonat(eintrag, monatWert) {
+  if (!monatWert) return true;
+
+  const grenzen = holeMonatsGrenzen(monatWert);
+  if (!grenzen) return true;
+
+  const datum = normalisiereDatum(eintrag.created_at);
+  if (!datum) return false;
+
+  return datum >= grenzen.start && datum <= grenzen.ende;
+}
+
+function holeGefilterteKinder() {
+  if (!aktiverMonatsFilter) {
+    return alleKinderDaten;
+  }
+
+  return alleKinderDaten
+    .map(kind => {
+      const gefilterteEintraege = (Array.isArray(kind.eintraege) ? kind.eintraege : [])
+        .filter(eintrag => eintragPasstZumMonat(eintrag, aktiverMonatsFilter));
+
+      return {
+        ...kind,
+        eintraege: gefilterteEintraege
+      };
+    })
+    .filter(kind => kind.eintraege.length > 0);
+}
+
+function aktualisiereMonatInfo(sichtbareKinder) {
+  if (!monatInfo) return;
+
+  if (!aktiverMonatsFilter) {
+    monatInfo.textContent = "";
+    return;
+  }
+
+  const hymnAnzahl = sichtbareKinder.reduce((summe, kind) => {
+    return summe + (Array.isArray(kind.eintraege) ? kind.eintraege.length : 0);
+  }, 0);
+
+  monatInfo.textContent = `${sichtbareKinder.length} Kinder und ${hymnAnzahl} Hymnen für ${formatiereMonatJahr(aktiverMonatsFilter)} gefunden.`;
+}
+
+function renderKinderListe() {
+  kinderListe.innerHTML = "";
+
+  const sichtbareKinder = holeGefilterteKinder();
+
+  if (sichtbareKinder.length === 0) {
+    if (aktiverMonatsFilter) {
+      const leer = document.createElement("div");
+      leer.className = "keine-monats-treffer";
+      leer.textContent = `Für ${formatiereMonatJahr(aktiverMonatsFilter)} wurden keine Hymnen gefunden.`;
+      kinderListe.appendChild(leer);
+    }
+
+    aktualisiereMonatInfo([]);
+    return;
+  }
+
+  sichtbareKinder.forEach(kind => {
+    const card = baueKindCard(kind);
+    kinderListe.appendChild(card);
+  });
+
+  aktualisiereMonatInfo(sichtbareKinder);
+}
+
+function aktiviereMonatsFilter() {
+  const wert = monatSucheInput?.value || "";
+
+  if (!wert) {
+    alert("Bitte wähle zuerst Monat und Jahr aus.");
+    return;
+  }
+
+  aktiverMonatsFilter = wert;
+  renderKinderListe();
+}
+
+function resetMonatsFilter() {
+  aktiverMonatsFilter = "";
+  renderKinderListe();
+}
+
+async function screenshotMonatsErgebnis() {
+  if (!aktiverMonatsFilter) {
+    alert("Bitte wähle zuerst Monat und Jahr aus und suche danach.");
+    return;
+  }
+
+  if (!window.html2canvas) {
+    alert("Screenshot-Bibliothek wurde nicht geladen.");
+    return;
+  }
+
+  const sichtbareKinder = holeGefilterteKinder();
+  if (sichtbareKinder.length === 0) {
+    alert("Es gibt keine passenden Hymnen für diesen Monat.");
+    return;
+  }
+
+  const exportBox = document.createElement("div");
+  exportBox.style.position = "fixed";
+  exportBox.style.left = "-99999px";
+  exportBox.style.top = "0";
+  exportBox.style.width = "1300px";
+  exportBox.style.background = "#1A3D64";
+  exportBox.style.padding = "26px";
+  exportBox.style.zIndex = "-1";
+
+  const titel = document.createElement("h1");
+  titel.textContent = `Hymnen – ${formatiereMonatJahr(aktiverMonatsFilter)}`;
+  titel.style.color = "white";
+  titel.style.margin = "0 0 10px 0";
+  titel.style.fontFamily = "Arial, sans-serif";
+  titel.style.fontSize = "2rem";
+
+  const untertitel = document.createElement("div");
+  untertitel.textContent = "Jede geöffnete Box gehört zum jeweiligen Kind.";
+  untertitel.style.color = "#dbeafe";
+  untertitel.style.marginBottom = "22px";
+  untertitel.style.fontFamily = "Arial, sans-serif";
+  untertitel.style.fontWeight = "600";
+
+  const clone = kinderListe.cloneNode(true);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .plus-button,
+    .row-actions {
+      display: none !important;
+    }
+
+    .kind-header-row {
+      display: block !important;
+      padding: 0 !important;
+    }
+
+    .kind-header {
+      width: 100% !important;
+      cursor: default !important;
+      padding: 18px 20px !important;
+    }
+
+    .details-head,
+    .hymnen-row {
+      grid-template-columns: 1.5fr 270px 270px !important;
+    }
+  `;
+
+  exportBox.appendChild(style);
+  exportBox.appendChild(titel);
+  exportBox.appendChild(untertitel);
+  exportBox.appendChild(clone);
+  document.body.appendChild(exportBox);
+
+  try {
+    const canvas = await window.html2canvas(exportBox, {
+      backgroundColor: "#1A3D64",
+      scale: 2,
+      useCORS: true
+    });
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `hymnen-${aktiverMonatsFilter}.png`;
+    link.click();
+  } catch (error) {
+    console.error(error);
+    alert("Fehler beim Erstellen des Screenshots.");
+  } finally {
+    exportBox.remove();
+  }
+}
+
 async function ladeHymnenUebersicht() {
   try {
     const email = localStorage.getItem("email");
@@ -27,41 +253,37 @@ async function ladeHymnenUebersicht() {
       return;
     }
     
-    kinderListe.innerHTML = "";
-
     const response = await fetch(`${API_BASE_URL}/api/hymnen?email=${encodeURIComponent(email)}`);
-    if (!response.ok) {
-      throw new Error("Fehler beim Laden der Hymnen-Daten");
-    }
+if (!response.ok) {
+  throw new Error("Fehler beim Laden der Hymnen-Daten");
+}
 
-    const daten = await response.json();
+const daten = await response.json();
 
-    daten.sort((a, b) => {
+daten.sort((a, b) => {
   const punkteA = Number(a.gesamt_hymne) || 0;
   const punkteB = Number(b.gesamt_hymne) || 0;
 
   if (punkteB !== punkteA) {
-    return punkteB - punkteA; // größte Punktzahl zuerst
+    return punkteB - punkteA;
   }
 
-  return (a.kind_name || "").localeCompare(b.kind_name || "", "de");    
-    });
+  return (a.kind_name || "").localeCompare(b.kind_name || "", "de");
+});
 
-        daten.forEach(kind => {
-        const card = baueKindCard(kind);
-        kinderListe.appendChild(card);
-    });
+alleKinderDaten = daten;
+renderKinderListe();
 
     const openKindId = localStorage.getItem(OPEN_KIND_KEY);
-    if (openKindId) {
+    if (openKindId && !aktiverMonatsFilter) {
       const card = document.querySelector(`.kind-card[data-kind-id="${openKindId}"]`);
       if (card) {
         oeffneKindCard(card);
         hervorheben(card);
         card.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      localStorage.removeItem(OPEN_KIND_KEY);
     }
+    localStorage.removeItem(OPEN_KIND_KEY);
   } catch (err) {
     console.error(err);
   }
@@ -89,9 +311,13 @@ function baueKindCard(kind) {
   const details = document.createElement("div");
   details.className = "kind-details";
 
+  const angezeigtePunkte = aktiverMonatsFilter
+    ? kind.eintraege.reduce((summe, eintrag) => summe + (Number(eintrag.punkte) || 0), 0)
+    : (Number(kind.gesamt_hymne) || 0);
+
   header.innerHTML = `
     <span class="kind-name">${escapeHtml(kind.kind_name)}</span>
-    <span class="kind-punkte">${Number(kind.gesamt_hymne) || 0} Punkte</span>
+    <span class="kind-punkte">${angezeigtePunkte} Punkte</span>
   `;
 
   const punkteAnzeige = header.querySelector(".kind-punkte");
@@ -117,6 +343,11 @@ function baueKindCard(kind) {
   });
 
   baueDetailsInhalt(details, kind, punkteAnzeige);
+
+  if (aktiverMonatsFilter) {
+  details.classList.add("offen");
+  card.classList.add("aktiv");
+  }
 
   headerRow.appendChild(header);
   headerRow.appendChild(plusButton);
@@ -598,5 +829,16 @@ if (logoutButton) {
     window.location.href = "/login/login.html";
   });
 }
+
+monatSucheButton?.addEventListener("click", aktiviereMonatsFilter);
+monatResetButton?.addEventListener("click", resetMonatsFilter);
+monatScreenshotButton?.addEventListener("click", screenshotMonatsErgebnis);
+
+monatSucheInput?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    aktiviereMonatsFilter();
+  }
+});
 
 ladeHymnenUebersicht();
