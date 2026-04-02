@@ -105,7 +105,7 @@ tr:nth-child(even) {
 }
 
 #zurueckButton:hover {
-  background-color: #1D546C;
+  background-color: #cd4b4b;
   transform: scale(1.05);
 }
 
