@@ -17,6 +17,9 @@ const KATEGORIEN = [
 const ordnerListe = document.getElementById("ordnerListe");
 const zurueckButton = document.getElementById("zurueckButton");
 
+let aktuellGezogeneHymneId = null;
+let aktuellGezogeneKategorie = null;
+
 let daten = leeresDatenObjekt();
 
 init();
@@ -68,6 +71,117 @@ function leeresDatenObjekt() {
   return obj;
 }
 
+function ermittleNaechstenSortIndex(kategorie) {
+  const offene = (daten[kategorie] || []).filter(item => !item.checked);
+  if (offene.length === 0) return 0;
+  return Math.max(...offene.map(item => Number(item.sortIndex) || 0)) + 1;
+}
+
+function compareErledigteHymnen(a, b) {
+  const aDatum1 = a.startDate || a.endDate || "9999-12-31";
+  const bDatum1 = b.startDate || b.endDate || "9999-12-31";
+
+  if (aDatum1 !== bDatum1) {
+    return aDatum1.localeCompare(bDatum1);
+  }
+
+  const aDatum2 = a.endDate || a.startDate || "9999-12-31";
+  const bDatum2 = b.endDate || b.startDate || "9999-12-31";
+
+  if (aDatum2 !== bDatum2) {
+    return aDatum2.localeCompare(bDatum2);
+  }
+
+  return (a.sortIndex || 0) - (b.sortIndex || 0);
+}
+
+function sortiereKategorie(kategorie) {
+  const alle = [...(daten[kategorie] || [])];
+
+  const erledigt = alle
+    .filter(item => item.checked)
+    .sort(compareErledigteHymnen);
+
+  const offen = alle
+    .filter(item => !item.checked)
+    .sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0));
+
+  daten[kategorie] = [...erledigt, ...offen];
+}
+
+function holeElementNachPosition(container, y) {
+  const elemente = [
+    ...container.querySelectorAll(".hymne-row.verschiebbar:not(.dragging)")
+  ];
+
+  let naechstes = null;
+  let groessterNegativerOffset = Number.NEGATIVE_INFINITY;
+
+  for (const element of elemente) {
+    const box = element.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+
+    if (offset < 0 && offset > groessterNegativerOffset) {
+      groessterNegativerOffset = offset;
+      naechstes = element;
+    }
+  }
+
+  return naechstes;
+}
+
+function uebernehmeOffeneReihenfolgeAusDOM(kategorie, container) {
+  const idsInReihenfolge = [
+    ...container.querySelectorAll(".hymne-row.verschiebbar")
+  ].map(el => Number(el.dataset.id));
+
+  const erledigte = daten[kategorie]
+    .filter(item => item.checked)
+    .sort(compareErledigteHymnen);
+
+  const offeneMap = new Map(
+    daten[kategorie]
+      .filter(item => !item.checked)
+      .map(item => [Number(item.id), item])
+  );
+
+  const offeneNeu = idsInReihenfolge
+    .map((id, index) => {
+      const item = offeneMap.get(id);
+      if (!item) return null;
+      item.sortIndex = index;
+      return item;
+    })
+    .filter(Boolean);
+
+  daten[kategorie] = [...erledigte, ...offeneNeu];
+}
+
+async function speichereOffeneReihenfolge(kategorie) {
+  const email = localStorage.getItem("email");
+
+  const ids = daten[kategorie]
+    .filter(item => !item.checked)
+    .sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0))
+    .map(item => item.id);
+
+  const response = await fetch(`${API_BASE_URL}/api/lehrplan/reihenfolge`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email,
+      kategorie,
+      ids
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("Fehler beim Speichern der Reihenfolge");
+  }
+}
+
 async function ladeDatenVomServer() {
   const email = localStorage.getItem("email");
 
@@ -94,7 +208,9 @@ async function ladeDatenVomServer() {
         name: eintrag.titel,
         checked: !!eintrag.erledigt,
         startDate: normalisiereDatumFuerInput(eintrag.start_datum),
-        endDate: normalisiereDatumFuerInput(eintrag.end_datum)
+        endDate: normalisiereDatumFuerInput(eintrag.end_datum),
+        sortIndex: Number(eintrag.sort_index) || 0,
+        createdAt: eintrag.created_at
       });
     });
   } catch (error) {
@@ -176,11 +292,13 @@ function baueOrdnerCard(kategorie) {
 function renderOrdnerInhalt(content, kategorie, countElement) {
   content.innerHTML = "";
 
+  sortiereKategorie(kategorie);
+
   const hymnen = daten[kategorie];
   countElement.textContent = `${hymnen.length} Hymnen`;
 
-  const liste = document.createElement("div");
-  liste.className = "hymnen-liste";
+  const erledigte = hymnen.filter(item => item.checked);
+  const offene = hymnen.filter(item => !item.checked);
 
   if (hymnen.length === 0) {
     const emptyText = document.createElement("div");
@@ -188,17 +306,70 @@ function renderOrdnerInhalt(content, kategorie, countElement) {
     emptyText.textContent = "Noch keine Hymnen vorhanden.";
     content.appendChild(emptyText);
   } else {
-    hymnen.forEach((hymne) => {
-      const row = baueHymneRow(hymne, kategorie, content, countElement);
-      liste.appendChild(row);
-    });
+    if (erledigte.length > 0) {
+      const erledigtListe = document.createElement("div");
+      erledigtListe.className = "hymnen-liste";
 
-    content.appendChild(liste);
+      erledigte.forEach((hymne) => {
+        const row = baueHymneRow(hymne, kategorie, content, countElement);
+        erledigtListe.appendChild(row);
+      });
+
+      content.appendChild(erledigtListe);
+    }
+
+    if (offene.length > 0) {
+      const offeneListe = document.createElement("div");
+      offeneListe.className = "hymnen-liste offen-dropzone";
+
+      offene.forEach((hymne) => {
+        const row = baueHymneRow(hymne, kategorie, content, countElement);
+        offeneListe.appendChild(row);
+      });
+
+      offeneListe.addEventListener("dragover", (event) => {
+        if (aktuellGezogeneKategorie !== kategorie) return;
+
+        event.preventDefault();
+
+        const afterElement = holeElementNachPosition(offeneListe, event.clientY);
+        const draggingElement = offeneListe.querySelector(
+          `.hymne-row[data-id="${aktuellGezogeneHymneId}"]`
+        );
+
+        if (!draggingElement) return;
+
+        if (afterElement == null) {
+          offeneListe.appendChild(draggingElement);
+        } else {
+          offeneListe.insertBefore(draggingElement, afterElement);
+        }
+      });
+
+      offeneListe.addEventListener("drop", async (event) => {
+        if (aktuellGezogeneKategorie !== kategorie) return;
+
+        event.preventDefault();
+
+        try {
+          uebernehmeOffeneReihenfolgeAusDOM(kategorie, offeneListe);
+          await speichereOffeneReihenfolge(kategorie);
+          renderOrdnerInhalt(content, kategorie, countElement);
+        } catch (error) {
+          console.error(error);
+          alert("Fehler beim Speichern der Reihenfolge.");
+          await ladeDatenVomServer();
+          renderOrdnerInhalt(content, kategorie, countElement);
+        }
+      });
+
+      content.appendChild(offeneListe);
+    }
   }
 
   const hint = document.createElement("div");
   hint.className = "edit-hint";
-  hint.textContent = "Tipp: Doppelklick auf einen Hymnennamen zum Bearbeiten.";
+  hint.textContent = "Tipp: Doppelklick zum Bearbeiten. Offene Hymnen kannst du per Gedrückthalten und Ziehen innerhalb dieser Box verschieben.";
 
   content.appendChild(hint);
 }
@@ -278,7 +449,9 @@ function zeigeAddForm(content, kategorie, countElement) {
         name: neuerEintrag.titel,
         checked: !!neuerEintrag.erledigt,
         startDate: normalisiereDatumFuerInput(neuerEintrag.start_datum),
-        endDate: normalisiereDatumFuerInput(neuerEintrag.end_datum)
+        endDate: normalisiereDatumFuerInput(neuerEintrag.end_datum),
+        sortIndex: Number(neuerEintrag.sort_index) || ermittleNaechstenSortIndex(kategorie),
+        createdAt: neuerEintrag.created_at
       });
 
       renderOrdnerInhalt(content, kategorie, countElement);
@@ -307,10 +480,32 @@ function zeigeAddForm(content, kategorie, countElement) {
 function baueHymneRow(hymne, kategorie, content, countElement) {
   const row = document.createElement("div");
   row.className = "hymne-row";
+  row.dataset.id = String(hymne.id);
 
   if (hymne.checked) {
     row.classList.add("erledigt");
   }
+
+  if (!hymne.checked) {
+  row.classList.add("verschiebbar");
+  row.draggable = true;
+
+  row.addEventListener("dragstart", (event) => {
+    aktuellGezogeneHymneId = hymne.id;
+    aktuellGezogeneKategorie = kategorie;
+    row.classList.add("dragging");
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+    }
+  });
+
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+    aktuellGezogeneHymneId = null;
+    aktuellGezogeneKategorie = null;
+  });
+}
 
   const checkbox = document.createElement("input");
   checkbox.className = "hymne-check";
@@ -388,11 +583,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   row.appendChild(info);
   row.appendChild(actions);
 
-  function formatiereZeitraum(start, end) {
-  if (start && end) return `${formatiereDatum(start)} - ${formatiereDatum(end)}`;
-  return "";
-  }
-
   function hatVollstaendigenZeitraum() {
   return !!(hymne.startDate && hymne.endDate);
   }
@@ -435,6 +625,7 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     const vorherChecked = !checkbox.checked;
     const vorherStart = hymne.startDate;
     const vorherEnd = hymne.endDate;
+    const vorherSortIndex = hymne.sortIndex;
 
     try {
       checkbox.disabled = true;
@@ -446,10 +637,10 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
         erledigt: checkbox.checked
       };
 
-      // Wenn Check entfernt wird -> Datum löschen
       if (!checkbox.checked) {
         body.start_datum = null;
         body.end_datum = null;
+        body.sort_index = ermittleNaechstenSortIndex(kategorie);
       }
 
       const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
@@ -469,30 +660,46 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       if (!checkbox.checked) {
         hymne.startDate = "";
         hymne.endDate = "";
+        hymne.sortIndex = body.sort_index;
         vonInput.value = "";
         bisInput.value = "";
       }
 
-      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+     const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
       if (eintrag) {
         eintrag.checked = hymne.checked;
         eintrag.startDate = hymne.startDate;
         eintrag.endDate = hymne.endDate;
+        if (!checkbox.checked) {
+          eintrag.sortIndex = hymne.sortIndex;
+        }
       }
 
-      row.classList.toggle("erledigt", checkbox.checked);
-      aktualisiereZeitraumAnzeige();
+      renderOrdnerInhalt(content, kategorie, countElement);
+
     } catch (error) {
       console.error(error);
       checkbox.checked = vorherChecked;
       hymne.checked = vorherChecked;
       hymne.startDate = vorherStart;
       hymne.endDate = vorherEnd;
+      hymne.sortIndex = vorherSortIndex;
       vonInput.value = vorherStart || "";
       bisInput.value = vorherEnd || "";
       row.classList.toggle("erledigt", vorherChecked);
       aktualisiereZeitraumAnzeige();
+
+      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+      if (eintrag) {
+        eintrag.checked = vorherChecked;
+        eintrag.startDate = vorherStart;
+        eintrag.endDate = vorherEnd;
+        eintrag.sortIndex = vorherSortIndex;
+      }
+
+      renderOrdnerInhalt(content, kategorie, countElement);
       alert("Fehler beim Speichern der Checkbox.");
+
     } finally {
       checkbox.disabled = false;
       vonInput.disabled = false;
@@ -549,6 +756,7 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       }
 
       aktualisiereZeitraumAnzeige();
+      renderOrdnerInhalt(content, kategorie, countElement);
     } catch (error) {
       console.error(error);
       hymne.startDate = vorherStart;
@@ -556,6 +764,7 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       vonInput.value = vorherStart || "";
       bisInput.value = vorherEnd || "";
       aktualisiereZeitraumAnzeige();
+      renderOrdnerInhalt(content, kategorie, countElement);
       alert("Fehler beim Speichern des Datums.");
     } finally {
       vonInput.disabled = false;

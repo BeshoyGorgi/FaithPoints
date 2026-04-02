@@ -373,10 +373,10 @@ app.get("/api/lehrplan", async (req, res) => {
   try {
     const result = await db.query(
       `
-        SELECT id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
+        SELECT id, user_email, kategorie, titel, erledigt, start_datum, end_datum, sort_index, created_at
         FROM lehrplan_eintraege
         WHERE user_email = $1
-        ORDER BY created_at ASC, id ASC
+        ORDER BY kategorie ASC, erledigt DESC, sort_index ASC, created_at ASC, id ASC
       `,
       [email]
     );
@@ -407,13 +407,30 @@ app.post("/api/lehrplan", async (req, res) => {
   }
 
   try {
+    const cleanKategorie = kategorie.trim();
+
+    const posResult = await db.query(
+      `
+        SELECT COALESCE(MAX(sort_index), -1) AS max_sort
+        FROM lehrplan_eintraege
+        WHERE user_email = $1
+          AND kategorie = $2
+          AND erledigt = false
+      `,
+      [email, cleanKategorie]
+    );
+
+    const nextSortIndex = Number(posResult.rows[0].max_sort) + 1;
+
+
     const result = await db.query(
       `
-        INSERT INTO lehrplan_eintraege (user_email, kategorie, titel, erledigt, start_datum, end_datum)
-        VALUES ($1, $2, $3, false, $4, $5)
-        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
+        INSERT INTO lehrplan_eintraege
+          (user_email, kategorie, titel, erledigt, start_datum, end_datum, sort_index)
+        VALUES ($1, $2, $3, false, $4, $5, $6)
+        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, sort_index, created_at
       `,
-      [email, kategorie.trim(), titel.trim(), start_datum || null, end_datum || null]
+      [email, cleanKategorie, titel.trim(), start_datum || null, end_datum || null, nextSortIndex]
     );
 
     res.status(201).json(result.rows[0]);
@@ -422,9 +439,75 @@ app.post("/api/lehrplan", async (req, res) => {
   }
 });
 
+app.put("/api/lehrplan/reihenfolge", async (req, res) => {
+  const { email, kategorie, ids } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail ist erforderlich" });
+  }
+
+  if (!kategorie || !kategorie.trim()) {
+    return res.status(400).json({ error: "Kategorie ist erforderlich" });
+  }
+
+  if (!Array.isArray(ids)) {
+    return res.status(400).json({ error: "ids muss ein Array sein" });
+  }
+
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const vorhandene = await client.query(
+      `
+        SELECT id
+        FROM lehrplan_eintraege
+        WHERE user_email = $1
+          AND kategorie = $2
+          AND erledigt = false
+      `,
+      [email, kategorie.trim()]
+    );
+
+    const dbIds = vorhandene.rows.map(r => Number(r.id)).sort((a, b) => a - b);
+    const neueIds = ids.map(Number).sort((a, b) => a - b);
+
+    if (
+      dbIds.length !== neueIds.length ||
+      dbIds.some((id, index) => id !== neueIds[index])
+    ) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ error: "Ungültige Reihenfolge-Daten" });
+    }
+
+    for (let i = 0; i < ids.length; i++) {
+      await client.query(
+        `
+          UPDATE lehrplan_eintraege
+          SET sort_index = $1
+          WHERE id = $2
+            AND user_email = $3
+            AND kategorie = $4
+            AND erledigt = false
+        `,
+        [i, ids[i], email, kategorie.trim()]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.json({ success: true });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+
 app.put("/api/lehrplan/:id", async (req, res) => {
   const { id } = req.params;
-  const { email, titel, erledigt, start_datum, end_datum } = req.body;
+  const { email, titel, erledigt, start_datum, end_datum, sort_index } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "E-Mail ist erforderlich" });
@@ -470,6 +553,17 @@ app.put("/api/lehrplan/:id", async (req, res) => {
     }
   }
 
+  if ("sort_index" in req.body) {
+  const sortNum = Number(sort_index);
+
+  if (!Number.isInteger(sortNum) || sortNum < 0) {
+    return res.status(400).json({ error: "sort_index ist ungültig" });
+  }
+
+  updates.push(`sort_index = $${values.length + 1}`);
+  values.push(sortNum);
+}
+
   if (updates.length === 0) {
     return res.status(400).json({ error: "Keine gültigen Felder zum Aktualisieren" });
   }
@@ -485,7 +579,7 @@ app.put("/api/lehrplan/:id", async (req, res) => {
         UPDATE lehrplan_eintraege
         SET ${updates.join(", ")}
         WHERE id = $${idPos} AND user_email = $${emailPos}
-        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, created_at
+        RETURNING id, user_email, kategorie, titel, erledigt, start_datum, end_datum, sort_index, created_at
       `,
       values
     );

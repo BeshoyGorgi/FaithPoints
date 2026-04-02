@@ -467,6 +467,28 @@ body {
   display: block;
 }
 
+.hymne-row.verschiebbar {
+  cursor: grab;
+  user-select: none;
+}
+
+.hymne-row.verschiebbar:active {
+  cursor: grabbing;
+}
+
+.hymne-row.dragging {
+  opacity: 0.45;
+  border: 2px dashed #2563eb;
+}
+
+.hymnen-liste.offen-dropzone {
+  min-height: 12px;
+}
+
+.hymne-row.erledigt {
+  cursor: default;
+}
+
 @media (max-width: 700px) {
   body {
     padding-top: 82px;

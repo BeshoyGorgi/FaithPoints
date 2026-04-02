@@ -48,6 +48,7 @@ export async function createTableIfNotExists() {
         erledigt BOOLEAN NOT NULL DEFAULT FALSE,
         start_datum DATE NULL,
         end_datum DATE NULL,
+        sort_index INT NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
@@ -65,6 +66,27 @@ export async function createTableIfNotExists() {
     await db.query(`
       ALTER TABLE lehrplan_eintraege
       ADD COLUMN IF NOT EXISTS end_datum DATE NULL;
+    `);
+
+    await db.query(`
+      ALTER TABLE lehrplan_eintraege
+      ADD COLUMN IF NOT EXISTS sort_index INT NOT NULL DEFAULT 0;
+    `);
+
+    await db.query(`
+      WITH nummeriert AS (
+        SELECT
+          id,
+          ROW_NUMBER() OVER (
+            PARTITION BY user_email, kategorie, erledigt
+            ORDER BY created_at ASC, id ASC
+          ) - 1 AS neue_position
+        FROM lehrplan_eintraege
+      )
+      UPDATE lehrplan_eintraege l
+      SET sort_index = n.neue_position
+      FROM nummeriert n
+      WHERE l.id = n.id;
     `);
 
     console.log("✅ Tabellen 'kinder', 'hymnen_eintraege' und 'lehrplan_eintraege' sind bereit!");
