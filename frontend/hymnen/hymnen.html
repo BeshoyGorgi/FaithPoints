@@ -41,40 +41,48 @@
 
   <h1 class="hymnen-titel">Hymnen</h1>
 
-<section class="monat-filter-box">
-  <label for="monatSuche" class="monat-filter-label">Datum suchen (Monat / Jahr)</label>
+<section class="toolbar-card">
+  <div class="toolbar-head">
+    <div>
+      <h2 class="toolbar-title">Hymnen Filtern</h2>
+    </div>
 
-  <div class="monat-filter-row">
-    <input type="month" id="monatSuche" class="monat-filter-input" />
-
-    <button id="monatSucheButton" class="filter-button" type="button">
-      Suchen
-    </button>
-
-    <button id="monatResetButton" class="filter-button secondary" type="button">
-      Zurücksetzen
-    </button>
-
-    <button id="monatScreenshotButton" class="filter-button export" type="button">
-      Screenshot herunterladen
-    </button>
+    <a href="/lehrplan/lehrplan.html" class="toolbar-link">Lehrplan</a>
   </div>
 
-  <div id="monatInfo" class="monat-info"></div>
+  <div class="toolbar-grid">
+    <div class="toolbar-field toolbar-field--wide">
+      <label for="kindSuche" class="toolbar-label">Kind</label>
+      <input
+        type="text"
+        id="kindSuche"
+        class="toolbar-input"
+        placeholder="Nach einem Kind suchen..."
+      />
+    </div>
+
+    <div class="toolbar-field">
+      <label for="monatSuche" class="toolbar-label">Monat / Jahr</label>
+      <input type="month" id="monatSuche" class="toolbar-input" />
+    </div>
+
+    <div class="toolbar-actions">
+      <button id="monatSucheButton" class="toolbar-button primary" type="button">
+        Filtern
+      </button>
+
+      <button id="monatScreenshotButton" class="toolbar-button success" type="button">
+        Screenshot
+      </button>
+
+      <button id="monatResetButton" class="toolbar-reset" type="button">
+        Zurücksetzen
+      </button>
+    </div>
+  </div>
+
+  <div id="monatInfo" class="toolbar-info"></div>
 </section>
-
-<div class="search-row-hymnen">
-  <input
-    type="text"
-    id="kindSuche"
-    class="search-input-hymnen"
-    placeholder="Nach einem Kind suchen..."
-  />
-</div>
-
-<div class="lehrplan-bereich">
-  <a href="/lehrplan/lehrplan.html" class="lehrplan-button">Lehrplan</a>
-</div>
 
     <section id="kinderListe" class="kinder-liste"></section>
 

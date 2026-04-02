@@ -146,6 +146,187 @@ body {
   padding: 24px;
 }
 
+.toolbar-card {
+  background: linear-gradient(180deg, #f0f0f1 0%, #f1f2f3 100%);
+  border-radius: 20px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(191, 219, 254, 0.75);
+}
+
+.toolbar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #2563eb;
+  margin-bottom: 2px;
+}
+
+.toolbar-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #2563eb;
+  margin-bottom: 2px;
+}
+
+.toolbar-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #c4dbff;
+  color: #0b45e3;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: 0.18s ease;
+}
+
+.toolbar-link:hover {
+  background: #aeccff;
+  transform: translateY(-1px);
+}
+
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.toolbar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.toolbar-field--wide {
+  min-width: 0;
+}
+
+.toolbar-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.toolbar-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  transition: 0.18s ease;
+}
+
+.toolbar-input:hover {
+  border-color: #93c5fd;
+}
+
+.toolbar-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar-button {
+  height: 44px;
+  border: none;
+  border-radius: 14px;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  transition: 0.18s ease;
+}
+
+.toolbar-button.primary {
+  background-color: #0f66c9;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+}
+
+.toolbar-button.primary:hover {
+  transform: translateY(-1px);
+  background-color: #277292;
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.28);
+}
+
+.toolbar-button.success {
+  background-color: #178e23;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.22);
+}
+
+.toolbar-button.success:hover {
+  transform: translateY(-1px);
+  background-color: #27b427;
+  box-shadow: 0 12px 22px rgba(22, 163, 74, 0.28);
+}
+
+.toolbar-reset {
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 6px;
+  transition: 0.18s ease;
+}
+
+.toolbar-reset:hover {
+  color: #0f172a;
+}
+
+.toolbar-info {
+  margin-top: 8px;
+  min-height: 18px;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.search-row-hymnen,
+.lehrplan-bereich,
+.monat-filter-box {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
 .monat-filter-box {
   background: white;
   border-radius: 16px;
@@ -635,5 +816,50 @@ body {
 
   .kind-punkte {
     white-space: normal;
+  }
+}
+
+@media (max-width: 980px) {
+  .toolbar-grid {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .toolbar-button {
+    flex: 1 1 180px;
+  }
+}
+
+@media (max-width: 640px) {
+  .toolbar-card {
+    padding: 18px 16px;
+    border-radius: 20px;
+  }
+
+  .toolbar-title {
+    font-size: 1.15rem;
+  }
+
+  .toolbar-link {
+    width: 100%;
+  }
+
+  .toolbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-button,
+  .toolbar-reset {
+    width: 100%;
+  }
+
+  .toolbar-reset {
+    height: 44px;
+    text-align: center;
   }
 }
