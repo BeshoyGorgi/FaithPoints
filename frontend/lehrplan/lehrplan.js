@@ -78,18 +78,18 @@ function ermittleNaechstenSortIndex(kategorie) {
 }
 
 function compareErledigteHymnen(a, b) {
-  const aDatum1 = a.startDate || a.endDate || "9999-12-31";
-  const bDatum1 = b.startDate || b.endDate || "9999-12-31";
+  const aStart = a.startDate || "0000-01-01";
+  const bStart = b.startDate || "0000-01-01";
 
-  if (aDatum1 !== bDatum1) {
-    return aDatum1.localeCompare(bDatum1);
+  if (aStart !== bStart) {
+    return bStart.localeCompare(aStart);
   }
 
-  const aDatum2 = a.endDate || a.startDate || "9999-12-31";
-  const bDatum2 = b.endDate || b.startDate || "9999-12-31";
+  const aEnd = a.endDate || "0000-01-01";
+  const bEnd = b.endDate || "0000-01-01";
 
-  if (aDatum2 !== bDatum2) {
-    return aDatum2.localeCompare(bDatum2);
+  if (aEnd !== bEnd) {
+    return bEnd.localeCompare(aEnd);
   }
 
   return (a.sortIndex || 0) - (b.sortIndex || 0);
