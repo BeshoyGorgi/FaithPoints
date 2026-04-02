@@ -610,6 +610,21 @@ body {
   cursor: default;
 }
 
+.hymne-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.hymne-edit-date {
+  max-width: 240px;
+}
+
+.hymne-text {
+  cursor: pointer;
+}
+
 @media (max-width: 900px) {
   .monat-filter-box {
     max-width: 100%;

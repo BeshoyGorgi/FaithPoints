@@ -622,7 +622,7 @@ function renderOrdnerInhalt(content, kategorie, countElement) {
 
   const hint = document.createElement("div");
   hint.className = "edit-hint";
-  hint.textContent = "Tipp: Doppelklick zum Bearbeiten. Offene Hymnen kannst du per Gedrückthalten und Ziehen innerhalb dieser Box verschieben.";
+  hint.textContent = "Tipp: Doppelklick auf den Namen zum Bearbeiten von Name und Datum. Offene Hymnen kannst du per Gedrückthalten und Ziehen innerhalb dieser Box verschieben.";
 
   content.appendChild(hint);
 }
@@ -828,21 +828,27 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     }
   }
 
-  function aktualisiereZeitraumAnzeige() {
-    const zeitraumText = formatiereZeitraum(hymne.startDate);
+ function aktualisiereZeitraumAnzeige() {
+  const zeitraumText = formatiereZeitraum(hymne.startDate);
 
-    if (zeitraumText) {
-      dateLabel.textContent = `(${zeitraumText})`;
-      dateLabel.style.display = "inline-flex";
-    } else {
-      dateLabel.textContent = "";
-      dateLabel.style.display = "none";
-    }
-
-    zeitraumBox.style.display = hymne.checked ? "flex" : "none";
-
-    aktualisiereDateInputPlaceholder(vonInput);
+  if (zeitraumText) {
+    dateLabel.textContent = `(${zeitraumText})`;
+    dateLabel.style.display = "inline-flex";
+  } else {
+    dateLabel.textContent = "";
+    dateLabel.style.display = "none";
   }
+
+  if (!hymne.checked) {
+    zeitraumBox.style.display = "none";
+  } else if (hymne.startDate) {
+    zeitraumBox.style.display = "none";
+  } else {
+    zeitraumBox.style.display = "flex";
+  }
+
+  aktualisiereDateInputPlaceholder(vonInput);
+}
 
   aktualisiereZeitraumAnzeige();
 
@@ -1020,110 +1026,164 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 
 function starteBearbeitung(textElement, hymne, kategorie, content, countElement) {
   const row = textElement.closest(".hymne-row");
-  const textParent = textElement.parentElement;
+  const info = row?.querySelector(".hymne-info");
+  const actions = row?.querySelector(".hymne-actions");
 
-  if (!row || !textParent) return;
+  if (!row || !info || !actions) return;
+  if (row.dataset.editing === "true") return;
 
-  const alterText = hymne.name;
+  row.dataset.editing = "true";
 
-  const input = document.createElement("input");
-  input.type = "text";
-  input.className = "hymne-edit-input";
-  input.value = alterText;
-
-  const actions = row.querySelector(".hymne-actions");
-  if (!actions) return;
-
-  const saveButton = document.createElement("button");
-  saveButton.type = "button";
-  saveButton.className = "edit-save-button";
-  saveButton.textContent = "Speichern";
+  const alterName = hymne.name || "";
+  const altesDatum = hymne.startDate || "";
 
   const deleteButton = actions.querySelector(".delete-button");
   if (deleteButton) {
     deleteButton.style.display = "none";
   }
 
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "edit-save-button";
+  saveButton.textContent = "Speichern";
+
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "cancel-button";
+  cancelButton.textContent = "Abbrechen";
+
+  actions.prepend(cancelButton);
   actions.prepend(saveButton);
-  textParent.replaceChild(input, textElement);
 
-  input.focus();
-  input.select();
+  const editBox = document.createElement("div");
+  editBox.className = "hymne-edit-box";
 
-let fertig = false;
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.className = "hymne-edit-input";
+  nameInput.value = alterName;
+  nameInput.placeholder = "Name der Hymne";
 
-saveButton.addEventListener("mousedown", (event) => {
-  event.preventDefault();
-});
+  editBox.appendChild(nameInput);
 
-async function beenden(uebernehmen) {
-  if (fertig) return;
+  let dateInput = null;
 
-  const neuerText = input.value.trim();
-
-  if (!uebernehmen) {
-    fertig = true;
-    renderOrdnerInhalt(content, kategorie, countElement);
-    return;
+  if (hymne.checked) {
+    dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.className = "date-input hymne-edit-date";
+    dateInput.value = altesDatum;
+    editBox.appendChild(dateInput);
   }
 
-  if (!neuerText) {
+  info.innerHTML = "";
+  info.appendChild(editBox);
+
+  nameInput.focus();
+  nameInput.select();
+
+  let fertig = false;
+
+  saveButton.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+  });
+
+  cancelButton.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+  });
+
+  async function beenden(uebernehmen) {
+    if (fertig) return;
+
+    if (!uebernehmen) {
+      fertig = true;
+      renderOrdnerInhalt(content, kategorie, countElement);
+      return;
+    }
+
+    const neuerText = nameInput.value.trim();
+    const neuesDatum = dateInput ? (dateInput.value || null) : null;
+
+    if (!neuerText) {
+      alert("Der Name darf nicht leer sein.");
+      nameInput.focus();
+      return;
+    }
+
     fertig = true;
-    alert("Der Name darf nicht leer sein.");
-    renderOrdnerInhalt(content, kategorie, countElement);
-    return;
-  }
+    const email = localStorage.getItem("email");
 
-  fertig = true;
-  const email = localStorage.getItem("email");
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+    try {
+      const body = {
         email,
         titel: neuerText
-      })
+      };
+
+      if (hymne.checked) {
+        body.start_datum = neuesDatum;
+        body.end_datum = null;
+        body.erledigt = true;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw new Error("Fehler beim Bearbeiten");
+      }
+
+      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+      if (eintrag) {
+        eintrag.name = neuerText;
+
+        if (hymne.checked) {
+          eintrag.startDate = neuesDatum || "";
+          eintrag.endDate = "";
+        }
+      }
+
+      renderOrdnerInhalt(content, kategorie, countElement);
+    } catch (error) {
+      console.error(error);
+      alert("Fehler beim Bearbeiten der Hymne.");
+      fertig = false;
+      nameInput.focus();
+    }
+  }
+
+  saveButton.addEventListener("click", () => beenden(true));
+  cancelButton.addEventListener("click", () => beenden(false));
+
+  nameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      beenden(true);
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      beenden(false);
+    }
+  });
+
+  if (dateInput) {
+    dateInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        beenden(true);
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        beenden(false);
+      }
     });
-
-    if (!response.ok) {
-      throw new Error("Fehler beim Bearbeiten");
-    }
-
-    const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
-    if (eintrag) {
-      eintrag.name = neuerText;
-    }
-
-    renderOrdnerInhalt(content, kategorie, countElement);
-  } catch (error) {
-    console.error(error);
-    alert("Fehler beim Bearbeiten der Hymne.");
-    fertig = false;
-    input.focus();
   }
-}
-
-saveButton.addEventListener("click", () => beenden(true));
-
-input.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    beenden(true);
-  }
-
-  if (event.key === "Escape") {
-    event.preventDefault();
-    beenden(false);
-  }
-});
-
-input.addEventListener("blur", () => {
-  beenden(false);
-});
 }
 
 if (monatSucheButton) {
