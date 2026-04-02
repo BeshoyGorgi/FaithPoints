@@ -182,6 +182,23 @@ function holeGefilterteHymnen(kategorie) {
   );
 }
 
+function baueZaehlerText(kategorie) {
+  const alleHymnen = daten[kategorie] || [];
+  const sichtbareHymnen = holeGefilterteHymnen(kategorie);
+
+  const basis = hatAktivenMonatsFilter() ? sichtbareHymnen : alleHymnen;
+
+  const gesamt = basis.length;
+  const erledigt = basis.filter(item => item.checked).length;
+  const offen = gesamt - erledigt;
+
+  if (hatAktivenMonatsFilter()) {
+    return `${gesamt} von ${alleHymnen.length} Hymnen • ${erledigt} erledigt • ${offen} offen`;
+  }
+
+  return `${gesamt} Hymnen • ${erledigt} erledigt • ${offen} offen`;
+}
+
 function aktualisiereMonatInfo() {
   if (!monatInfo) return;
 
@@ -488,12 +505,7 @@ function baueOrdnerCard(kategorie) {
 
   const count = document.createElement("span");
   count.className = "ordner-count";
-  const gesamtAnzahl = daten[kategorie].length;
-  const gefilterteAnzahl = holeGefilterteHymnen(kategorie).length;
-
-  count.textContent = hatAktivenMonatsFilter()
-  ? `${gefilterteAnzahl} von ${gesamtAnzahl} Hymnen`
-  : `${gesamtAnzahl} Hymnen`;
+  count.textContent = baueZaehlerText(kategorie);
 
   const plusButton = document.createElement("button");
   plusButton.className = "plus-button";
@@ -546,9 +558,7 @@ function renderOrdnerInhalt(content, kategorie, countElement) {
  const alleHymnen = daten[kategorie];
   const hymnen = holeGefilterteHymnen(kategorie);
 
-  countElement.textContent = hatAktivenMonatsFilter()
-  ? `${hymnen.length} von ${alleHymnen.length} Hymnen`
-  : `${alleHymnen.length} Hymnen`;
+countElement.textContent = baueZaehlerText(kategorie);
 
   const erledigte = hymnen.filter(item => item.checked);
   const offene = hymnen.filter(item => !item.checked);
