@@ -765,6 +765,28 @@ function sperreInput(input) {
   input.title = "Doppelklick zum Bearbeiten";
 }
 
+function fuehreSucheAus() {
+  const query = (suchInput?.value || "").trim();
+  const monatWert = (monatSucheInput?.value || "").trim();
+
+  if (query && monatWert) {
+    sucheKind();
+    return;
+  }
+
+  if (query) {
+    sucheKind();
+    return;
+  }
+
+  if (monatWert) {
+    aktiviereMonatsFilter();
+    return;
+  }
+
+  alert("Bitte gib einen Namen ein oder wähle Monat und Jahr aus.");
+}
+
 function sucheKind() {
   const query = (suchInput?.value || "").trim().toLowerCase();
   const monatWert = (monatSucheInput?.value || "").trim();
@@ -894,7 +916,7 @@ function escapeAttribute(str) {
 suchInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    sucheKind();
+    fuehreSucheAus();
   }
 });
 
@@ -914,14 +936,14 @@ if (logoutButton) {
   });
 }
 
-monatSucheButton?.addEventListener("click", aktiviereMonatsFilter);
+monatSucheButton?.addEventListener("click", fuehreSucheAus);
 monatResetButton?.addEventListener("click", resetMonatsFilter);
 monatScreenshotButton?.addEventListener("click", screenshotMonatsErgebnis);
 
 monatSucheInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    aktiviereMonatsFilter();
+    fuehreSucheAus();
   }
 });
 
