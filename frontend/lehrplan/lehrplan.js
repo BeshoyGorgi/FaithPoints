@@ -16,13 +16,15 @@ const KATEGORIEN = [
 
 const ordnerListe = document.getElementById("ordnerListe");
 const zurueckButton = document.getElementById("zurueckButton");
-const monatSucheInput = document.getElementById("monatSuche");
+const monatSucheVonInput = document.getElementById("monatSucheVon");
+const monatSucheBisInput = document.getElementById("monatSucheBis");
 const monatSucheButton = document.getElementById("monatSucheButton");
 const monatResetButton = document.getElementById("monatResetButton");
 const monatScreenshotButton = document.getElementById("monatScreenshotButton");
 const monatInfo = document.getElementById("monatInfo");
 
-let aktiverMonatsFilter = "";
+let aktiverMonatsFilterVon = "";
+let aktiverMonatsFilterBis = "";
 const offeneKategorien = new Set();
 let aktuellGezogeneHymneId = null;
 let aktuellGezogeneKategorie = null;
@@ -102,11 +104,62 @@ function formatiereMonatJahr(monatWert) {
   });
 }
 
-function hymnePasstZumMonat(hymne, monatWert) {
-  if (!monatWert) return true;
+function hatAktivenMonatsFilter() {
+  return !!(aktiverMonatsFilterVon || aktiverMonatsFilterBis);
+}
 
-  const grenzen = holeMonatsGrenzen(monatWert);
-  if (!grenzen) return true;
+function holeMonatsbereich(vonWert, bisWert) {
+  if (!vonWert && !bisWert) return null;
+
+  const von = vonWert || bisWert;
+  const bis = bisWert || vonWert;
+
+  const vonGrenzen = holeMonatsGrenzen(von);
+  const bisGrenzen = holeMonatsGrenzen(bis);
+
+  if (!vonGrenzen || !bisGrenzen) return null;
+
+  let start = vonGrenzen.start;
+  let end = bisGrenzen.end;
+
+  if (start > end) {
+    [start, end] = [end, start];
+  }
+
+  return { start, end };
+}
+
+function formatiereMonatsbereich(vonWert, bisWert) {
+  if (!vonWert && !bisWert) return "";
+
+  const von = vonWert || bisWert;
+  const bis = bisWert || vonWert;
+
+  if (von === bis) {
+    return formatiereMonatJahr(von);
+  }
+
+  return `${formatiereMonatJahr(von)} bis ${formatiereMonatJahr(bis)}`;
+}
+
+function baueDateinameMonatsbereich(vonWert, bisWert) {
+  if (!vonWert && !bisWert) return "ohne-filter";
+
+  const von = vonWert || bisWert;
+  const bis = bisWert || vonWert;
+
+  if (von === bis) {
+    return von;
+  }
+
+  return `${von}-bis-${bis}`;
+}
+
+function hymnePasstZumMonatsbereich(hymne, vonWert, bisWert) {
+  if (!vonWert && !bisWert) return true;
+
+  const bereich = holeMonatsbereich(vonWert, bisWert);
+  if (!bereich) return true;
 
   const datum = hymne.startDate || "";
 
@@ -114,23 +167,25 @@ function hymnePasstZumMonat(hymne, monatWert) {
     return false;
   }
 
-  return datum >= grenzen.start && datum <= grenzen.end;
+  return datum >= bereich.start && datum <= bereich.end;
 }
 
 function holeGefilterteHymnen(kategorie) {
   const alle = daten[kategorie] || [];
 
-  if (!aktiverMonatsFilter) {
+  if (!hatAktivenMonatsFilter()) {
     return alle;
   }
 
-  return alle.filter((hymne) => hymnePasstZumMonat(hymne, aktiverMonatsFilter));
+  return alle.filter((hymne) =>
+    hymnePasstZumMonatsbereich(hymne, aktiverMonatsFilterVon, aktiverMonatsFilterBis)
+  );
 }
 
 function aktualisiereMonatInfo() {
   if (!monatInfo) return;
 
-  if (!aktiverMonatsFilter) {
+  if (!hatAktivenMonatsFilter()) {
     monatInfo.textContent = "";
     return;
   }
@@ -139,31 +194,49 @@ function aktualisiereMonatInfo() {
     return summe + holeGefilterteHymnen(kategorie).length;
   }, 0);
 
-  monatInfo.textContent = `${anzahlHymnen} Hymnen für ${formatiereMonatJahr(aktiverMonatsFilter)} gefunden.`;
+  monatInfo.textContent = `${anzahlHymnen} Hymnen für ${formatiereMonatsbereich(aktiverMonatsFilterVon, aktiverMonatsFilterBis)} gefunden.`;
 }
 
 function aktiviereMonatsFilter() {
-  const wert = monatSucheInput?.value || "";
+  let von = monatSucheVonInput?.value || "";
+  let bis = monatSucheBisInput?.value || "";
 
-  if (!wert) {
-    alert("Bitte wähle zuerst Monat und Jahr aus.");
+  if (!von && !bis) {
+    alert("Bitte wähle mindestens einen Monat aus.");
     return;
   }
 
-  aktiverMonatsFilter = wert;
+  if (!von) von = bis;
+  if (!bis) bis = von;
+
+  if (von > bis) {
+    [von, bis] = [bis, von];
+  }
+
+  aktiverMonatsFilterVon = von;
+  aktiverMonatsFilterBis = bis;
+
+  if (monatSucheVonInput) monatSucheVonInput.value = von;
+  if (monatSucheBisInput) monatSucheBisInput.value = bis;
+
   renderAlleOrdner();
 }
 
 function filterZuruecksetzen() {
-  aktiverMonatsFilter = "";
+  aktiverMonatsFilterVon = "";
+  aktiverMonatsFilterBis = "";
+
+  if (monatSucheVonInput) monatSucheVonInput.value = "";
+  if (monatSucheBisInput) monatSucheBisInput.value = "";
+
   renderAlleOrdner();
 }
 
 async function screenshotHerunterladen() {
-  if (!aktiverMonatsFilter) {
-    alert("Bitte wähle zuerst Monat und Jahr aus und suche danach.");
-    return;
-  }
+  if (!hatAktivenMonatsFilter()) {
+  alert("Bitte wähle zuerst einen Zeitraum aus und suche danach.");
+  return;
+}
 
   if (!window.html2canvas) {
     alert("Screenshot-Bibliothek wurde nicht geladen.");
@@ -185,7 +258,7 @@ async function screenshotHerunterladen() {
   exportBox.style.zIndex = "-1";
 
   const titel = document.createElement("h1");
-  titel.textContent = `Lehrplan – ${formatiereMonatJahr(aktiverMonatsFilter)}`;
+  titel.textContent = `Lehrplan – ${formatiereMonatsbereich(aktiverMonatsFilterVon, aktiverMonatsFilterBis)}`;
   titel.style.color = "white";
   titel.style.margin = "0 0 18px 0";
   titel.style.fontFamily = "Arial, sans-serif";
@@ -211,7 +284,7 @@ async function screenshotHerunterladen() {
 
     const link = document.createElement("a");
     link.href = canvas.toDataURL("image/png");
-    link.download = `lehrplan-${aktiverMonatsFilter}.png`;
+    link.download = `lehrplan-${baueDateinameMonatsbereich(aktiverMonatsFilterVon, aktiverMonatsFilterBis)}.png`;
     link.click();
   } catch (error) {
     console.error(error);
@@ -370,7 +443,7 @@ function renderAlleOrdner() {
   KATEGORIEN.forEach((kategorie) => {
     const gefilterte = holeGefilterteHymnen(kategorie);
 
-    if (aktiverMonatsFilter && gefilterte.length === 0) {
+    if (hatAktivenMonatsFilter() && gefilterte.length === 0) {
       return;
     }
 
@@ -379,10 +452,10 @@ function renderAlleOrdner() {
     anzahlKarten++;
   });
 
-  if (aktiverMonatsFilter && anzahlKarten === 0) {
+  if (hatAktivenMonatsFilter() && anzahlKarten === 0) {
     const leer = document.createElement("div");
     leer.className = "keine-filter-treffer";
-    leer.textContent = `Für ${formatiereMonatJahr(aktiverMonatsFilter)} wurden keine Hymnen gefunden.`;
+    leer.textContent = `Für ${formatiereMonatsbereich(aktiverMonatsFilterVon, aktiverMonatsFilterBis)} wurden keine Hymnen gefunden.`;
     ordnerListe.appendChild(leer);
   }
 
@@ -418,9 +491,9 @@ function baueOrdnerCard(kategorie) {
   const gesamtAnzahl = daten[kategorie].length;
   const gefilterteAnzahl = holeGefilterteHymnen(kategorie).length;
 
-  count.textContent = aktiverMonatsFilter
-    ? `${gefilterteAnzahl} von ${gesamtAnzahl} Hymnen`
-    : `${gesamtAnzahl} Hymnen`;
+  count.textContent = hatAktivenMonatsFilter()
+  ? `${gefilterteAnzahl} von ${gesamtAnzahl} Hymnen`
+  : `${gesamtAnzahl} Hymnen`;
 
   const plusButton = document.createElement("button");
   plusButton.className = "plus-button";
@@ -453,9 +526,9 @@ function baueOrdnerCard(kategorie) {
     zeigeAddForm(content, kategorie, count);
   });
 
-  if ((aktiverMonatsFilter && holeGefilterteHymnen(kategorie).length > 0) || offeneKategorien.has(kategorie)) {
+  if ((hatAktivenMonatsFilter() && holeGefilterteHymnen(kategorie).length > 0) || offeneKategorien.has(kategorie)) {
   card.classList.add("offen");
-  }
+}
 
   renderOrdnerInhalt(content, kategorie, count);
 
@@ -473,9 +546,9 @@ function renderOrdnerInhalt(content, kategorie, countElement) {
  const alleHymnen = daten[kategorie];
   const hymnen = holeGefilterteHymnen(kategorie);
 
-  countElement.textContent = aktiverMonatsFilter
-    ? `${hymnen.length} von ${alleHymnen.length} Hymnen`
-    : `${alleHymnen.length} Hymnen`;
+  countElement.textContent = hatAktivenMonatsFilter()
+  ? `${hymnen.length} von ${alleHymnen.length} Hymnen`
+  : `${alleHymnen.length} Hymnen`;
 
   const erledigte = hymnen.filter(item => item.checked);
   const offene = hymnen.filter(item => !item.checked);
@@ -1065,8 +1138,17 @@ if (monatScreenshotButton) {
   monatScreenshotButton.addEventListener("click", screenshotHerunterladen);
 }
 
-if (monatSucheInput) {
-  monatSucheInput.addEventListener("keydown", (event) => {
+if (monatSucheVonInput) {
+  monatSucheVonInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      aktiviereMonatsFilter();
+    }
+  });
+}
+
+if (monatSucheBisInput) {
+  monatSucheBisInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       aktiviereMonatsFilter();

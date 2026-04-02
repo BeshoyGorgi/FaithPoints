@@ -39,26 +39,34 @@
   <h1 class="page-title">Lehrplan</h1>
 
   <section class="monat-filter-box">
-    <label for="monatSuche" class="monat-filter-label">Datum (Monat / Jahr)</label>
+  <div class="monat-filter-label">Zeitraum wählen (Monat / Jahr)</div>
 
-    <div class="monat-filter-row">
-      <input type="month" id="monatSuche" class="monat-filter-input" />
-
-      <button id="monatSucheButton" class="filter-button" type="button">
-        Suchen
-      </button>
-
-      <button id="monatResetButton" class="filter-button secondary" type="button">
-        Zurücksetzen
-      </button>
-
-      <button id="monatScreenshotButton" class="filter-button export" type="button">
-        Screenshot
-      </button>
+  <div class="monat-filter-row">
+    <div class="monat-input-box">
+      <label for="monatSucheVon" class="monat-input-label">Von</label>
+      <input type="month" id="monatSucheVon" class="monat-filter-input" />
     </div>
 
-    <div id="monatInfo" class="monat-info"></div>
-  </section>
+    <div class="monat-input-box">
+      <label for="monatSucheBis" class="monat-input-label">Bis</label>
+      <input type="month" id="monatSucheBis" class="monat-filter-input" />
+    </div>
+
+    <button id="monatSucheButton" class="filter-button" type="button">
+      Suchen
+    </button>
+
+    <button id="monatResetButton" class="filter-button secondary" type="button">
+      Zurücksetzen
+    </button>
+
+    <button id="monatScreenshotButton" class="filter-button export" type="button">
+      Screenshot
+    </button>
+  </div>
+
+  <div id="monatInfo" class="monat-info"></div>
+</section>
 
   <section id="ordnerListe" class="ordner-liste"></section>
 </main>

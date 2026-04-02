@@ -160,9 +160,22 @@ body {
 
 .monat-filter-row {
   display: grid;
-  grid-template-columns: minmax(240px, 320px) auto auto auto;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto auto auto;
   gap: 10px;
-  align-items: center;
+  align-items: end;
+}
+
+.monat-input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.monat-input-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
 }
 
 .monat-filter-input {
@@ -609,12 +622,12 @@ body {
     gap: 10px;
   }
 
-  .monat-filter-input {
-    grid-column: 1 / -1;
+  .monat-input-box {
+    width: 100%;
   }
 
-  .filter-button.export {
-    grid-column: 1 / -1;
+  .filter-button {
+    width: 100%;
   }
 }
 
@@ -635,9 +648,14 @@ body {
     gap: 8px;
   }
 
+  .monat-input-box,
   .monat-filter-input,
   .filter-button {
     width: 100%;
+  }
+
+  .monat-filter-input,
+  .filter-button {
     height: 40px;
     font-size: 0.86rem;
     border-radius: 10px;
