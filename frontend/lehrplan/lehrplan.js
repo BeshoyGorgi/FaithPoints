@@ -194,7 +194,6 @@ async function screenshotHerunterladen() {
   titel.style.fontFamily = "Arial, sans-serif";
 
   const untertitel = document.createElement("div");
-  untertitel.textContent = "Die Box-Titel zeigen die jeweilige Kategorie der Hymnen.";
   untertitel.style.color = "#dbeafe";
   untertitel.style.marginBottom = "22px";
   untertitel.style.fontFamily = "Arial, sans-serif";

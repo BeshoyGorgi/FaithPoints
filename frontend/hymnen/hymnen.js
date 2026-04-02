@@ -231,7 +231,6 @@ async function screenshotMonatsErgebnis() {
   titel.style.fontSize = "2rem";
 
   const untertitel = document.createElement("div");
-  untertitel.textContent = "Jede geöffnete Box gehört zum jeweiligen Kind.";
   untertitel.style.color = "#dbeafe";
   untertitel.style.marginBottom = "22px";
   untertitel.style.fontFamily = "Arial, sans-serif";
