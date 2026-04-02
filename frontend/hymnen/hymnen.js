@@ -10,6 +10,7 @@ const monatInfo = document.getElementById("monatInfo");
 
 let alleKinderDaten = [];
 let aktiverMonatsFilter = "";
+let aktiverKindFilterId = null;
 
 const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 
@@ -80,21 +81,27 @@ function eintragPasstZumMonat(eintrag, monatWert) {
 }
 
 function holeGefilterteKinder() {
-  if (!aktiverMonatsFilter) {
-    return alleKinderDaten;
+  let kinder = [...alleKinderDaten];
+
+  if (aktiverMonatsFilter) {
+    kinder = kinder
+      .map(kind => {
+        const gefilterteEintraege = (Array.isArray(kind.eintraege) ? kind.eintraege : [])
+          .filter(eintrag => eintragPasstZumMonat(eintrag, aktiverMonatsFilter));
+
+        return {
+          ...kind,
+          eintraege: gefilterteEintraege
+        };
+      })
+      .filter(kind => kind.eintraege.length > 0);
   }
 
-  return alleKinderDaten
-    .map(kind => {
-      const gefilterteEintraege = (Array.isArray(kind.eintraege) ? kind.eintraege : [])
-        .filter(eintrag => eintragPasstZumMonat(eintrag, aktiverMonatsFilter));
+  if (aktiverKindFilterId !== null) {
+    kinder = kinder.filter(kind => Number(kind.kind_id) === Number(aktiverKindFilterId));
+  }
 
-      return {
-        ...kind,
-        eintraege: gefilterteEintraege
-      };
-    })
-    .filter(kind => kind.eintraege.length > 0);
+  return kinder;
 }
 
 function aktualisiereMonatInfo(sichtbareKinder) {
@@ -138,19 +145,55 @@ function renderKinderListe() {
 }
 
 function aktiviereMonatsFilter() {
-  const wert = monatSucheInput?.value || "";
+  const monatWert = (monatSucheInput?.value || "").trim();
+  const query = (suchInput?.value || "").trim().toLowerCase();
 
-  if (!wert) {
+  if (!monatWert) {
     alert("Bitte wähle zuerst Monat und Jahr aus.");
     return;
   }
 
-  aktiverMonatsFilter = wert;
+  aktiverMonatsFilter = monatWert;
+
+  if (query) {
+    const matchKind = alleKinderDaten.find(kind =>
+      (kind.kind_name || "").toLowerCase().includes(query)
+    );
+
+    if (!matchKind) {
+      alert("Kein passendes Kind gefunden.");
+      return;
+    }
+
+    aktiverKindFilterId = matchKind.kind_id;
+  } else {
+    aktiverKindFilterId = null;
+  }
+
   renderKinderListe();
+
+  if (aktiverKindFilterId !== null) {
+    const gefunden = springeZuKind(aktiverKindFilterId);
+
+    if (!gefunden) {
+      const kind = alleKinderDaten.find(k => Number(k.kind_id) === Number(aktiverKindFilterId));
+      alert(`"${kind?.kind_name || "Dieses Kind"}" hat in ${formatiereMonatJahr(monatWert)} keine Hymnen.`);
+    }
+  }
 }
 
 function resetMonatsFilter() {
   aktiverMonatsFilter = "";
+  aktiverKindFilterId = null;
+
+  if (monatSucheInput) {
+    monatSucheInput.value = "";
+  }
+
+  if (suchInput) {
+    suchInput.value = "";
+  }
+
   renderKinderListe();
 }
 
@@ -723,22 +766,63 @@ function sperreInput(input) {
 }
 
 function sucheKind() {
-  const query = (suchInput.value || "").trim().toLowerCase();
-  if (!query) return;
+  const query = (suchInput?.value || "").trim().toLowerCase();
+  const monatWert = (monatSucheInput?.value || "").trim();
 
-  const cards = Array.from(document.querySelectorAll(".kind-card"));
-  const match = cards.find(card =>
-    (card.dataset.kindName || "").includes(query)
+  if (!query) {
+    return;
+  }
+
+  const matchKind = alleKinderDaten.find(kind =>
+    (kind.kind_name || "").toLowerCase().includes(query)
   );
 
-  if (!match) {
+  if (!matchKind) {
     alert("Kein passendes Kind gefunden.");
     return;
   }
 
-  oeffneKindCard(match);
-  hervorheben(match);
-  match.scrollIntoView({ behavior: "smooth", block: "center" });
+  // Wenn auch ein Monat gesetzt ist:
+  // nur dieses Kind + nur seine Hymnen in diesem Monat
+  if (monatWert) {
+    aktiverMonatsFilter = monatWert;
+    aktiverKindFilterId = matchKind.kind_id;
+
+    renderKinderListe();
+
+    const gefunden = springeZuKind(matchKind.kind_id);
+
+    if (!gefunden) {
+      alert(`"${matchKind.kind_name}" hat in ${formatiereMonatJahr(monatWert)} keine Hymnen.`);
+    }
+
+    return;
+  }
+
+  // Nur Namenssuche:
+  // immer über alle Kinder, unabhängig vom Datumsfilter
+  aktiverMonatsFilter = "";
+  aktiverKindFilterId = null;
+
+  if (monatSucheInput) {
+    monatSucheInput.value = "";
+  }
+
+  renderKinderListe();
+  springeZuKind(matchKind.kind_id);
+}
+
+function springeZuKind(kindId) {
+  const card = document.querySelector(`.kind-card[data-kind-id="${kindId}"]`);
+
+  if (!card) {
+    return false;
+  }
+
+  oeffneKindCard(card);
+  hervorheben(card);
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  return true;
 }
 
 function hervorheben(card) {
