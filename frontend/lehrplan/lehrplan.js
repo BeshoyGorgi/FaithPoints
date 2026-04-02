@@ -51,10 +51,8 @@ function formatiereDatum(value) {
   return datum.toLocaleDateString("de-DE");
 }
 
-function formatiereZeitraum(start, end) {
-  if (start && end) return `${formatiereDatum(start)} - ${formatiereDatum(end)}`;
+function formatiereZeitraum(start) {
   if (start) return `ab ${formatiereDatum(start)}`;
-  if (end) return `bis ${formatiereDatum(end)}`;
   return "";
 }
 
@@ -110,14 +108,13 @@ function hymnePasstZumMonat(hymne, monatWert) {
   const grenzen = holeMonatsGrenzen(monatWert);
   if (!grenzen) return true;
 
-  const hymnVon = hymne.startDate || hymne.endDate || "";
-  const hymnBis = hymne.endDate || hymne.startDate || "";
+  const datum = hymne.startDate || "";
 
-  if (!hymnVon && !hymnBis) {
+  if (!datum) {
     return false;
   }
 
-  return hymnVon <= grenzen.end && hymnBis >= grenzen.start;
+  return datum >= grenzen.start && datum <= grenzen.end;
 }
 
 function holeGefilterteHymnen(kategorie) {
@@ -236,13 +233,6 @@ function compareErledigteHymnen(a, b) {
 
   if (aStart !== bStart) {
     return bStart.localeCompare(aStart);
-  }
-
-  const aEnd = a.endDate || "0000-01-01";
-  const bEnd = b.endDate || "0000-01-01";
-
-  if (aEnd !== bEnd) {
-    return bEnd.localeCompare(aEnd);
   }
 
   return (a.sortIndex || 0) - (b.sortIndex || 0);
@@ -677,25 +667,25 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   }
 
   if (!hymne.checked) {
-  row.classList.add("verschiebbar");
-  row.draggable = true;
+    row.classList.add("verschiebbar");
+    row.draggable = true;
 
-  row.addEventListener("dragstart", (event) => {
-    aktuellGezogeneHymneId = hymne.id;
-    aktuellGezogeneKategorie = kategorie;
-    row.classList.add("dragging");
+    row.addEventListener("dragstart", (event) => {
+      aktuellGezogeneHymneId = hymne.id;
+      aktuellGezogeneKategorie = kategorie;
+      row.classList.add("dragging");
 
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = "move";
-    }
-  });
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+      }
+    });
 
-  row.addEventListener("dragend", () => {
-    row.classList.remove("dragging");
-    aktuellGezogeneHymneId = null;
-    aktuellGezogeneKategorie = null;
-  });
-}
+    row.addEventListener("dragend", () => {
+      row.classList.remove("dragging");
+      aktuellGezogeneHymneId = null;
+      aktuellGezogeneKategorie = null;
+    });
+  }
 
   const checkbox = document.createElement("input");
   checkbox.className = "hymne-check";
@@ -731,28 +721,12 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 
   const startPlaceholder = document.createElement("span");
   startPlaceholder.className = "fake-placeholder";
-  startPlaceholder.textContent = "Anfangsdatum auswählen...";
+  startPlaceholder.textContent = "Datum auswählen...";
 
   startInputWrap.appendChild(vonInput);
   startInputWrap.appendChild(startPlaceholder);
 
-  const endInputWrap = document.createElement("div");
-  endInputWrap.className = "date-input-wrap";
-
-  const bisInput = document.createElement("input");
-  bisInput.type = "date";
-  bisInput.className = "date-input";
-  bisInput.value = hymne.endDate || "";
-
-  const endPlaceholder = document.createElement("span");
-  endPlaceholder.className = "fake-placeholder";
-  endPlaceholder.textContent = "Enddatum auswählen...";
-
-  endInputWrap.appendChild(bisInput);
-  endInputWrap.appendChild(endPlaceholder);
-
   zeitraumBox.appendChild(startInputWrap);
-  zeitraumBox.appendChild(endInputWrap);
 
   info.appendChild(titleLine);
   info.appendChild(zeitraumBox);
@@ -773,10 +747,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   row.appendChild(info);
   row.appendChild(actions);
 
-  function hatVollstaendigenZeitraum() {
-  return !!(hymne.startDate && hymne.endDate);
-  }
-
   function aktualisiereDateInputPlaceholder(input) {
     if (input.value) {
       input.classList.remove("show-placeholder");
@@ -786,7 +756,7 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
   }
 
   function aktualisiereZeitraumAnzeige() {
-    const zeitraumText = formatiereZeitraum(hymne.startDate, hymne.endDate);
+    const zeitraumText = formatiereZeitraum(hymne.startDate);
 
     if (zeitraumText) {
       dateLabel.textContent = `(${zeitraumText})`;
@@ -796,16 +766,9 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       dateLabel.style.display = "none";
     }
 
-    if (!hymne.checked) {
-      zeitraumBox.style.display = "none";
-    } else if (hatVollstaendigenZeitraum()) {
-      zeitraumBox.style.display = "none";
-    } else {
-      zeitraumBox.style.display = "flex";
-    }
+    zeitraumBox.style.display = hymne.checked ? "flex" : "none";
 
     aktualisiereDateInputPlaceholder(vonInput);
-    aktualisiereDateInputPlaceholder(bisInput);
   }
 
   aktualisiereZeitraumAnzeige();
@@ -820,7 +783,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     try {
       checkbox.disabled = true;
       vonInput.disabled = true;
-      bisInput.disabled = true;
 
       const body = {
         email,
@@ -852,10 +814,9 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
         hymne.endDate = "";
         hymne.sortIndex = body.sort_index;
         vonInput.value = "";
-        bisInput.value = "";
       }
 
-     const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
+      const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
       if (eintrag) {
         eintrag.checked = hymne.checked;
         eintrag.startDate = hymne.startDate;
@@ -875,7 +836,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
       hymne.endDate = vorherEnd;
       hymne.sortIndex = vorherSortIndex;
       vonInput.value = vorherStart || "";
-      bisInput.value = vorherEnd || "";
       row.classList.toggle("erledigt", vorherChecked);
       aktualisiereZeitraumAnzeige();
 
@@ -893,7 +853,6 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     } finally {
       checkbox.disabled = false;
       vonInput.disabled = false;
-      bisInput.disabled = false;
     }
   });
 
@@ -902,21 +861,10 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
 
     const email = localStorage.getItem("email");
     const neuesStart = vonInput.value || null;
-    const neuesEnde = bisInput.value || null;
-
-    if (neuesStart && neuesEnde && neuesStart > neuesEnde) {
-      alert("Das Von-Datum darf nicht nach dem Bis-Datum liegen.");
-      vonInput.value = hymne.startDate || "";
-      bisInput.value = hymne.endDate || "";
-      return;
-    }
-
     const vorherStart = hymne.startDate;
-    const vorherEnd = hymne.endDate;
 
     try {
       vonInput.disabled = true;
-      bisInput.disabled = true;
 
       const response = await fetch(`${API_BASE_URL}/api/lehrplan/${hymne.id}`, {
         method: "PUT",
@@ -927,21 +875,21 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
           email,
           erledigt: true,
           start_datum: neuesStart,
-          end_datum: neuesEnde
+          end_datum: null
         })
       });
 
       if (!response.ok) {
-        throw new Error("Fehler beim Speichern des Zeitraums");
+        throw new Error("Fehler beim Speichern des Datums");
       }
 
       hymne.startDate = neuesStart || "";
-      hymne.endDate = neuesEnde || "";
+      hymne.endDate = "";
 
       const eintrag = daten[kategorie].find((item) => item.id === hymne.id);
       if (eintrag) {
         eintrag.startDate = hymne.startDate;
-        eintrag.endDate = hymne.endDate;
+        eintrag.endDate = "";
         eintrag.checked = true;
       }
 
@@ -950,20 +898,16 @@ function baueHymneRow(hymne, kategorie, content, countElement) {
     } catch (error) {
       console.error(error);
       hymne.startDate = vorherStart;
-      hymne.endDate = vorherEnd;
       vonInput.value = vorherStart || "";
-      bisInput.value = vorherEnd || "";
       aktualisiereZeitraumAnzeige();
       renderOrdnerInhalt(content, kategorie, countElement);
       alert("Fehler beim Speichern des Datums.");
     } finally {
       vonInput.disabled = false;
-      bisInput.disabled = false;
     }
   }
 
   vonInput.addEventListener("change", speichereZeitraum);
-  bisInput.addEventListener("change", speichereZeitraum);
 
   deleteButton.addEventListener("click", async () => {
     const bestaetigt = confirm(`Möchtest du "${hymne.name}" wirklich löschen?`);
