@@ -16,7 +16,14 @@ const KATEGORIEN = [
 
 const ordnerListe = document.getElementById("ordnerListe");
 const zurueckButton = document.getElementById("zurueckButton");
+const monatSucheInput = document.getElementById("monatSuche");
+const monatSucheButton = document.getElementById("monatSucheButton");
+const monatResetButton = document.getElementById("monatResetButton");
+const monatScreenshotButton = document.getElementById("monatScreenshotButton");
+const monatInfo = document.getElementById("monatInfo");
 
+let aktiverMonatsFilter = "";
+const offeneKategorien = new Set();
 let aktuellGezogeneHymneId = null;
 let aktuellGezogeneKategorie = null;
 
@@ -69,6 +76,153 @@ function leeresDatenObjekt() {
     obj[kategorie] = [];
   });
   return obj;
+}
+
+function holeMonatsGrenzen(monatWert) {
+  if (!monatWert) return null;
+
+  const [jahr, monat] = monatWert.split("-").map(Number);
+  if (!jahr || !monat) return null;
+
+  const ersterTag = `${jahr}-${String(monat).padStart(2, "0")}-01`;
+  const letzterTagDate = new Date(jahr, monat, 0);
+  const letzterTag = `${jahr}-${String(monat).padStart(2, "0")}-${String(letzterTagDate.getDate()).padStart(2, "0")}`;
+
+  return {
+    start: ersterTag,
+    end: letzterTag
+  };
+}
+
+function formatiereMonatJahr(monatWert) {
+  if (!monatWert) return "";
+  const [jahr, monat] = monatWert.split("-").map(Number);
+  const d = new Date(jahr, monat - 1, 1);
+  return d.toLocaleDateString("de-DE", {
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function hymnePasstZumMonat(hymne, monatWert) {
+  if (!monatWert) return true;
+
+  const grenzen = holeMonatsGrenzen(monatWert);
+  if (!grenzen) return true;
+
+  const hymnVon = hymne.startDate || hymne.endDate || "";
+  const hymnBis = hymne.endDate || hymne.startDate || "";
+
+  if (!hymnVon && !hymnBis) {
+    return false;
+  }
+
+  return hymnVon <= grenzen.end && hymnBis >= grenzen.start;
+}
+
+function holeGefilterteHymnen(kategorie) {
+  const alle = daten[kategorie] || [];
+
+  if (!aktiverMonatsFilter) {
+    return alle;
+  }
+
+  return alle.filter((hymne) => hymnePasstZumMonat(hymne, aktiverMonatsFilter));
+}
+
+function aktualisiereMonatInfo() {
+  if (!monatInfo) return;
+
+  if (!aktiverMonatsFilter) {
+    monatInfo.textContent = "";
+    return;
+  }
+
+  const anzahlHymnen = KATEGORIEN.reduce((summe, kategorie) => {
+    return summe + holeGefilterteHymnen(kategorie).length;
+  }, 0);
+
+  monatInfo.textContent = `${anzahlHymnen} Hymnen für ${formatiereMonatJahr(aktiverMonatsFilter)} gefunden.`;
+}
+
+function aktiviereMonatsFilter() {
+  const wert = monatSucheInput?.value || "";
+
+  if (!wert) {
+    alert("Bitte wähle zuerst Monat und Jahr aus.");
+    return;
+  }
+
+  aktiverMonatsFilter = wert;
+  renderAlleOrdner();
+}
+
+function filterZuruecksetzen() {
+  aktiverMonatsFilter = "";
+  renderAlleOrdner();
+}
+
+async function screenshotHerunterladen() {
+  if (!aktiverMonatsFilter) {
+    alert("Bitte wähle zuerst Monat und Jahr aus und suche danach.");
+    return;
+  }
+
+  if (!window.html2canvas) {
+    alert("Screenshot-Bibliothek wurde nicht geladen.");
+    return;
+  }
+
+  if (!ordnerListe || ordnerListe.children.length === 0) {
+    alert("Es gibt keine passenden Hymnen für diesen Monat.");
+    return;
+  }
+
+  const exportBox = document.createElement("div");
+  exportBox.style.position = "fixed";
+  exportBox.style.left = "-99999px";
+  exportBox.style.top = "0";
+  exportBox.style.width = "1200px";
+  exportBox.style.background = "#1A3D64";
+  exportBox.style.padding = "24px";
+  exportBox.style.zIndex = "-1";
+
+  const titel = document.createElement("h1");
+  titel.textContent = `Lehrplan – ${formatiereMonatJahr(aktiverMonatsFilter)}`;
+  titel.style.color = "white";
+  titel.style.margin = "0 0 18px 0";
+  titel.style.fontFamily = "Arial, sans-serif";
+
+  const untertitel = document.createElement("div");
+  untertitel.textContent = "Die Box-Titel zeigen die jeweilige Kategorie der Hymnen.";
+  untertitel.style.color = "#dbeafe";
+  untertitel.style.marginBottom = "22px";
+  untertitel.style.fontFamily = "Arial, sans-serif";
+
+  const clone = ordnerListe.cloneNode(true);
+
+  exportBox.appendChild(titel);
+  exportBox.appendChild(untertitel);
+  exportBox.appendChild(clone);
+  document.body.appendChild(exportBox);
+
+  try {
+    const canvas = await window.html2canvas(exportBox, {
+      backgroundColor: "#1A3D64",
+      scale: 2,
+      useCORS: true
+    });
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `lehrplan-${aktiverMonatsFilter}.png`;
+    link.click();
+  } catch (error) {
+    console.error(error);
+    alert("Fehler beim Erstellen des Screenshots.");
+  } finally {
+    exportBox.remove();
+  }
 }
 
 function ermittleNaechstenSortIndex(kategorie) {
@@ -222,10 +376,28 @@ async function ladeDatenVomServer() {
 function renderAlleOrdner() {
   ordnerListe.innerHTML = "";
 
+  let anzahlKarten = 0;
+
   KATEGORIEN.forEach((kategorie) => {
+    const gefilterte = holeGefilterteHymnen(kategorie);
+
+    if (aktiverMonatsFilter && gefilterte.length === 0) {
+      return;
+    }
+
     const card = baueOrdnerCard(kategorie);
     ordnerListe.appendChild(card);
+    anzahlKarten++;
   });
+
+  if (aktiverMonatsFilter && anzahlKarten === 0) {
+    const leer = document.createElement("div");
+    leer.className = "keine-filter-treffer";
+    leer.textContent = `Für ${formatiereMonatJahr(aktiverMonatsFilter)} wurden keine Hymnen gefunden.`;
+    ordnerListe.appendChild(leer);
+  }
+
+  aktualisiereMonatInfo();
 }
 
 function baueOrdnerCard(kategorie) {
@@ -254,7 +426,12 @@ function baueOrdnerCard(kategorie) {
 
   const count = document.createElement("span");
   count.className = "ordner-count";
-  count.textContent = `${daten[kategorie].length} Hymnen`;
+  const gesamtAnzahl = daten[kategorie].length;
+  const gefilterteAnzahl = holeGefilterteHymnen(kategorie).length;
+
+  count.textContent = aktiverMonatsFilter
+    ? `${gefilterteAnzahl} von ${gesamtAnzahl} Hymnen`
+    : `${gesamtAnzahl} Hymnen`;
 
   const plusButton = document.createElement("button");
   plusButton.className = "plus-button";
@@ -273,6 +450,12 @@ function baueOrdnerCard(kategorie) {
 
   header.addEventListener("click", () => {
     card.classList.toggle("offen");
+
+    if (card.classList.contains("offen")) {
+      offeneKategorien.add(kategorie);
+    } else {
+      offeneKategorien.delete(kategorie);
+    }
   });
 
   plusButton.addEventListener("click", (event) => {
@@ -280,6 +463,10 @@ function baueOrdnerCard(kategorie) {
     card.classList.add("offen");
     zeigeAddForm(content, kategorie, count);
   });
+
+  if ((aktiverMonatsFilter && holeGefilterteHymnen(kategorie).length > 0) || offeneKategorien.has(kategorie)) {
+  card.classList.add("offen");
+  }
 
   renderOrdnerInhalt(content, kategorie, count);
 
@@ -294,8 +481,12 @@ function renderOrdnerInhalt(content, kategorie, countElement) {
 
   sortiereKategorie(kategorie);
 
-  const hymnen = daten[kategorie];
-  countElement.textContent = `${hymnen.length} Hymnen`;
+ const alleHymnen = daten[kategorie];
+  const hymnen = holeGefilterteHymnen(kategorie);
+
+  countElement.textContent = aktiverMonatsFilter
+    ? `${hymnen.length} von ${alleHymnen.length} Hymnen`
+    : `${alleHymnen.length} Hymnen`;
 
   const erledigte = hymnen.filter(item => item.checked);
   const offene = hymnen.filter(item => !item.checked);
@@ -917,6 +1108,27 @@ input.addEventListener("keydown", (event) => {
 input.addEventListener("blur", () => {
   beenden(false);
 });
+}
+
+if (monatSucheButton) {
+  monatSucheButton.addEventListener("click", aktiviereMonatsFilter);
+}
+
+if (monatResetButton) {
+  monatResetButton.addEventListener("click", filterZuruecksetzen);
+}
+
+if (monatScreenshotButton) {
+  monatScreenshotButton.addEventListener("click", screenshotHerunterladen);
+}
+
+if (monatSucheInput) {
+  monatSucheInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      aktiviereMonatsFilter();
+    }
+  });
 }
 
 if (zurueckButton) {

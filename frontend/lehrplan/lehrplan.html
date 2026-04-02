@@ -36,10 +36,34 @@
   </nav>
 
   <main class="page">
-    <h1 class="page-title">Lehrplan</h1>
-    <section id="ordnerListe" class="ordner-liste"></section>
-  </main>
+  <h1 class="page-title">Lehrplan</h1>
 
+  <section class="monat-filter-box">
+    <label for="monatSuche" class="monat-filter-label">Datum suchen (Monat / Jahr)</label>
+
+    <div class="monat-filter-row">
+      <input type="month" id="monatSuche" class="monat-filter-input" />
+
+      <button id="monatSucheButton" class="filter-button" type="button">
+        Suchen
+      </button>
+
+      <button id="monatResetButton" class="filter-button secondary" type="button">
+        Zurücksetzen
+      </button>
+
+      <button id="monatScreenshotButton" class="filter-button export" type="button">
+        Screenshot herunterladen
+      </button>
+    </div>
+
+    <div id="monatInfo" class="monat-info"></div>
+  </section>
+
+  <section id="ordnerListe" class="ordner-liste"></section>
+</main>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script type="module" src="/lehrplan/lehrplan.js"></script>
 </body>
 </html>

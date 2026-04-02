@@ -138,6 +138,82 @@ body {
   color: #dbeafe;
 }
 
+.monat-filter-box {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.monat-filter-label {
+  display: block;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.monat-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.monat-filter-input {
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  min-width: 220px;
+}
+
+.filter-button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  background: #2563eb;
+  color: white;
+}
+
+.filter-button:hover {
+  background: #1d4ed8;
+}
+
+.filter-button.secondary {
+  background: #64748b;
+}
+
+.filter-button.secondary:hover {
+  background: #475569;
+}
+
+.filter-button.export {
+  background: #16a34a;
+}
+
+.filter-button.export:hover {
+  background: #15803d;
+}
+
+.monat-info {
+  margin-top: 10px;
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.keine-filter-treffer {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  color: #64748b;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
 .ordner-liste {
   display: flex;
   flex-direction: column;
