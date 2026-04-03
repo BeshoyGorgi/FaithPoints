@@ -14,6 +14,284 @@ const KATEGORIEN = [
   "Kiahk"
 ];
 
+
+const KATEGORIE_DESIGNS = {
+  "Bonus-Hymne": {
+    accent: "#b8871c",
+    accentSoft: "rgba(184, 135, 28, 0.16)",
+    button: "#b8871c",
+    buttonHover: "#946d13",
+    count: "#9a6b10",
+    contentBg: "#fffaf0",
+    glow: "rgba(184, 135, 28, 0.20)",
+    icon: "bi-stars"
+  },
+  "Jährlich": {
+    accent: "#2c5f8a",
+    accentSoft: "rgba(44, 95, 138, 0.15)",
+    button: "#2c5f8a",
+    buttonHover: "#224968",
+    count: "#244f74",
+    contentBg: "#f6faff",
+    glow: "rgba(44, 95, 138, 0.20)",
+    icon: "bi-book-fill"
+  },
+  "Geburt Christi": {
+    accent: "#cf9c1f",
+    accentSoft: "rgba(207, 156, 31, 0.16)",
+    button: "#cf9c1f",
+    buttonHover: "#aa7f17",
+    count: "#9f7410",
+    contentBg: "#fff9ed",
+    glow: "rgba(207, 156, 31, 0.20)",
+    icon: "bi-star-fill"
+  },
+  "Große Fastenzeit": {
+    accent: "#8c6b3f",
+    accentSoft: "rgba(140, 107, 63, 0.15)",
+    button: "#8c6b3f",
+    buttonHover: "#6e5331",
+    count: "#6e5331",
+    contentBg: "#fcf9f3",
+    glow: "rgba(140, 107, 63, 0.20)",
+    icon: "bi-hourglass-split"
+  },
+  "Das Kreuzfest": {
+    accent: "#7a3eb1",
+    accentSoft: "rgba(122, 62, 177, 0.16)",
+    button: "#7a3eb1",
+    buttonHover: "#5f2f8a",
+    count: "#642f95",
+    contentBg: "#faf5ff",
+    glow: "rgba(122, 62, 177, 0.22)",
+    icon: "bi-gem"
+  },
+  "Karwoche": {
+    accent: "#7a1f2a",
+    accentSoft: "rgba(122, 31, 42, 0.16)",
+    button: "#7a1f2a",
+    buttonHover: "#5f1820",
+    count: "#6a1823",
+    contentBg: "#fff6f7",
+    glow: "rgba(122, 31, 42, 0.22)",
+    icon: "bi-plus-lg"
+  },
+  "Al Khamasin (50 hl. Tage)": {
+    accent: "#d6a31d",
+    accentSoft: "rgba(214, 163, 29, 0.16)",
+    button: "#d6a31d",
+    buttonHover: "#ae8417",
+    count: "#9e7711",
+    contentBg: "#fffcef",
+    glow: "rgba(214, 163, 29, 0.20)",
+    icon: "bi-sun-fill"
+  },
+  "Apostelfastenzeit": {
+    accent: "#1f6e78",
+    accentSoft: "rgba(31, 110, 120, 0.16)",
+    button: "#1f6e78",
+    buttonHover: "#17535a",
+    count: "#17535a",
+    contentBg: "#f2fbfc",
+    glow: "rgba(31, 110, 120, 0.22)",
+    icon: "bi-compass-fill"
+  },
+  "Marienfastenzeit": {
+    accent: "#4f86c6",
+    accentSoft: "rgba(79, 134, 198, 0.16)",
+    button: "#4f86c6",
+    buttonHover: "#3c6ea8",
+    count: "#3a69a0",
+    contentBg: "#f4f9ff",
+    glow: "rgba(79, 134, 198, 0.22)",
+    icon: "bi-flower1"
+  },
+  "Koptisches Neujahr (Neiruzfest)": {
+    accent: "#c13c3c",
+    accentSoft: "rgba(193, 60, 60, 0.16)",
+    button: "#c13c3c",
+    buttonHover: "#9c2f2f",
+    count: "#972c2c",
+    contentBg: "#fff6f6",
+    glow: "rgba(193, 60, 60, 0.22)",
+    icon: "bi-award-fill"
+  },
+  "Kiahk": {
+    accent: "#355b9d",
+    accentSoft: "rgba(53, 91, 157, 0.16)",
+    button: "#355b9d",
+    buttonHover: "#2a477b",
+    count: "#2c4c86",
+    contentBg: "#f5f8ff",
+    glow: "rgba(53, 91, 157, 0.22)",
+    icon: "bi-moon-stars-fill"
+  }
+};
+
+function svgZuCssUrl(svg) {
+  return `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}")`;
+}
+
+function holeKategorieDesign(kategorie) {
+  return KATEGORIE_DESIGNS[kategorie] || {
+    accent: "#2563eb",
+    accentSoft: "rgba(37, 99, 235, 0.14)",
+    button: "#16a34a",
+    buttonHover: "#15803d",
+    count: "#2563eb",
+    contentBg: "#f8fafc",
+    glow: "rgba(37, 99, 235, 0.22)",
+    icon: "bi-folder-fill"
+  };
+}
+
+function holeKategorieIllustration(kategorie) {
+  switch (kategorie) {
+    case "Bonus-Hymne":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='410' cy='128' r='90' fill='#f1d08b' fill-opacity='.12'/>
+          <rect x='325' y='96' width='118' height='72' rx='12' fill='#c79d37' fill-opacity='.18'/>
+          <path d='M384 92l10 23 25 3-18 16 5 25-22-12-22 12 5-25-18-16 25-3z' fill='#d7a82a' fill-opacity='.32'/>
+          <path d='M446 72l6 14 15 2-11 9 3 15-13-7-13 7 3-15-11-9 15-2z' fill='#d7a82a' fill-opacity='.24'/>
+          <path d='M333 183c32-16 88-18 131-5' stroke='#c79d37' stroke-opacity='.24' stroke-width='8' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Jährlich":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <path d='M322 180c0-56 37-98 90-98s90 42 90 98' fill='none' stroke='#2c5f8a' stroke-opacity='.20' stroke-width='16' stroke-linecap='round'/>
+          <path d='M352 180v-62c0-12 9-21 21-21h78c12 0 21 9 21 21v62' fill='#2c5f8a' fill-opacity='.08'/>
+          <path d='M406 82v38' stroke='#b9913a' stroke-opacity='.25' stroke-width='10' stroke-linecap='round'/>
+          <path d='M380 126h52' stroke='#b9913a' stroke-opacity='.22' stroke-width='10' stroke-linecap='round'/>
+          <path d='M448 86c14 20 19 43 14 69' stroke='#7d8fa3' stroke-opacity='.24' stroke-width='8' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Geburt Christi":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='409' cy='94' r='72' fill='#f2d38e' fill-opacity='.12'/>
+          <path d='M410 42l10 24 26 3-19 16 5 25-22-12-22 12 5-25-19-16 26-3z' fill='#d7a82a' fill-opacity='.34'/>
+          <path d='M350 177c16-28 36-42 60-42s44 14 60 42' fill='none' stroke='#8f6a41' stroke-opacity='.26' stroke-width='12' stroke-linecap='round'/>
+          <path d='M372 162h76' stroke='#8f6a41' stroke-opacity='.22' stroke-width='10' stroke-linecap='round'/>
+          <path d='M330 196c38-20 117-21 160 0' stroke='#cf9c1f' stroke-opacity='.16' stroke-width='8' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Große Fastenzeit":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <path d='M305 194c28-36 57-55 92-55 27 0 50 10 78 31 12 9 23 16 32 24H305z' fill='#8c6b3f' fill-opacity='.11'/>
+          <path d='M324 194c20-28 46-47 73-47 18 0 35 7 54 21 9 7 18 13 25 20H324z' fill='#b08d61' fill-opacity='.16'/>
+          <path d='M382 116v42' stroke='#6e5331' stroke-opacity='.26' stroke-width='8' stroke-linecap='round'/>
+          <path d='M367 131h30' stroke='#6e5331' stroke-opacity='.26' stroke-width='8' stroke-linecap='round'/>
+          <path d='M420 194c-14-15-28-24-45-31' stroke='#8c6b3f' stroke-opacity='.20' stroke-width='7' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Das Kreuzfest":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='411' cy='126' r='82' fill='#c6a2e9' fill-opacity='.10'/>
+          <path d='M408 68v118' stroke='#7a3eb1' stroke-opacity='.30' stroke-width='16' stroke-linecap='round'/>
+          <path d='M362 116h92' stroke='#7a3eb1' stroke-opacity='.30' stroke-width='16' stroke-linecap='round'/>
+          <path d='M408 53l6 11 13 2-9 8 2 13-12-6-12 6 2-13-9-8 13-2z' fill='#d9b65e' fill-opacity='.34'/>
+          <path d='M330 126h36M454 126h36M408 204v22' stroke='#d9b65e' stroke-opacity='.22' stroke-width='7' stroke-linecap='round'/>
+        </svg>
+      `);
+
+    case "Karwoche":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='410' cy='128' r='84' fill='#7a1f2a' fill-opacity='.08'/>
+          <path d='M365 88c18-24 72-28 94 0' fill='none' stroke='#7a1f2a' stroke-opacity='.30' stroke-width='8' stroke-linecap='round'/>
+          <path d='M370 95l10-12M391 88l12-15M417 88l13-15M442 93l12-13' stroke='#7a1f2a' stroke-opacity='.28' stroke-width='6' stroke-linecap='round'/>
+          <path d='M410 104v86' stroke='#5c1520' stroke-opacity='.30' stroke-width='12' stroke-linecap='round'/>
+          <path d='M374 138h72' stroke='#5c1520' stroke-opacity='.30' stroke-width='12' stroke-linecap='round'/>
+          <path d='M452 176c0 9-6 17-14 17-9 0-14-8-14-17 0-7 5-13 14-21 9 8 14 14 14 21z' fill='#a61e2b' fill-opacity='.22'/>
+        </svg>
+      `);
+
+    case "Al Khamasin (50 hl. Tage)":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='413' cy='112' r='58' fill='#f0d481' fill-opacity='.20'/>
+          <path d='M413 28v22M413 174v22M329 112h22M475 112h22M353 52l16 16M457 156l16 16M353 172l16-16M457 68l16-16' stroke='#d6a31d' stroke-opacity='.28' stroke-width='8' stroke-linecap='round'/>
+          <path d='M352 186c13-28 30-41 61-41s48 13 61 41' fill='#d6a31d' fill-opacity='.10'/>
+          <path d='M382 186v-36h62v36' fill='none' stroke='#d6a31d' stroke-opacity='.24' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
+        </svg>
+      `);
+
+    case "Apostelfastenzeit":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <path d='M332 174c19 9 38 13 58 13 35 0 64-11 96-31-10 25-39 42-85 42-27 0-50-7-69-24z' fill='#1f6e78' fill-opacity='.18'/>
+          <path d='M352 154l55-42 57 42' fill='none' stroke='#1f6e78' stroke-opacity='.28' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
+          <path d='M407 112v52' stroke='#8e5f28' stroke-opacity='.24' stroke-width='8' stroke-linecap='round'/>
+          <path d='M432 78c9 8 14 17 14 27-12-2-22-8-28-18 4-5 8-8 14-9z' fill='#d57b1f' fill-opacity='.24'/>
+          <path d='M338 205c28-10 54-14 79-14 29 0 55 5 78 14' stroke='#1f6e78' stroke-opacity='.18' stroke-width='7' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Marienfastenzeit":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='410' cy='100' r='66' fill='#9cc0ea' fill-opacity='.12'/>
+          <path d='M410 67c20 21 28 46 24 74-16-8-29-21-39-39-10 18-23 31-39 39-4-28 4-53 24-74 10 10 19 15 15 15s5-5 15-15z' fill='#4f86c6' fill-opacity='.18'/>
+          <path d='M410 44l6 14 15 2-11 9 3 15-13-7-13 7 3-15-11-9 15-2z' fill='#d7bd70' fill-opacity='.34'/>
+          <path d='M367 180c23-17 51-26 84-26' stroke='#4f86c6' stroke-opacity='.20' stroke-width='8' stroke-linecap='round' fill='none'/>
+        </svg>
+      `);
+
+    case "Koptisches Neujahr (Neiruzfest)":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <path d='M359 96l14 24h72l14-24-22-14-28 17-28-17z' fill='#c13c3c' fill-opacity='.22'/>
+          <path d='M409 120v58' stroke='#c13c3c' stroke-opacity='.24' stroke-width='10' stroke-linecap='round'/>
+          <path d='M447 150c12 15 18 31 17 49-17-7-31-21-41-39' fill='none' stroke='#5f9c4b' stroke-opacity='.24' stroke-width='8' stroke-linecap='round'/>
+          <path d='M369 186c20-6 43-9 67-9 21 0 42 3 64 9' stroke='#d2a93c' stroke-opacity='.24' stroke-width='8' stroke-linecap='round' fill='none'/>
+          <circle cx='409' cy='68' r='20' fill='#d2a93c' fill-opacity='.18'/>
+        </svg>
+      `);
+
+    case "Kiahk":
+      return svgZuCssUrl(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260'>
+          <circle cx='430' cy='82' r='32' fill='#9db5e8' fill-opacity='.18'/>
+          <circle cx='442' cy='76' r='32' fill='white' fill-opacity='.90'/>
+          <path d='M372 146c0-17 14-31 31-31s31 14 31 31c0 10-4 19-10 27l-21 27-21-27c-6-8-10-17-10-27z' fill='#355b9d' fill-opacity='.16'/>
+          <path d='M404 117v33' stroke='#d4b35d' stroke-opacity='.26' stroke-width='8' stroke-linecap='round'/>
+          <path d='M389 132h30' stroke='#d4b35d' stroke-opacity='.24' stroke-width='7' stroke-linecap='round'/>
+          <path d='M350 54l6 14 15 2-11 9 3 15-13-7-13 7 3-15-11-9 15-2z' fill='#d4b35d' fill-opacity='.26'/>
+          <path d='M468 120l5 11 12 2-9 7 2 12-10-6-10 6 2-12-9-7 12-2z' fill='#d4b35d' fill-opacity='.22'/>
+        </svg>
+      `);
+
+    default:
+      return "none";
+  }
+}
+
+function wendeKategorieDesignAn(card, iconElement, kategorie) {
+  const design = holeKategorieDesign(kategorie);
+
+  card.style.setProperty("--theme-accent", design.accent);
+  card.style.setProperty("--theme-accent-soft", design.accentSoft);
+  card.style.setProperty("--theme-button", design.button);
+  card.style.setProperty("--theme-button-hover", design.buttonHover);
+  card.style.setProperty("--theme-count", design.count);
+  card.style.setProperty("--theme-content-bg", design.contentBg);
+  card.style.setProperty("--theme-glow", design.glow);
+  card.style.setProperty("--card-illustration", holeKategorieIllustration(kategorie));
+
+  if (iconElement) {
+    iconElement.innerHTML = `<i class="bi ${design.icon}"></i>`;
+  }
+}
+
+//Beginn des codes
 const ordnerListe = document.getElementById("ordnerListe");
 const zurueckButton = document.getElementById("zurueckButton");
 const monatSucheVonInput = document.getElementById("monatSucheVon");
@@ -500,6 +778,8 @@ function baueOrdnerCard(kategorie) {
   headerLeft.appendChild(icon);
   headerLeft.appendChild(name);
 
+  wendeKategorieDesignAn(card, icon, kategorie);
+
   const headerRight = document.createElement("div");
   headerRight.className = "ordner-header-right";
 
@@ -539,8 +819,8 @@ function baueOrdnerCard(kategorie) {
   });
 
   if ((hatAktivenMonatsFilter() && holeGefilterteHymnen(kategorie).length > 0) || offeneKategorien.has(kategorie)) {
-  card.classList.add("offen");
-}
+    card.classList.add("offen");
+  }
 
   renderOrdnerInhalt(content, kategorie, count);
 
