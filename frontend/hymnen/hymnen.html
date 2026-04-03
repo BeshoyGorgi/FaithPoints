@@ -51,35 +51,40 @@
   </div>
 
   <div class="toolbar-grid">
-    <div class="toolbar-field toolbar-field--wide">
-      <label for="kindSuche" class="toolbar-label">Kind</label>
-      <input
-        type="text"
-        id="kindSuche"
-        class="toolbar-input"
-        placeholder="Nach einem Kind suchen..."
-      />
-    </div>
-
-    <div class="toolbar-field">
-      <label for="monatSuche" class="toolbar-label">Monat / Jahr</label>
-      <input type="month" id="monatSuche" class="toolbar-input" />
-    </div>
-
-    <div class="toolbar-actions">
-      <button id="monatSucheButton" class="toolbar-button primary" type="button">
-        Suchen
-      </button>
-
-      <button id="monatScreenshotButton" class="toolbar-button success" type="button">
-        Screenshot
-      </button>
-
-      <button id="monatResetButton" class="toolbar-reset" type="button">
-        Zurücksetzen
-      </button>
-    </div>
+  <div class="toolbar-field toolbar-field--wide">
+    <label for="kindSuche" class="toolbar-label">Kind</label>
+    <input
+      type="text"
+      id="kindSuche"
+      class="toolbar-input"
+      placeholder="Nach einem Kind suchen..."
+    />
   </div>
+
+  <div class="toolbar-field">
+    <label for="monatSucheVon" class="toolbar-label">Von</label>
+    <input type="month" id="monatSucheVon" class="toolbar-input" />
+  </div>
+
+  <div class="toolbar-field">
+    <label for="monatSucheBis" class="toolbar-label">Bis</label>
+    <input type="month" id="monatSucheBis" class="toolbar-input" />
+  </div>
+
+  <div class="toolbar-actions">
+    <button id="monatSucheButton" class="toolbar-button primary" type="button">
+      Suchen
+    </button>
+
+    <button id="monatScreenshotButton" class="toolbar-button success" type="button">
+      Screenshot
+    </button>
+
+    <button id="monatResetButton" class="toolbar-reset" type="button">
+      Zurücksetzen
+    </button>
+  </div>
+</div>
 
   <div id="monatInfo" class="toolbar-info"></div>
 </section>
