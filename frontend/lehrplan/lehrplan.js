@@ -539,11 +539,57 @@ function filterZuruecksetzen() {
   renderAlleOrdner();
 }
 
+async function macheSvgBilderScreenshotSicher(rootElement) {
+  const svgBilder = [...rootElement.querySelectorAll("img.ordner-icon-svg")];
+
+  await Promise.all(
+    svgBilder.map(async (img) => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+
+      try {
+        const absoluteUrl = new URL(src, window.location.href).href;
+        const response = await fetch(absoluteUrl);
+
+        if (!response.ok) {
+          throw new Error(`SVG konnte nicht geladen werden: ${absoluteUrl}`);
+        }
+
+        let svgText = await response.text();
+
+        svgText = svgText
+          .replace(/<\?xml[\s\S]*?\?>/g, "")
+          .replace(/<!DOCTYPE[\s\S]*?>/gi, "");
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "ordner-icon-svg-inline";
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
+        wrapper.style.display = "block";
+
+        wrapper.innerHTML = svgText;
+
+        const svg = wrapper.querySelector("svg");
+        if (svg) {
+          svg.style.width = "100%";
+          svg.style.height = "100%";
+          svg.style.display = "block";
+          svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+        }
+
+        img.replaceWith(wrapper);
+      } catch (error) {
+        console.error("Fehler beim Umwandeln des SVG für Screenshot:", error);
+      }
+    })
+  );
+}
+
 async function screenshotHerunterladen() {
   if (!hatAktivenMonatsFilter()) {
-  alert("Bitte wähle zuerst einen Zeitraum aus und suche danach.");
-  return;
-}
+    alert("Bitte wähle zuerst einen Zeitraum aus und suche danach.");
+    return;
+  }
 
   if (!window.html2canvas) {
     alert("Screenshot-Bibliothek wurde nicht geladen.");
@@ -583,6 +629,11 @@ async function screenshotHerunterladen() {
   document.body.appendChild(exportBox);
 
   try {
+    await macheSvgBilderScreenshotSicher(clone);
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     const canvas = await window.html2canvas(exportBox, {
       backgroundColor: "#1A3D64",
       scale: 2,
