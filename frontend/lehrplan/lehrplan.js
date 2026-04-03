@@ -24,7 +24,7 @@ const KATEGORIE_DESIGNS = {
     count: "#9a6b10",
     contentBg: "#fffaf0",
     glow: "rgba(184, 135, 28, 0.20)",
-    icon: "bi-stars"
+    iconSvg: "../images/lehrplan/bonus-Hymne.svg"
   },
   "Jährlich": {
     accent: "#2c5f8a",
@@ -34,7 +34,7 @@ const KATEGORIE_DESIGNS = {
     count: "#244f74",
     contentBg: "#f6faff",
     glow: "rgba(44, 95, 138, 0.20)",
-    icon: "bi-book-fill"
+    iconSvg: "../images/lehrplan/jährlich.svg" 
   },
   "Geburt Christi": {
     accent: "#cf9c1f",
@@ -44,7 +44,7 @@ const KATEGORIE_DESIGNS = {
     count: "#9f7410",
     contentBg: "#fff9ed",
     glow: "rgba(207, 156, 31, 0.20)",
-    icon: "bi-star-fill"
+    iconSvg: "../images/lehrplan/geburt-christi.svg"
   },
   "Große Fastenzeit": {
     accent: "#8c6b3f",
@@ -54,7 +54,7 @@ const KATEGORIE_DESIGNS = {
     count: "#6e5331",
     contentBg: "#fcf9f3",
     glow: "rgba(140, 107, 63, 0.20)",
-    icon: "bi-hourglass-split"
+    iconSvg: "../images/lehrplan/große-fastenzeit.svg"
   },
   "Das Kreuzfest": {
     accent: "#7a3eb1",
@@ -64,7 +64,7 @@ const KATEGORIE_DESIGNS = {
     count: "#642f95",
     contentBg: "#faf5ff",
     glow: "rgba(122, 62, 177, 0.22)",
-    icon: "bi-gem"
+    iconSvg: "../images/lehrplan/das-kreuzfest.svg"
   },
   "Karwoche": {
     accent: "#7a1f2a",
@@ -74,7 +74,7 @@ const KATEGORIE_DESIGNS = {
     count: "#6a1823",
     contentBg: "#fff6f7",
     glow: "rgba(122, 31, 42, 0.22)",
-    icon: "bi-plus-lg"
+    iconSvg: "../images/lehrplan/karwoche.svg"
   },
   "Al Khamasin (50 hl. Tage)": {
     accent: "#d6a31d",
@@ -84,7 +84,7 @@ const KATEGORIE_DESIGNS = {
     count: "#9e7711",
     contentBg: "#fffcef",
     glow: "rgba(214, 163, 29, 0.20)",
-    icon: "bi-sun-fill"
+    iconSvg: "../images/lehrplan/al-khamasin.svg"
   },
   "Apostelfastenzeit": {
     accent: "#1f6e78",
@@ -94,7 +94,7 @@ const KATEGORIE_DESIGNS = {
     count: "#17535a",
     contentBg: "#f2fbfc",
     glow: "rgba(31, 110, 120, 0.22)",
-    icon: "bi-compass-fill"
+    iconSvg: "../images/lehrplan/apostelfastenzeit.svg"
   },
   "Marienfastenzeit": {
     accent: "#4f86c6",
@@ -104,7 +104,7 @@ const KATEGORIE_DESIGNS = {
     count: "#3a69a0",
     contentBg: "#f4f9ff",
     glow: "rgba(79, 134, 198, 0.22)",
-    icon: "bi-flower1"
+    iconSvg: "../images/lehrplan/mariafastenzeit.svg"
   },
   "Koptisches Neujahr (Neiruzfest)": {
     accent: "#c13c3c",
@@ -114,7 +114,7 @@ const KATEGORIE_DESIGNS = {
     count: "#972c2c",
     contentBg: "#fff6f6",
     glow: "rgba(193, 60, 60, 0.22)",
-    icon: "bi-award-fill"
+    iconSvg: "../images/lehrplan/koptisches-neujahr.svg"
   },
   "Kiahk": {
     accent: "#355b9d",
@@ -124,7 +124,7 @@ const KATEGORIE_DESIGNS = {
     count: "#2c4c86",
     contentBg: "#f5f8ff",
     glow: "rgba(53, 91, 157, 0.22)",
-    icon: "bi-moon-stars-fill"
+    iconSvg: "../images/lehrplan/kiahk.svg"
   }
 };
 
@@ -286,9 +286,15 @@ function wendeKategorieDesignAn(card, iconElement, kategorie) {
   card.style.setProperty("--theme-glow", design.glow);
   card.style.setProperty("--card-illustration", holeKategorieIllustration(kategorie));
 
-  if (iconElement) {
+ if (iconElement) {
+  if (design.iconSvg) {
+    iconElement.innerHTML = `<img src="${design.iconSvg}" alt="" class="ordner-icon-svg">`;
+  } else if (design.icon) {
     iconElement.innerHTML = `<i class="bi ${design.icon}"></i>`;
+  } else {
+    iconElement.innerHTML = "";
   }
+}
 }
 
 //Beginn des codes
@@ -335,6 +341,12 @@ function formatiereZeitraum(start) {
   if (start) return `ab ${formatiereDatum(start)}`;
   return "";
 }
+
+//Local ansehen:
+// async function init() {
+//   daten = leeresDatenObjekt();
+//   renderAlleOrdner();
+// }
 
 async function init() {
   const email = localStorage.getItem("email");
