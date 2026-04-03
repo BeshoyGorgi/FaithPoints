@@ -275,13 +275,14 @@ body {
 }
 
 .toolbar-button {
-  height: 46px;
+  width: 170px;
+  height: 45px;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 0 16px;
   cursor: pointer;
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 0.98rem;
+  font-weight: 800;
   color: white;
   white-space: nowrap;
   transition: 0.18s ease;
@@ -310,15 +311,16 @@ body {
 }
 
 .toolbar-reset {
-  height: 46px;
-  border: none;
-  background: #64748b;
-  color: white;
-  font-size: 0.92rem;
-  font-weight: 700;
+  width: 170px;
+  height: 45px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.94rem;
+  font-weight: 800;
   cursor: pointer;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 16px;
   white-space: nowrap;
   transition: 0.18s ease;
 }
