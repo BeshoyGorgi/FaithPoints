@@ -41,7 +41,13 @@ async function ladeKinderDetails() {
 
       tr.innerHTML = `
         <td>
-          <img src="${bildUrl}" alt="Bild von ${kind.name}" class="kind-bild" id="bild-${kind.id}">
+          <img 
+            src="${bildUrl}" 
+            alt="Bild von ${kind.name}" 
+            class="kind-bild" 
+            id="bild-${kind.id}"
+            onerror="this.onerror=null; this.src='../images/platzhalter.png';"
+          >
           <div class="bild-buttons">
             <button class="add-bild" data-id="${kind.id}">+</button>
             <button class="remove-bild" data-id="${kind.id}">−</button>
