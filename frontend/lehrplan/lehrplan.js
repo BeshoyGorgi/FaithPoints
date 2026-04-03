@@ -3,15 +3,15 @@ import { API_BASE_URL } from "../config.js";
 const KATEGORIEN = [
   "Bonus-Hymne",
   "Jährlich",
+  "Koptisches Neujahr (Neiruzfest)",
+  "Kiahk",
   "Geburt Christi",
   "Große Fastenzeit",
   "Das Kreuzfest",
   "Karwoche",
   "Al Khamasin (50 hl. Tage)",
   "Apostelfastenzeit",
-  "Marienfastenzeit",
-  "Koptisches Neujahr (Neiruzfest)",
-  "Kiahk"
+  "Marienfastenzeit"
 ];
 
 
@@ -35,6 +35,26 @@ const KATEGORIE_DESIGNS = {
     contentBg: "#f6faff",
     glow: "rgba(44, 95, 138, 0.20)",
     iconSvg: "../images/lehrplan/jährlich.svg" 
+  },
+    "Koptisches Neujahr (Neiruzfest)": {
+    accent: "#c13c3c",
+    accentSoft: "rgba(193, 60, 60, 0.16)",
+    button: "#c13c3c",
+    buttonHover: "#9c2f2f",
+    count: "#972c2c",
+    contentBg: "#fff6f6",
+    glow: "rgba(193, 60, 60, 0.22)",
+    iconSvg: "../images/lehrplan/koptisches-neujahr.svg"
+  },
+  "Kiahk": {
+    accent: "#355b9d",
+    accentSoft: "rgba(53, 91, 157, 0.16)",
+    button: "#355b9d",
+    buttonHover: "#2a477b",
+    count: "#2c4c86",
+    contentBg: "#f5f8ff",
+    glow: "rgba(53, 91, 157, 0.22)",
+    iconSvg: "../images/lehrplan/kiahk.svg"
   },
   "Geburt Christi": {
     accent: "#cf9c1f",
@@ -105,26 +125,6 @@ const KATEGORIE_DESIGNS = {
     contentBg: "#f4f9ff",
     glow: "rgba(79, 134, 198, 0.22)",
     iconSvg: "../images/lehrplan/mariafastenzeit.svg"
-  },
-  "Koptisches Neujahr (Neiruzfest)": {
-    accent: "#c13c3c",
-    accentSoft: "rgba(193, 60, 60, 0.16)",
-    button: "#c13c3c",
-    buttonHover: "#9c2f2f",
-    count: "#972c2c",
-    contentBg: "#fff6f6",
-    glow: "rgba(193, 60, 60, 0.22)",
-    iconSvg: "../images/lehrplan/koptisches-neujahr.svg"
-  },
-  "Kiahk": {
-    accent: "#355b9d",
-    accentSoft: "rgba(53, 91, 157, 0.16)",
-    button: "#355b9d",
-    buttonHover: "#2a477b",
-    count: "#2c4c86",
-    contentBg: "#f5f8ff",
-    glow: "rgba(53, 91, 157, 0.22)",
-    iconSvg: "../images/lehrplan/kiahk.svg"
   }
 };
 

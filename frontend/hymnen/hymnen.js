@@ -19,15 +19,15 @@ const OPEN_KIND_KEY = "fp_open_hymnen_kind_id";
 const HYMNNEN_KATEGORIEN = [
   "Bonus-Hymne",
   "Jährlich",
+  "Koptisches Neujahr (Neiruzfest)",
+  "Kiahk",
   "Geburt Christi",
   "Große Fastenzeit",
   "Das Kreuzfest",
   "Karwoche",
   "Al Khamasin (50 hl. Tage)",
   "Apostelfastenzeit",
-  "Marienfastenzeit",
-  "Koptisches Neujahr (Neiruzfest)",
-  "Kiahk"
+  "Marienfastenzeit"
 ];
 
 function normalisiereDatum(value) {
