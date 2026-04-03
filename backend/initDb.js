@@ -54,6 +54,11 @@ export async function createTableIfNotExists() {
     `);
 
     await db.query(`
+      ALTER TABLE kinder
+      ADD COLUMN IF NOT EXISTS bildurl VARCHAR(255);
+    `);
+
+    await db.query(`
       ALTER TABLE lehrplan_eintraege
       ADD COLUMN IF NOT EXISTS erledigt BOOLEAN NOT NULL DEFAULT FALSE;
     `);

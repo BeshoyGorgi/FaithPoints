@@ -8,19 +8,40 @@ import { fileURLToPath } from "url";
 import multer from "multer";
 import fs from "fs";
 
-// Bild-Upload Ordner
-const uploadDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+// Kinderbilder sollen im Frontend unter images/kinderbilder gespeichert werden
+const uploadDir = path.join(process.cwd(), "..", "frontend", "images", "kinderbilder");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Multer-Konfiguration
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
+    const originalExt = path.extname(file.originalname).toLowerCase();
+    const erlaubteEndungen = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+    const ext = erlaubteEndungen.includes(originalExt) ? originalExt : ".jpg";
+
+    const dateiname = `kind-${req.params.id}-${Date.now()}${ext}`;
+    cb(null, dateiname);
   }
 });
-const upload = multer({ storage });
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // max. 5 MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Nur Bilddateien sind erlaubt."));
+    }
+    cb(null, true);
+  }
+});
 
 
 dotenv.config();
@@ -699,14 +720,49 @@ app.delete("/api/kinder/:id", async (req, res) => {
 // === BILD HOCHLADEN ===
 app.post("/api/kinder/:id/bild", upload.single("bild"), async (req, res) => {
   const { id } = req.params;
-  if (!req.file) return res.status(400).json({ error: "Kein Bild hochgeladen" });
 
-  const bildUrl = `/uploads/${req.file.filename}`;
+  if (!req.file) {
+    return res.status(400).json({ error: "Kein Bild hochgeladen" });
+  }
+
+  const neueBildUrl = `/images/kinderbilder/${req.file.filename}`;
 
   try {
-    // ⬇️ hier wird der Bildpfad in der DB gespeichert
-    await db.query(`UPDATE kinder SET bildurl = $1 WHERE id = $2`, [bildUrl, id]);
-    res.json({ bildUrl });
+    // Prüfen, ob das Kind existiert und altes Bild holen
+    const result = await db.query(
+      `SELECT bildurl FROM kinder WHERE id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      // Falls Kind nicht existiert: neu hochgeladene Datei wieder löschen
+      const neuerPfad = path.join(uploadDir, req.file.filename);
+      if (fs.existsSync(neuerPfad)) {
+        fs.unlinkSync(neuerPfad);
+      }
+
+      return res.status(404).json({ error: "Kind nicht gefunden" });
+    }
+
+    const alteBildUrl = result.rows[0].bildurl;
+
+    // Neues Bild in DB speichern
+    await db.query(
+      `UPDATE kinder SET bildurl = $1 WHERE id = $2`,
+      [neueBildUrl, id]
+    );
+
+    // Altes Bild löschen, falls vorhanden
+    if (alteBildUrl) {
+      const alterDateiname = path.basename(alteBildUrl);
+      const alterPfad = path.join(uploadDir, alterDateiname);
+
+      if (fs.existsSync(alterPfad)) {
+        fs.unlinkSync(alterPfad);
+      }
+    }
+
+    res.json({ bildUrl: neueBildUrl });
   } catch (err) {
     console.error("Fehler beim Speichern des Bildes:", err);
     res.status(500).json({ error: err.message });
@@ -717,23 +773,39 @@ app.post("/api/kinder/:id/bild", upload.single("bild"), async (req, res) => {
 // === BILD LÖSCHEN ===
 app.delete("/api/kinder/:id/bild", async (req, res) => {
   const { id } = req.params;
+
   try {
-    const result = await db.query(`SELECT bildurl FROM kinder WHERE id = $1`, [id]);
-    const bildUrl = result.rows[0]?.bildurl;
-    if (bildUrl) {
-      const filePath = path.join(process.cwd(), bildUrl);
-      fs.unlink(filePath, () => {});
+    const result = await db.query(
+      `SELECT bildurl FROM kinder WHERE id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Kind nicht gefunden" });
     }
-    await db.query(`UPDATE kinder SET bildurl = NULL WHERE id = $1`, [id]);
+
+    const bildUrl = result.rows[0].bildurl;
+
+    if (bildUrl) {
+      const dateiname = path.basename(bildUrl);
+      const filePath = path.join(uploadDir, dateiname);
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await db.query(
+      `UPDATE kinder SET bildurl = NULL WHERE id = $1`,
+      [id]
+    );
+
     res.json({ success: true });
   } catch (err) {
+    console.error("Fehler beim Löschen des Bildes:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
-// Static route für Uploads
-app.use("/uploads", express.static(uploadDir));
-
 
 // === Tabelle erstellen und Server starten ===
 createTableIfNotExists().then(() => {

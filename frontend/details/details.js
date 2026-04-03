@@ -35,7 +35,9 @@ async function ladeKinderDetails() {
       const tr = document.createElement("tr");
       tr.dataset.id = kind.id;
 
-      const bildUrl = kind.bildurl || "../images/platzhalter.png";
+      const bildUrl = kind.bildurl
+        ? `${API_BASE_URL}${kind.bildurl}`
+        : "../images/default.png";
 
       tr.innerHTML = `
         <td>
@@ -66,26 +68,42 @@ tbody.addEventListener("click", async (e) => {
 
   // + Bild hochladen
   if (e.target.classList.contains("add-bild")) {
-    const fileInput = document.getElementById(`file-${id}`);
-    fileInput.click();
-    fileInput.onchange = async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      const formData = new FormData();
-      formData.append("bild", file);
-      const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, { method: "POST", body: formData });
+  const fileInput = document.getElementById(`file-${id}`);
+  fileInput.value = "";
+  fileInput.click();
+
+  fileInput.onchange = async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("bild", file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, {
+        method: "POST",
+        body: formData
+      });
+
       if (response.ok) {
         const result = await response.json();
-        document.getElementById(`bild-${id}`).src = result.bildUrl;
-      } else alert("Fehler beim Hochladen des Bildes");
-    };
-  }
+        document.getElementById(`bild-${id}`).src = `${API_BASE_URL}${result.bildUrl}`;
+      } else {
+        const fehler = await response.json();
+        alert(fehler.error || "Fehler beim Hochladen des Bildes");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Fehler beim Hochladen des Bildes");
+    }
+  };
+}
 
   // − Bild löschen
   if (e.target.classList.contains("remove-bild")) {
     if (!confirm("Bild wirklich entfernen?")) return;
     const response = await fetch(`${API_BASE_URL}/api/kinder/${id}/bild`, { method: "DELETE" });
-    if (response.ok) document.getElementById(`bild-${id}`).src = "../images/platzhalter.png";
+    if (response.ok) document.getElementById(`bild-${id}`).src = "../images/default.png";
     else alert("Fehler beim Löschen des Bildes");
   }
 });
