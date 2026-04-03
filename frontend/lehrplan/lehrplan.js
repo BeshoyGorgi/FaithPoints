@@ -343,22 +343,22 @@ function formatiereZeitraum(start) {
 }
 
 //Local ansehen:
-// async function init() {
-//   daten = leeresDatenObjekt();
-//   renderAlleOrdner();
-// }
-
 async function init() {
-  const email = localStorage.getItem("email");
-
-  if (!email) {
-    window.location.href = "/login/login.html";
-    return;
-  }
-
-  await ladeDatenVomServer();
+  daten = leeresDatenObjekt();
   renderAlleOrdner();
 }
+
+// async function init() {
+//   const email = localStorage.getItem("email");
+
+//   if (!email) {
+//     window.location.href = "/login/login.html";
+//     return;
+//   }
+
+//   await ladeDatenVomServer();
+//   renderAlleOrdner();
+// }
 
 function leeresDatenObjekt() {
   const obj = {};
