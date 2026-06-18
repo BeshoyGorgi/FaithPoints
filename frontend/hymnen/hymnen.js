@@ -9,6 +9,34 @@ const monatResetButton = document.getElementById("monatResetButton");
 const monatScreenshotButton = document.getElementById("monatScreenshotButton");
 const monatInfo = document.getElementById("monatInfo");
 
+//Koptisch Email
+const KOPTISCH_EMAIL = "Koptisch@al7an.com";
+const istKoptischLogin = localStorage.getItem("email") === KOPTISCH_EMAIL;
+
+function passeHymnenSeiteFuerKoptischAn() {
+  if (!istKoptischLogin) return;
+
+  document.title = "FaithPoints - Koptisch";
+
+  const navbarTitel = document.querySelector(".seiten-titel");
+  if (navbarTitel) {
+    navbarTitel.textContent = "Koptisch-Übersicht";
+  }
+
+  const seitenTitel = document.querySelector(".hymnen-titel");
+  if (seitenTitel) {
+    seitenTitel.textContent = "Koptisch";
+  }
+
+  const filterTitel = document.querySelector(".toolbar-title");
+  if (filterTitel) {
+    filterTitel.textContent = "Abgaben Filtern";
+  }
+}
+
+passeHymnenSeiteFuerKoptischAn();
+
+
 let alleKinderDaten = [];
 let aktiverMonatsFilterVon = "";
 let aktiverMonatsFilterBis = "";
