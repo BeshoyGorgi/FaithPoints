@@ -67,7 +67,7 @@ const users = [
   { email: "Kirchenchor-Stufe1@al7an.com", password: "KS1" },
   { email: "Kirchenchor-Stufe2@al7an.com", password: "KS2" },
   { email: "Kirchenchor-Stufe3@al7an.com", password: "KS3" },
-  { email: "Kirchenchor-Oberstufe@al7an.com", password: "KO" }
+  { email: "Koptisch@al7an.com", password: "KO" }
 ];
 
 app.post("/api/login", (req, res) => {
