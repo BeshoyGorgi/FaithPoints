@@ -66,7 +66,7 @@ function passeTabelleFuerKoptischAn() {
 passeTabelleFuerKoptischAn();
 
 if (email && stufenAnzeige) {
-  stufenAnzeige.textContent = STUFEN_MAP[email] || "Unbekannte Stufe";
+  stufenAnzeige.textContent = STUFEN_MAP[email] || "Koptisch-Unterricht";
 }
 
 
