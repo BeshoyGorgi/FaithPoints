@@ -55,6 +55,11 @@ function passeTabelleFuerKoptischAn() {
     kopfZellen[1].innerHTML = "Abgaben<br>------<br>تسليمات";
   }
 
+  const hymnenButton = document.getElementById("zuHymnen");
+  if (hymnenButton) {
+    hymnenButton.textContent = "Abgaben-Übersicht";
+  }
+
   versteckeAnwesenheitGSpalteFuerKoptisch();
 }
 
