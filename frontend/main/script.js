@@ -31,6 +31,35 @@ toggleMarkBtn?.addEventListener("click", () => {
 const email = localStorage.getItem("email");
 const stufenAnzeige = document.getElementById("stufenAnzeige");
 
+//Koptische Email
+const KOPTISCH_EMAIL = "Koptisch@al7an.com";
+const istKoptischLogin = email === KOPTISCH_EMAIL;
+
+function versteckeAnwesenheitGSpalteFuerKoptisch() {
+  if (!istKoptischLogin) return;
+
+  tabelle.querySelectorAll("tr").forEach(row => {
+    const anwesenheitGSpalte = row.children[3];
+    if (anwesenheitGSpalte) {
+      anwesenheitGSpalte.style.display = "none";
+    }
+  });
+}
+
+function passeTabelleFuerKoptischAn() {
+  if (!istKoptischLogin) return;
+
+  const kopfZellen = tabelle.querySelectorAll("thead th");
+
+  if (kopfZellen[1]) {
+    kopfZellen[1].innerHTML = "Abgaben<br>------<br>تسليمات";
+  }
+
+  versteckeAnwesenheitGSpalteFuerKoptisch();
+}
+
+passeTabelleFuerKoptischAn();
+
 if (email && stufenAnzeige) {
   stufenAnzeige.textContent = STUFEN_MAP[email] || "Unbekannte Stufe";
 }
@@ -121,6 +150,7 @@ async function ladeKinder() {
     tbody.appendChild(neueZeile);
   });
 
+    versteckeAnwesenheitGSpalteFuerKoptisch();
     markiereHoverbareZellen();
     sortiereNachGesamt();
   } catch (err) {
@@ -171,6 +201,7 @@ plusButton?.addEventListener("click", async () => {
         <td>${result.gesamt}</td>
       `;
       tbody.appendChild(neueZeile);
+      versteckeAnwesenheitGSpalteFuerKoptisch();
       markiereHoverbareZellen();
       sortiereNachGesamt();
     } else {
