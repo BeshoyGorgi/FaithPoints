@@ -31,6 +31,23 @@ toggleMarkBtn?.addEventListener("click", () => {
 const email = localStorage.getItem("email");
 const stufenAnzeige = document.getElementById("stufenAnzeige");
 
+const kinderAnzahlAnzeige = document.getElementById("kinderAnzahlAnzeige");
+
+function aktualisiereKinderAnzahl() {
+  const anzahl = Array.from(tbody.querySelectorAll("tr"))
+    .filter(row => {
+      const nameZelle = row.children[0];
+      return nameZelle && nameZelle.textContent.trim().length > 0;
+    })
+    .length;
+
+  if (kinderAnzahlAnzeige) {
+    kinderAnzahlAnzeige.textContent = anzahl === 1
+      ? "1 Kind"
+      : `${anzahl} Kinder`;
+  }
+}
+
 //Koptische Email
 const KOPTISCH_EMAIL = "Koptisch@al7an.com";
 const istKoptischLogin = email === KOPTISCH_EMAIL;
@@ -158,6 +175,7 @@ async function ladeKinder() {
     versteckeAnwesenheitGSpalteFuerKoptisch();
     markiereHoverbareZellen();
     sortiereNachGesamt();
+    aktualisiereKinderAnzahl();
   } catch (err) {
     console.error("Fehler beim Laden der Kinder:", err);
   }
@@ -209,6 +227,7 @@ plusButton?.addEventListener("click", async () => {
       versteckeAnwesenheitGSpalteFuerKoptisch();
       markiereHoverbareZellen();
       sortiereNachGesamt();
+      aktualisiereKinderAnzahl();
     } else {
       alert(result.error || "Fehler beim Hinzufügen des Kindes.");
     }
@@ -234,6 +253,7 @@ minusButton?.addEventListener("click", async () => {
     const response = await fetch(`${API_BASE_URL}/api/kinder/${id}`, { method: "DELETE" });
     if (response.ok) {
       zeile.remove();
+      aktualisiereKinderAnzahl();
       alert(`Das Kind "${name}" wurde gelöscht.`);
     } else {
       const result = await response.json();

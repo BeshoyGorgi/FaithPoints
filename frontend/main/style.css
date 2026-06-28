@@ -83,6 +83,15 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.kinder-anzahl {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.45);
+  margin: -10px auto 16px auto;
+  width: fit-content;
+}
+
 /* ================= TABLE ================= */
 .table-container {
   position: relative;
@@ -446,6 +455,12 @@ body.markierungen-aus .duplicate{
 
   .search-row{
     gap: 6px;
+  }
+
+  .kinder-anzahl {
+    font-size: 0.95rem;
+    padding: 6px 10px;
+    margin-bottom: 14px;
   }
 
 }
