@@ -706,6 +706,77 @@ app.delete("/api/hymnen/:id", async (req, res) => {
   }
 });
 
+// === ALLE PUNKTE DER AKTUELLEN STUFE ZURÜCKSETZEN ===
+app.post("/api/kinder/reset-punkte", async (req, res) => {
+  const { email, bestaetigung } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "E-Mail fehlt." });
+  }
+
+  if (bestaetigung !== "Zurücksetzen") {
+    return res.status(400).json({
+      error: 'Bitte exakt "Zurücksetzen" eingeben.'
+    });
+  }
+
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // Hymnen-Einträge der Kinder dieser Stufe löschen
+    await client.query(
+      `
+        DELETE FROM hymnen_eintraege
+        WHERE kind_id IN (
+          SELECT id
+          FROM kinder
+          WHERE user_email = $1
+        )
+      `,
+      [email]
+    );
+
+    // Alle Punkte auf 0 setzen
+    const result = await client.query(
+      `
+        UPDATE kinder
+        SET
+          hymne = 0,
+          verhalten = 0,
+          anwesenheit_g = 0,
+          anwesenheit_u = 0,
+          gesamt = 0,
+          last_updated_hymne = NULL,
+          last_updated_anwesenheit_g = NULL,
+          last_updated_anwesenheit_u = NULL
+        WHERE user_email = $1
+        RETURNING id
+      `,
+      [email]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      anzahl: result.rowCount
+    });
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Fehler beim Zurücksetzen:", err);
+
+    res.status(500).json({
+      error: "Punkte konnten nicht zurückgesetzt werden."
+    });
+
+  } finally {
+    client.release();
+  }
+});
+
 app.delete("/api/kinder/:id", async (req, res) => {
   const { id } = req.params;
   try {

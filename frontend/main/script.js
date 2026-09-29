@@ -683,5 +683,90 @@ document.getElementById("screenshot").addEventListener("click", () => {
     });
 });
 
+// =====================================================
+// ALLE PUNKTE ZURÜCKSETZEN
+// =====================================================
+
+document.getElementById("resetPunkteButton")?.addEventListener("click", async () => {
+
+  const bestaetigung = prompt(
+    'ACHTUNG!\n\n' +
+    'Dadurch werden ALLE Punkte aller Kinder dieser Stufe auf 0 zurückgesetzt.\n\n' +
+    'Dieser Vorgang kann nicht rückgängig gemacht werden.\n\n' +
+    'Schreibe "Zurücksetzen", um fortzufahren:'
+  );
+
+  // Abbrechen gedrückt
+  if (bestaetigung === null) {
+    return;
+  }
+
+  // Falsche Eingabe
+  if (bestaetigung !== "Zurücksetzen") {
+    alert(
+      'Zurücksetzen abgebrochen.\n\n' +
+      'Du musst exakt "Zurücksetzen" schreiben.'
+    );
+    return;
+  }
+
+  // Zweite Sicherheitsabfrage
+  const wirklichSicher = confirm(
+    "Bist du wirklich sicher?\n\n" +
+    "Alle Punkte aller Kinder dieser Stufe werden auf 0 gesetzt."
+  );
+
+  if (!wirklichSicher) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/kinder/reset-punkte`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          email: localStorage.getItem("email"),
+          bestaetigung: bestaetigung
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || "Punkte konnten nicht zurückgesetzt werden."
+      );
+    }
+
+    alert(
+      `Erfolgreich!\n\n` +
+      `Die Punkte von ${result.anzahl} Kindern wurden auf 0 zurückgesetzt.`
+    );
+
+    // Tabelle neu laden
+    await ladeKinder();
+
+  } catch (err) {
+
+    console.error(
+      "Fehler beim Zurücksetzen der Punkte:",
+      err
+    );
+
+    alert(
+      err.message ||
+      "Fehler beim Zurücksetzen der Punkte."
+    );
+  }
+});
+
 
 

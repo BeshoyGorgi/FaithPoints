@@ -465,3 +465,35 @@ body.markierungen-aus .duplicate{
 
 }
 
+
+/* =========================================
+   ALLE PUNKTE ZURÜCKSETZEN
+========================================= */
+
+.reset-punkte-button {
+  display: block;
+  margin: 25px auto 10px auto;
+  padding: 10px 18px;
+
+  background-color: #c62828;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.reset-punkte-button:hover {
+  background-color: #a91f1f;
+  transform: translateY(-1px);
+}
+
+.reset-punkte-button:active {
+  transform: translateY(0);
+}
