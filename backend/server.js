@@ -744,10 +744,10 @@ app.post("/api/kinder/reset-punkte", async (req, res) => {
         UPDATE kinder
         SET
           hymne = 0,
-          verhalten = 0,
+          verhalten = 1000,
           anwesenheit_g = 0,
           anwesenheit_u = 0,
-          gesamt = 0,
+          gesamt = 1000,
           last_updated_hymne = NULL,
           last_updated_anwesenheit_g = NULL,
           last_updated_anwesenheit_u = NULL
